@@ -11,8 +11,8 @@ class Array2d<T> {
 
   Array2d(int width, int height, {required this.defaultValue}) {
     array = <List<T>>[];
-    this.width = width;
-    this.height = height;
+    _width = width;
+    _height = height;
   }
 
   List<T> operator [](int x) => array[x];
@@ -20,7 +20,7 @@ class Array2d<T> {
   get first => array.first;
   get length => array.length;
 
-  set width(int v) {
+  set _width(int v) {
     while (array.length > v) {
       array.removeLast();
     }
@@ -35,7 +35,7 @@ class Array2d<T> {
     }
   }
 
-  set height(int v) {
+  set _height(int v) {
     while (array.first.length > v) {
       for (int x = 0; x < array.length; x++) {
         array[x].removeLast();

@@ -19,21 +19,6 @@ void main() {
     expect(array[0][1], "empty"); // Check custom default value
   });
 
-  test('test shrink', () {
-    final array = Array2d<bool>(5, 3, defaultValue: true);
-    array.width = 2;
-    expect(array.length, 2); // Rows remain the same
-    expect(array[0].length, 3); // Columns are reduced
-  });
-
-  test('test expand', () {
-    final array = Array2d<bool>(4, 5, defaultValue: true);
-    array.height = 6;
-    expect(array.length, 4); // Rows remain the same
-    expect(array[0].length, 6); // Columns
-    expect(array[0].last, true);
-  });
-
   test('test modification', () {
     final array = Array2d<bool>(3, 2, defaultValue: true);
     array[1][0] = false;

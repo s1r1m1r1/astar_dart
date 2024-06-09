@@ -28,39 +28,40 @@ class AStarSquareGrid extends AstarGrid {
         _diagonalMovement = diagonalMovement {
     _grounds = Array2d<int>(rows, columns, defaultValue: 1);
     _barriers = Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass);
+    _grid = Array2d(rows, columns, defaultValue: Tile.wrong);
   }
 
   void setBarrier(BarrierPoint point) {
-    assert(point.x <= _rows, "Point can't be bigger than Array2d width");
-    assert(point.y <= _columns, "Point can't be bigger than Array2d height");
+    assert(point.x <= _rows, "Point can't be bigger than Array2d rows");
+    assert(point.y <= _columns, "Point can't be bigger than Array2d column");
     _barriers[point.x][point.y] = point.barrier;
   }
 
   void setBarriers(List<BarrierPoint> points) {
     for (final point in points) {
-      assert(point.x <= _rows, "Point can't be bigger than Array2d width");
-      assert(point.y <= _columns, "Point can't be bigger than Array2d height");
+      assert(point.x <= _rows, "Point can't be bigger than Array2d rows");
+      assert(point.y <= _columns, "Point can't be bigger than Array2d columns");
 
       _barriers[point.x][point.y] = point.barrier;
     }
   }
 
   void setPoint(WeightedPoint point) {
-    assert(point.x <= _rows, "Point can't be bigger than Array2d width");
-    assert(point.y <= _columns, "Point can't be bigger than Array2d height");
+    assert(point.x <= _rows, "Point can't be bigger than Array2d rows");
+    assert(point.y <= _columns, "Point can't be bigger than Array2d columns");
     _grounds[point.x][point.y] = point.weight;
   }
 
   void setPoints(List<WeightedPoint> points) {
     for (final point in points) {
-      assert(point.x <= _rows, "Point can't be bigger than Array2d width");
-      assert(point.y <= _columns, "Point can't be bigger than Array2d height");
+      assert(point.x <= _rows, "Point can't be bigger than Array2d rows");
+      assert(point.y <= _columns, "Point can't be bigger than Array2d columns");
       _grounds[point.x][point.y] = point.weight;
     }
   }
 
   void calculateGrid() {
-    _createGridWithBarriers(rows: _rows, columns: _columns);
+    _createGrid(rows: _rows, columns: _columns);
   }
 
   @override
@@ -107,22 +108,20 @@ class AStarSquareGrid extends AstarGrid {
     return path.reversed;
   }
 
-  void _createGridWithBarriers({
+  void _createGrid({
     required int rows,
     required int columns,
   }) {
-    final grid = Array2d(rows, columns, defaultValue: Tile.wrong);
-    List.generate(rows, (x) {
-      List.generate(columns, (y) {
-        grid[x][y] = Tile(
+    for (int x = 0; x < rows; x++) {
+      for (int y = 0; y < columns; y++) {
+        _grid[x][y] = Tile(
           x: x,
           y: y,
           neighbors: [],
           weight: _grounds[x][y].toDouble(),
         );
-      });
-    });
-    _grid = grid;
+      }
+    }
   }
 
   /// find steps area , useful for Turn Based Game
@@ -192,7 +191,6 @@ class AStarSquareGrid extends AstarGrid {
     return null;
   }
 
-  /// Calculates the distance g and h
   void _analiseDistance(Tile current, Tile end, {required Tile parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
