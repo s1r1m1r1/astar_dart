@@ -304,7 +304,7 @@ class AStarSquareGrid extends AstarGrid {
     }
 
     // for in faster than forEach
-    for (var element in listPoint) {
+    for (final element in listPoint) {
       if (element.length > 1) {
         newPath.add(element.first);
         newPath.add(element.last);
@@ -317,24 +317,13 @@ class AStarSquareGrid extends AstarGrid {
   }
 
   bool _isNeighbors(Point<int> start, Point<int> end) {
-    bool isNeighbor = false;
-    if (start.x + 1 == end.x) {
-      isNeighbor = true;
+    if (start.x + 1 == end.x ||
+        start.x - 1 == end.x ||
+        start.y + 1 == end.y ||
+        start.y - 1 == end.y) {
+      return true;
     }
-
-    if (start.x - 1 == end.x) {
-      isNeighbor = true;
-    }
-
-    if (start.y + 1 == end.y) {
-      isNeighbor = true;
-    }
-
-    if (start.y - 1 == end.y) {
-      isNeighbor = true;
-    }
-
-    return isNeighbor;
+    return false;
   }
 
   /// Adds neighbors to cells
