@@ -302,7 +302,6 @@ class _MyHomePageState extends State<MyHomePage> {
     late Iterable<Point<int>> result;
     timeTracker = SyncTimeTracker()
       ..track(() {
-       
         _astar.setPoints(weighted);
         _astar.setBarriers([...barriers, ...targets]
             .map((p) => BarrierPoint(p.x, p.y, barrier: Barrier.block))

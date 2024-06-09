@@ -13,7 +13,7 @@ class AStarSquareGrid extends AstarGrid {
   late final Array2d<Barrier> _barriers;
   late final Array2d<int> _grounds;
 
-  final DiagonalMovement diagonalMovement;
+  late final DiagonalMovement _diagonalMovement;
   final List<Tile> _doneList = [];
   final List<Tile> _waitList = [];
 
@@ -22,39 +22,45 @@ class AStarSquareGrid extends AstarGrid {
   AStarSquareGrid({
     required int rows,
     required int columns,
-    this.diagonalMovement = DiagonalMovement.euclidean,
+    DiagonalMovement diagonalMovement = DiagonalMovement.euclidean,
   })  : _rows = rows,
-        _columns = columns {
+        _columns = columns,
+        _diagonalMovement = diagonalMovement {
     _grounds = Array2d<int>(rows, columns, defaultValue: 1);
     _barriers = Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass);
   }
 
   void setBarrier(BarrierPoint point) {
+    assert(point.x <= _rows, "Point can't be bigger than Array2d width");
+    assert(point.y <= _columns, "Point can't be bigger than Array2d height");
     _barriers[point.x][point.y] = point.barrier;
   }
 
   void setBarriers(List<BarrierPoint> points) {
     for (final point in points) {
-      // assert(point.x <= _rows, "Point can't be bigger than Array2d width");
-      // assert(point.y <= _columns, "Point can't be bigger than Array2d height");
+      assert(point.x <= _rows, "Point can't be bigger than Array2d width");
+      assert(point.y <= _columns, "Point can't be bigger than Array2d height");
+
       _barriers[point.x][point.y] = point.barrier;
     }
   }
 
+  void setPoint(WeightedPoint point) {
+    assert(point.x <= _rows, "Point can't be bigger than Array2d width");
+    assert(point.y <= _columns, "Point can't be bigger than Array2d height");
+    _grounds[point.x][point.y] = point.weight;
+  }
+
   void setPoints(List<WeightedPoint> points) {
     for (final point in points) {
-      // assert(point.x <= _rows, "Point can't be bigger than Array2d width");
-      // assert(point.y <= _columns, "Point can't be bigger than Array2d height");
+      assert(point.x <= _rows, "Point can't be bigger than Array2d width");
+      assert(point.y <= _columns, "Point can't be bigger than Array2d height");
       _grounds[point.x][point.y] = point.weight;
     }
   }
 
   void calculateGrid() {
-    _grid = _createGridWithBarriers(rows: _rows, columns: _columns);
-  }
-
-  void setPoint(WeightedPoint point) {
-    _grounds[point.x][point.y] = point.weight;
+    _createGridWithBarriers(rows: _rows, columns: _columns);
   }
 
   @override
@@ -101,15 +107,14 @@ class AStarSquareGrid extends AstarGrid {
     return path.reversed;
   }
 
-  /// Method that create the grid using barriers
-  Array2d<Tile> _createGridWithBarriers({
+  void _createGridWithBarriers({
     required int rows,
     required int columns,
   }) {
-    final initGrid = Array2d(rows, columns, defaultValue: Tile.wrong);
+    final grid = Array2d(rows, columns, defaultValue: Tile.wrong);
     List.generate(rows, (x) {
       List.generate(columns, (y) {
-        initGrid[x][y] = Tile(
+        grid[x][y] = Tile(
           x: x,
           y: y,
           neighbors: [],
@@ -117,7 +122,7 @@ class AStarSquareGrid extends AstarGrid {
         );
       });
     });
-    return initGrid;
+    _grid = grid;
   }
 
   /// find steps area , useful for Turn Based Game
@@ -200,7 +205,6 @@ class AStarSquareGrid extends AstarGrid {
     int toY = current.y - target.y;
     return Point(toX, toY).magnitude * 2;
   }
-
 
   /// Resume path
   /// Example:
@@ -382,7 +386,7 @@ class AStarSquareGrid extends AstarGrid {
       }
     }
 
-    if (diagonalMovement == DiagonalMovement.euclidean) {
+    if (_diagonalMovement == DiagonalMovement.euclidean) {
       /// adds in top-left
       if (y > 0 && x > 0) {
         final top = _grid[x][y - 1];

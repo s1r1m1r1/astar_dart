@@ -15,7 +15,6 @@ class Array2d<T> {
     this.height = height;
   }
 
-
   List<T> operator [](int x) => array[x];
 
   get first => array.first;
