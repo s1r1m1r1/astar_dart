@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:astar_dart/src/tile.dart';
 
 import '../astar_dart.dart';
 import 'astar_grid.dart';
@@ -14,10 +13,10 @@ class AStarSquareGrid extends AstarGrid {
   late final Array2d<int> _grounds;
 
   late final DiagonalMovement _diagonalMovement;
-  final List<Tile> _doneList = [];
-  final List<Tile> _waitList = [];
+  final List<AstarNode> _doneList = [];
+  final List<AstarNode> _waitList = [];
 
-  late Array2d<Tile> _grid;
+  late Array2d<AstarNode> _grid;
 
   AStarSquareGrid({
     required int rows,
@@ -28,7 +27,7 @@ class AStarSquareGrid extends AstarGrid {
         _diagonalMovement = diagonalMovement {
     _grounds = Array2d<int>(rows, columns, defaultValue: 1);
     _barriers = Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass);
-    _grid = Array2d(rows, columns, defaultValue: Tile.wrong);
+    _grid = Array2d(rows, columns, defaultValue: AstarNode.wrong);
   }
 
   void setBarrier(BarrierPoint point) {
@@ -65,7 +64,7 @@ class AStarSquareGrid extends AstarGrid {
   }
 
   @override
-  Iterable<Point<int>> findThePath(
+  List<AstarNode> findPath(
       {void Function(List<Point<int>>)? doneList,
       required Point<int> start,
       required Point<int> end}) {
@@ -78,23 +77,23 @@ class AStarSquareGrid extends AstarGrid {
       return [];
     }
 
-    Tile startTile = _grid[_start.x][_start.y];
+    AstarNode startAstarNode = _grid[_start.x][_start.y];
 
-    Tile endTile = _grid[_end.x][_end.y];
+    AstarNode endAstarNode = _grid[_end.x][_end.y];
     _addNeighbors();
-    Tile? winner = _getTileWinner(
-      startTile,
-      endTile,
+    AstarNode? winner = _getAstarNodeWinner(
+      startAstarNode,
+      endAstarNode,
     );
 
-    List<Point<int>> path = [_end];
+    List<AstarNode> path = [_grid[_end.x][_end.y]];
     if (winner?.parent != null) {
-      Tile tileAux = winner!.parent!;
+      AstarNode tileAux = winner!.parent!;
       for (int i = 0; i < winner.g - 1; i++) {
         if (tileAux.x == _start.x && tileAux.y == _start.y) {
           break;
         }
-        path.add(Point(tileAux.x, tileAux.y));
+        path.add(tileAux);
         tileAux = tileAux.parent!;
       }
     }
@@ -103,9 +102,9 @@ class AStarSquareGrid extends AstarGrid {
     if (winner == null && !_isNeighbors(_start, _end)) {
       path.clear();
     }
-    path.add(_start);
+    path.add(_grid[_start.x][_start.y]);
 
-    return path.reversed;
+    return path.reversed.toList();
   }
 
   void _createGrid({
@@ -114,7 +113,7 @@ class AStarSquareGrid extends AstarGrid {
   }) {
     for (int x = 0; x < rows; x++) {
       for (int y = 0; y < columns; y++) {
-        _grid[x][y] = Tile(
+        _grid[x][y] = AstarNode(
           x: x,
           y: y,
           neighbors: [],
@@ -128,33 +127,33 @@ class AStarSquareGrid extends AstarGrid {
   List<Point<int>> findSteps({required int steps, required Point<int> start}) {
     _addNeighbors();
 
-    Tile startTile = _grid[start.x][start.y];
-    final List<Tile> totalArea = [startTile];
-    final List<Tile> waitArea = [];
+    AstarNode startAstarNode = _grid[start.x][start.y];
+    final List<AstarNode> totalArea = [startAstarNode];
+    final List<AstarNode> waitArea = [];
 
-    final List<Tile> currentArea = [...startTile.neighbors];
+    final List<AstarNode> currentArea = [...startAstarNode.neighbors];
     if (currentArea.isEmpty) {
       return totalArea.map((tile) => Point(tile.x, tile.y)).toList();
     }
-    for (var element in startTile.neighbors) {
-      element.parent = startTile;
-      element.g = element.weight + startTile.weight;
+    for (var element in startAstarNode.neighbors) {
+      element.parent = startAstarNode;
+      element.g = element.weight + startAstarNode.weight;
     }
     for (var i = 1; i < steps + 2; i++) {
       if (currentArea.isEmpty) continue;
-      for (var currentTile in currentArea) {
-        if (currentTile.g <= i) {
-          totalArea.add(currentTile);
-          for (var n in currentTile.neighbors) {
+      for (var currentAstarNode in currentArea) {
+        if (currentAstarNode.g <= i) {
+          totalArea.add(currentAstarNode);
+          for (var n in currentAstarNode.neighbors) {
             if (totalArea.contains(n)) continue;
             if (n.parent == null) {
-              n.parent = currentTile;
-              n.g = n.weight + currentTile.g;
+              n.parent = currentAstarNode;
+              n.g = n.weight + currentAstarNode.g;
             }
             waitArea.add(n);
           }
         } else {
-          waitArea.add(currentTile);
+          waitArea.add(currentAstarNode);
         }
       }
       currentArea.clear();
@@ -165,7 +164,7 @@ class AStarSquareGrid extends AstarGrid {
   }
 
   /// Method recursive that execute the A* algorithm
-  Tile? _getTileWinner(Tile current, Tile end) {
+  AstarNode? _getAstarNodeWinner(AstarNode current, AstarNode end) {
     _waitList.remove(current);
     if (end == current) return current;
     for (final n in current.neighbors) {
@@ -181,7 +180,7 @@ class AStarSquareGrid extends AstarGrid {
 
     for (final element in _waitList) {
       if (!_doneList.contains(element)) {
-        final result = _getTileWinner(element, end);
+        final result = _getAstarNodeWinner(element, end);
         if (result != null) {
           return result;
         }
@@ -191,14 +190,15 @@ class AStarSquareGrid extends AstarGrid {
     return null;
   }
 
-  void _analiseDistance(Tile current, Tile end, {required Tile parent}) {
+  void _analiseDistance(AstarNode current, AstarNode end,
+      {required AstarNode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
     current.h = _distance(current, end);
   }
 
   /// Calculates the distance between two tiles.
-  double _distance(Tile current, Tile target) {
+  double _distance(AstarNode current, AstarNode target) {
     int toX = current.x - target.x;
     int toY = current.y - target.y;
     return Point(toX, toY).magnitude * 2;
@@ -329,14 +329,14 @@ class AStarSquareGrid extends AstarGrid {
   /// Adds neighbors to cells
   void _addNeighbors() {
     for (var row in _grid.array) {
-      for (Tile tile in row) {
+      for (AstarNode tile in row) {
         _chainNeigbors(tile);
       }
     }
   }
 
   void _chainNeigbors(
-    Tile tile,
+    AstarNode tile,
   ) {
     final x = tile.x;
     final y = tile.y;

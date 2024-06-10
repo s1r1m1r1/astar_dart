@@ -3,3 +3,6 @@
 
 ## 0.0.2
  performance improvement
+
+## 0.0.3
+  added AstarNode

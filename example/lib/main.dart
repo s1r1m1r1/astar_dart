@@ -299,7 +299,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _start(Point<int> target) {
     _cleanTiles();
     List<Point<int>> done = [];
-    late Iterable<Point<int>> result;
+    late List<Point<int>> result;
     timeTracker = SyncTimeTracker()
       ..track(() {
         _astar.setPoints(weighted);
@@ -307,15 +307,18 @@ class _MyHomePageState extends State<MyHomePage> {
             .map((p) => BarrierPoint(p.x, p.y, barrier: Barrier.block))
             .toList());
         _astar.calculateGrid();
-        result = _astar.findThePath(
-          doneList: (
-            doneList,
-          ) {
-            done = doneList;
-          },
-          start: start,
-          end: target,
-        );
+        result = _astar
+            .findPath(
+              doneList: (
+                doneList,
+              ) {
+                done = doneList;
+              },
+              start: start,
+              end: target,
+            )
+            .toPointList();
+        ;
       });
 
     for (var element in result) {
