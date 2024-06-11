@@ -6,3 +6,7 @@
 
 ## 0.0.3
   added AstarNode
+
+## 0.0.4
+  change example
+  dart format

@@ -22,10 +22,10 @@ class MyApp extends StatelessWidget {
 }
 
 enum TypeInput {
-  START_POINT,
-  BARRIERS,
-  TARGETS,
-  WATER,
+  start,
+  barrier,
+  target,
+  water,
 }
 
 class MyHomePage extends StatefulWidget {
@@ -34,7 +34,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TypeInput _typeInput = TypeInput.START_POINT;
+  TypeInput _typeInput = TypeInput.start;
 
   // benchmark timing
   TimeTracker? timeTracker;
@@ -115,44 +115,44 @@ class _MyHomePageState extends State<MyHomePage> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      _typeInput = TypeInput.START_POINT;
+                      _typeInput = TypeInput.start;
                     });
                   },
                   style: ButtonStyle(
-                    backgroundColor: _getColorSelected(TypeInput.START_POINT),
+                    backgroundColor: _getColorSelected(TypeInput.start),
                   ),
                   child: Text('START'),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      _typeInput = TypeInput.WATER;
+                      _typeInput = TypeInput.water;
                     });
                   },
                   style: ButtonStyle(
-                    backgroundColor: _getColorSelected(TypeInput.WATER),
+                    backgroundColor: _getColorSelected(TypeInput.water),
                   ),
                   child: Text('WATER'),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      _typeInput = TypeInput.BARRIERS;
+                      _typeInput = TypeInput.barrier;
                     });
                   },
                   style: ButtonStyle(
-                    backgroundColor: _getColorSelected(TypeInput.BARRIERS),
+                    backgroundColor: _getColorSelected(TypeInput.barrier),
                   ),
                   child: Text('BARRIES'),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      _typeInput = TypeInput.TARGETS;
+                      _typeInput = TypeInput.target;
                     });
                   },
                   style: ButtonStyle(
-                    backgroundColor: _getColorSelected(TypeInput.TARGETS),
+                    backgroundColor: _getColorSelected(TypeInput.target),
                   ),
                   child: Text('TARGETS'),
                 ),
@@ -238,25 +238,25 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         onDoubleTap: () => _start(e.position),
         onTap: () {
-          if (_typeInput == TypeInput.START_POINT) {
+          if (_typeInput == TypeInput.start) {
             start = e.position;
           }
 
-          if (_typeInput == TypeInput.BARRIERS) {
+          if (_typeInput == TypeInput.barrier) {
             if (barriers.contains(e.position)) {
               barriers.remove(e.position);
             } else {
               barriers.add(e.position);
             }
           }
-          if (_typeInput == TypeInput.TARGETS) {
+          if (_typeInput == TypeInput.target) {
             if (targets.contains(e.position)) {
               targets.remove(e.position);
             } else {
               targets.add(e.position);
             }
           }
-          if (_typeInput == TypeInput.WATER) {
+          if (_typeInput == TypeInput.water) {
             if (weighted.contains(e.position)) {
               weighted.remove(e.position);
             } else {
@@ -285,13 +285,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Color _getColorByType(TypeInput input) {
     switch (input) {
-      case TypeInput.START_POINT:
+      case TypeInput.start:
         return Colors.yellow;
-      case TypeInput.BARRIERS:
+      case TypeInput.barrier:
         return Colors.red;
-      case TypeInput.TARGETS:
+      case TypeInput.target:
         return Colors.purple;
-      case TypeInput.WATER:
+      case TypeInput.water:
         return Colors.blue;
     }
   }

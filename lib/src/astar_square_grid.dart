@@ -1,6 +1,5 @@
 import 'dart:math';
 
-
 import '../astar_dart.dart';
 import 'astar_grid.dart';
 
@@ -63,6 +62,7 @@ class AStarSquareGrid extends AstarGrid {
     _createGrid(rows: _rows, columns: _columns);
   }
 
+  /// return full path without Start position
   @override
   List<AstarNode> findPath(
       {void Function(List<Point<int>>)? doneList,
@@ -102,7 +102,6 @@ class AStarSquareGrid extends AstarGrid {
     if (winner == null && !_isNeighbors(_start, _end)) {
       path.clear();
     }
-    path.add(_grid[_start.x][_start.y]);
 
     return path.reversed.toList();
   }
@@ -124,6 +123,16 @@ class AStarSquareGrid extends AstarGrid {
   }
 
   /// find steps area , useful for Turn Based Game
+  /// example 3 steps
+  /// ```
+  ///          3
+  ///       3  2  3
+  ///    3  2  1  2  3
+  /// 3  2  1  🧍‍♂️ 1  2  3
+  ///    3  2  1  2  3
+  ///       3  2  3
+  ///          3
+  /// ```
   List<Point<int>> findSteps({required int steps, required Point<int> start}) {
     _addNeighbors();
 
@@ -163,6 +172,8 @@ class AStarSquareGrid extends AstarGrid {
     return totalArea.map((tile) => Point(tile.x, tile.y)).toList();
   }
 
+  /// MIT
+  /// https://github.com/RafaelBarbosatec/a_star/blob/main/lib/a_star_algorithm.dart
   /// Method recursive that execute the A* algorithm
   AstarNode? _getAstarNodeWinner(AstarNode current, AstarNode end) {
     _waitList.remove(current);
@@ -204,7 +215,8 @@ class AStarSquareGrid extends AstarGrid {
     return Point(toX, toY).magnitude * 2;
   }
 
-  /// Resume path
+  /// MIT
+  /// https://github.com/RafaelBarbosatec/a_star/blob/main/lib/a_star_algorithm.dart
   /// Example:
   /// [(1,2),(1,3),(1,4),(1,5)] = [(1,2),(1,5)]
   static List<Point<int>> resumePath(Iterable<Point<int>> path) {
@@ -218,6 +230,8 @@ class AStarSquareGrid extends AstarGrid {
     return newPath;
   }
 
+  /// MIT
+  /// https://github.com/RafaelBarbosatec/a_star/blob/main/lib/a_star_algorithm.dart
   static List<Point<int>> _resumeDirection(
     Iterable<Point<int>> path,
     TypeResumeDirection type,
@@ -425,6 +439,8 @@ class AStarSquareGrid extends AstarGrid {
   }
 }
 
+/// MIT
+/// https://github.com/RafaelBarbosatec/a_star/blob/main/lib/a_star_algorithm.dart
 enum TypeResumeDirection {
   axisX,
   axisY,
