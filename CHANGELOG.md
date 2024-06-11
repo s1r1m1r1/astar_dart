@@ -10,3 +10,9 @@
 ## 0.0.4
   change example
   dart format
+
+## 0.0.5
+  astar test
+  fix errors
+
+

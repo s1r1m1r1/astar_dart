@@ -14,10 +14,6 @@ void main() {
     expect(array[0][1], "empty"); // Check custom default value
   });
 
-  test('test String defaultValue', () {
-    final array = Array2d<String>(2, 2, defaultValue: "empty");
-    expect(array[0][1], "empty"); // Check custom default value
-  });
 
   test('test modification', () {
     final array = Array2d<bool>(3, 2, defaultValue: true);

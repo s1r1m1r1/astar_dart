@@ -76,6 +76,9 @@ class AStarSquareGrid extends AstarGrid {
     if (_barriers[_end.x][_end.y].isBlock) {
       return [];
     }
+    if (_isNeighbors(start, end)) {
+      return [];
+    }
 
     AstarNode startAstarNode = _grid[_start.x][_start.y];
 
@@ -331,11 +334,19 @@ class AStarSquareGrid extends AstarGrid {
   }
 
   bool _isNeighbors(Point<int> start, Point<int> end) {
-    if (start.x + 1 == end.x ||
-        start.x - 1 == end.x ||
-        start.y + 1 == end.y ||
-        start.y - 1 == end.y) {
-      return true;
+    if (_diagonalMovement == DiagonalMovement.euclidean) {
+      if (start.x + 1 == end.x ||
+          start.x - 1 == end.x ||
+          start.y + 1 == end.y ||
+          start.y - 1 == end.y) {
+        return true;
+      }
+    }
+    if (_diagonalMovement == DiagonalMovement.manhattan) {
+      if ((start.x + 1 == end.x || start.x - 1 == end.x) && start.y == end.y ||
+          (start.y + 1 == end.y || start.y - 1 == end.y) && start.x == end.x) {
+        return true;
+      }
     }
     return false;
   }
