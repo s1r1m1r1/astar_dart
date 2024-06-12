@@ -20,3 +20,9 @@ extension PointExt on Point<int> {
   BarrierPoint toBarrier(Barrier barrier) =>
       BarrierPoint(x, y, barrier: barrier);
 }
+
+extension ListPointExt on List<Point<int>> {
+  List<BarrierPoint> toListBarrier(Barrier barrier) =>
+  map((p)=> BarrierPoint(p.x, p.y,barrier: barrier)).toList();
+}
+

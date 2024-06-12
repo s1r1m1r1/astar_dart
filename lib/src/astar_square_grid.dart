@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+
 import '../astar_dart.dart';
 import 'astar_grid.dart';
 
@@ -195,9 +197,7 @@ class AStarSquareGrid extends AstarGrid {
     for (final element in _waitList) {
       if (!_doneList.contains(element)) {
         final result = _getANodeWinner(element, end);
-        if (result != null) {
           return result;
-        }
       }
     }
 
@@ -447,6 +447,9 @@ class AStarSquareGrid extends AstarGrid {
       }
     }
   }
+
+  @visibleForTesting
+  Array2d<ANode> get grid => _grid;
 }
 
 /// MIT

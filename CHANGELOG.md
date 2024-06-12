@@ -23,6 +23,12 @@
   rename AstarNode to ANode
   add extension 
 
+## 0.0.7
+  test blocked path
+  fix blocked path finding 
+
+
+
 
 
 
