@@ -1,9 +1,9 @@
-class AstarNode {
+class ANode {
   final int x;
   final int y;
-  AstarNode? parent;
+  ANode? parent;
   // AstarNode? next;
-  final List<AstarNode> neighbors;
+  final List<ANode> neighbors;
   late double _weight;
 
   /// distanse from current to start
@@ -15,7 +15,7 @@ class AstarNode {
   /// total distance
   double get f => g + h;
 
-  AstarNode(
+  ANode(
       {required this.x,
       required this.y,
       required this.neighbors,
@@ -31,7 +31,7 @@ class AstarNode {
   double get weight => _weight;
 
   @override
-  bool operator ==(covariant AstarNode other) {
+  bool operator ==(covariant ANode other) {
     if (identical(this, other)) return true;
     return other.x == x && other.y == y;
   }
@@ -41,5 +41,5 @@ class AstarNode {
     return Object.hashAll([x, y]);
   }
 
-  static final wrong = AstarNode(x: -1, y: -1, neighbors: []);
+  static final wrong = ANode(x: -1, y: -1, neighbors: []);
 }

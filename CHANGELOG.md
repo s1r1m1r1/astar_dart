@@ -15,4 +15,14 @@
   astar test
   fix errors
 
+## 0.0.5
+  astar test
+  fix errors
+
+## 0.0.6
+  rename AstarNode to ANode
+  add extension 
+
+
+
 

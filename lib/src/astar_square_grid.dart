@@ -12,10 +12,10 @@ class AStarSquareGrid extends AstarGrid {
   late final Array2d<int> _grounds;
 
   late final DiagonalMovement _diagonalMovement;
-  final List<AstarNode> _doneList = [];
-  final List<AstarNode> _waitList = [];
+  final List<ANode> _doneList = [];
+  final List<ANode> _waitList = [];
 
-  late Array2d<AstarNode> _grid;
+  late Array2d<ANode> _grid;
 
   AStarSquareGrid({
     required int rows,
@@ -26,7 +26,7 @@ class AStarSquareGrid extends AstarGrid {
         _diagonalMovement = diagonalMovement {
     _grounds = Array2d<int>(rows, columns, defaultValue: 1);
     _barriers = Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass);
-    _grid = Array2d(rows, columns, defaultValue: AstarNode.wrong);
+    _grid = Array2d(rows, columns, defaultValue: ANode.wrong);
   }
 
   void setBarrier(BarrierPoint point) {
@@ -64,7 +64,7 @@ class AStarSquareGrid extends AstarGrid {
 
   /// return full path without Start position
   @override
-  List<AstarNode> findPath(
+  List<ANode> findPath(
       {void Function(List<Point<int>>)? doneList,
       required Point<int> start,
       required Point<int> end}) {
@@ -80,18 +80,18 @@ class AStarSquareGrid extends AstarGrid {
       return [];
     }
 
-    AstarNode startAstarNode = _grid[_start.x][_start.y];
+    ANode startANode = _grid[_start.x][_start.y];
 
-    AstarNode endAstarNode = _grid[_end.x][_end.y];
+    ANode endANode = _grid[_end.x][_end.y];
     _addNeighbors();
-    AstarNode? winner = _getAstarNodeWinner(
-      startAstarNode,
-      endAstarNode,
+    ANode? winner = _getANodeWinner(
+      startANode,
+      endANode,
     );
 
-    List<AstarNode> path = [_grid[_end.x][_end.y]];
+    List<ANode> path = [_grid[_end.x][_end.y]];
     if (winner?.parent != null) {
-      AstarNode tileAux = winner!.parent!;
+      ANode tileAux = winner!.parent!;
       for (int i = 0; i < winner.g - 1; i++) {
         if (tileAux.x == _start.x && tileAux.y == _start.y) {
           break;
@@ -115,7 +115,7 @@ class AStarSquareGrid extends AstarGrid {
   }) {
     for (int x = 0; x < rows; x++) {
       for (int y = 0; y < columns; y++) {
-        _grid[x][y] = AstarNode(
+        _grid[x][y] = ANode(
           x: x,
           y: y,
           neighbors: [],
@@ -139,33 +139,33 @@ class AStarSquareGrid extends AstarGrid {
   List<Point<int>> findSteps({required int steps, required Point<int> start}) {
     _addNeighbors();
 
-    AstarNode startAstarNode = _grid[start.x][start.y];
-    final List<AstarNode> totalArea = [startAstarNode];
-    final List<AstarNode> waitArea = [];
+    ANode startANode = _grid[start.x][start.y];
+    final List<ANode> totalArea = [startANode];
+    final List<ANode> waitArea = [];
 
-    final List<AstarNode> currentArea = [...startAstarNode.neighbors];
+    final List<ANode> currentArea = [...startANode.neighbors];
     if (currentArea.isEmpty) {
       return totalArea.map((tile) => Point(tile.x, tile.y)).toList();
     }
-    for (var element in startAstarNode.neighbors) {
-      element.parent = startAstarNode;
-      element.g = element.weight + startAstarNode.weight;
+    for (var element in startANode.neighbors) {
+      element.parent = startANode;
+      element.g = element.weight + startANode.weight;
     }
     for (var i = 1; i < steps + 2; i++) {
       if (currentArea.isEmpty) continue;
-      for (var currentAstarNode in currentArea) {
-        if (currentAstarNode.g <= i) {
-          totalArea.add(currentAstarNode);
-          for (var n in currentAstarNode.neighbors) {
+      for (var currentANode in currentArea) {
+        if (currentANode.g <= i) {
+          totalArea.add(currentANode);
+          for (var n in currentANode.neighbors) {
             if (totalArea.contains(n)) continue;
             if (n.parent == null) {
-              n.parent = currentAstarNode;
-              n.g = n.weight + currentAstarNode.g;
+              n.parent = currentANode;
+              n.g = n.weight + currentANode.g;
             }
             waitArea.add(n);
           }
         } else {
-          waitArea.add(currentAstarNode);
+          waitArea.add(currentANode);
         }
       }
       currentArea.clear();
@@ -178,7 +178,7 @@ class AStarSquareGrid extends AstarGrid {
   /// MIT
   /// https://github.com/RafaelBarbosatec/a_star/blob/main/lib/a_star_algorithm.dart
   /// Method recursive that execute the A* algorithm
-  AstarNode? _getAstarNodeWinner(AstarNode current, AstarNode end) {
+  ANode? _getANodeWinner(ANode current, ANode end) {
     _waitList.remove(current);
     if (end == current) return current;
     for (final n in current.neighbors) {
@@ -194,7 +194,7 @@ class AStarSquareGrid extends AstarGrid {
 
     for (final element in _waitList) {
       if (!_doneList.contains(element)) {
-        final result = _getAstarNodeWinner(element, end);
+        final result = _getANodeWinner(element, end);
         if (result != null) {
           return result;
         }
@@ -204,15 +204,14 @@ class AStarSquareGrid extends AstarGrid {
     return null;
   }
 
-  void _analiseDistance(AstarNode current, AstarNode end,
-      {required AstarNode parent}) {
+  void _analiseDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
     current.h = _distance(current, end);
   }
 
   /// Calculates the distance between two tiles.
-  double _distance(AstarNode current, AstarNode target) {
+  double _distance(ANode current, ANode target) {
     int toX = current.x - target.x;
     int toY = current.y - target.y;
     return Point(toX, toY).magnitude * 2;
@@ -354,14 +353,14 @@ class AStarSquareGrid extends AstarGrid {
   /// Adds neighbors to cells
   void _addNeighbors() {
     for (var row in _grid.array) {
-      for (AstarNode tile in row) {
+      for (ANode tile in row) {
         _chainNeigbors(tile);
       }
     }
   }
 
   void _chainNeigbors(
-    AstarNode tile,
+    ANode tile,
   ) {
     final x = tile.x;
     final y = tile.y;

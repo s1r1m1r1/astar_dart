@@ -8,6 +8,15 @@ extension BarrierExt on Barrier {
   bool get isPathThrough => this == Barrier.passThrough;
 }
 
-extension AstarNodeExt on List<AstarNode> {
+extension ListNodeExt on List<ANode> {
   List<Point<int>> toPointList() => map((n) => Point(n.x, n.y)).toList();
+}
+
+extension ANodeExt on ANode {
+  Point<int> toPoint() => Point<int>(x, y);
+}
+
+extension PointExt on Point<int> {
+  BarrierPoint toBarrier(Barrier barrier) =>
+      BarrierPoint(x, y, barrier: barrier);
 }
