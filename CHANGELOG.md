@@ -27,6 +27,9 @@
   test blocked path
   fix blocked path finding 
 
+## 0.0.8
+  Fixed bugs with barriers using diagonals
+  Improved example
 
 
 

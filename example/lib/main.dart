@@ -5,20 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:timing/timing.dart';
 
 void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(),
-    );
-  }
+  runApp(MaterialApp(
+    title: 'Astar demo',
+    theme: ThemeData(
+      primarySwatch: Colors.blue,
+    ),
+    home: MyHomePage(),
+  ));
 }
 
 enum TypeInput {
@@ -44,13 +37,20 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _withDiagonals = true;
   Point<int> start = Point<int>(0, 0);
   List<Tile> tiles = [];
-  List<Point<int>> barriers = [];
+  List<Point<int>> barriers = [
+    ...List.generate(6,(i)=> Point(2 , 4 + i)),
+    Point(3, 4),
+    ...List.generate(5,(i)=> Point(4 , 4 + i)),
+    Point(2,10),
+    Point(3,10),
+    Point(4,10),
+
+    ...List.generate(5,(i)=> Point(4 + i, 0 + i)),
+  ];
   List<WeightedPoint> weighted = [
-    WeightedPoint(5, 5, weight: 5),
-    WeightedPoint(6, 5, weight: 5),
-    WeightedPoint(7, 5, weight: 5),
-    WeightedPoint(7, 6, weight: 5),
-    WeightedPoint(8, 5, weight: 5),
+    ...List.generate(4, (i) => WeightedPoint(5 + i, 5, weight: 5)),
+    ...List.generate(8, (i) => WeightedPoint(8, 5 + i, weight: 5)),
+    ...List.generate(10, (i) => WeightedPoint(8 + i, 13, weight: 5)),
   ];
   List<Point<int>> targets = [];
   late int _rows;
@@ -63,14 +63,12 @@ class _MyHomePageState extends State<MyHomePage> {
     _rows = 20;
     _columns = 20;
     _astar = AStarSquareGrid(rows: _rows, columns: _columns);
-    List.generate(_rows, (y) {
-      List.generate(_columns, (x) {
+    for (int x = 0; x < _rows; x++) {
+      for (int y = 0; y < _columns; y++) {
         final point = Point(x, y);
-        tiles.add(
-          Tile(point),
-        );
-      });
-    });
+        tiles.add(Tile(point));
+      }
+    }
   }
 
   @override
@@ -156,15 +154,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   child: Text('TARGETS'),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      barriers.clear();
-                      _cleanTiles();
-                    });
-                  },
-                  child: Text('CLEAN'),
-                )
               ],
             ),
           ),
@@ -274,7 +263,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (timeTracker == null) return '';
     if (!timeTracker!.isFinished) return '';
     final duration = timeTracker!.duration;
-    return 'benchmark: inMicroseconds: ${duration.inMicroseconds}';
+    return 'benchmark: inMilliseconds: ${duration.inMilliseconds}';
   }
 
   MaterialStateProperty<Color> _getColorSelected(TypeInput input) {
@@ -302,6 +291,7 @@ class _MyHomePageState extends State<MyHomePage> {
     late List<Point<int>> result;
     timeTracker = SyncTimeTracker()
       ..track(() {
+        _astar.setDiagonalMovement(_withDiagonals ? DiagonalMovement.euclidean : DiagonalMovement.manhattan);
         _astar.setPoints(weighted);
         _astar.setBarriers([...barriers, ...targets]
             .map((p) => BarrierPoint(p.x, p.y, barrier: Barrier.block))

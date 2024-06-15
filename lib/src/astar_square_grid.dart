@@ -13,7 +13,7 @@ class AStarSquareGrid extends AstarGrid {
   late final Array2d<Barrier> _barriers;
   late final Array2d<int> _grounds;
 
-  late final DiagonalMovement _diagonalMovement;
+  late DiagonalMovement _diagonalMovement;
   final List<ANode> _doneList = [];
   final List<ANode> _waitList = [];
 
@@ -29,6 +29,9 @@ class AStarSquareGrid extends AstarGrid {
     _grounds = Array2d<int>(rows, columns, defaultValue: 1);
     _barriers = Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass);
     _grid = Array2d(rows, columns, defaultValue: ANode.wrong);
+  }
+  void setDiagonalMovement(DiagonalMovement diagonalMovement) {
+    _diagonalMovement = diagonalMovement;
   }
 
   void setBarrier(BarrierPoint point) {
@@ -197,7 +200,7 @@ class AStarSquareGrid extends AstarGrid {
     for (final element in _waitList) {
       if (!_doneList.contains(element)) {
         final result = _getANodeWinner(element, end);
-          return result;
+        return result;
       }
     }
 
@@ -400,48 +403,32 @@ class AStarSquareGrid extends AstarGrid {
     if (_diagonalMovement == DiagonalMovement.euclidean) {
       /// adds in top-left
       if (y > 0 && x > 0) {
-        final top = _grid[x][y - 1];
-        final left = _grid[x - 1][y];
         final t = _grid[x - 1][y - 1];
-        if (!_barriers[t.x][t.y].isBlock &&
-            !_barriers[left.x][left.y].isBlock &&
-            !_barriers[top.x][top.y].isBlock) {
+        if (!_barriers[t.x][t.y].isBlock) {
           tile.neighbors.add(t);
         }
       }
 
       /// adds in top-right
       if (y > 0 && x < (_grid.length - 1)) {
-        final top = _grid[x][y - 1];
-        final right = _grid[x + 1][y];
         final t = _grid[x + 1][y - 1];
-        if (!_barriers[t.x][t.y].isBlock &&
-            !_barriers[top.x][top.y].isBlock &&
-            !_barriers[right.x][right.y].isBlock) {
+        if (!_barriers[t.x][t.y].isBlock) {
           tile.neighbors.add(t);
         }
       }
 
       /// adds in bottom-left
       if (x > 0 && y < (_grid.first.length - 1)) {
-        final bottom = _grid[x][y + 1];
-        final left = _grid[x - 1][y];
         final t = _grid[x - 1][y + 1];
-        if (!_barriers[t.x][t.y].isBlock &&
-            !_barriers[bottom.x][bottom.y].isBlock &&
-            !_barriers[left.x][left.y].isBlock) {
+        if (!_barriers[t.x][t.y].isBlock) {
           tile.neighbors.add(t);
         }
       }
 
       /// adds in bottom-right
       if (x < (_grid.length - 1) && y < (_grid.first.length - 1)) {
-        final bottom = _grid[x][y + 1];
-        final right = _grid[x + 1][y];
         final t = _grid[x + 1][y + 1];
-        if (!_barriers[t.x][t.y].isBlock &&
-            !_barriers[bottom.x][bottom.y].isBlock &&
-            !_barriers[right.x][right.y].isBlock) {
+        if (!_barriers[t.x][t.y].isBlock) {
           tile.neighbors.add(t);
         }
       }
