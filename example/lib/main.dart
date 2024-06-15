@@ -10,7 +10,7 @@ void main() {
     theme: ThemeData(
       primarySwatch: Colors.blue,
     ),
-    home: MyHomePage(),
+    home: const ExamplePage(),
   ));
 }
 
@@ -21,31 +21,31 @@ enum TypeInput {
   water,
 }
 
-class MyHomePage extends StatefulWidget {
+class ExamplePage extends StatefulWidget {
+  const ExamplePage({super.key});
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<ExamplePage> createState() => ExamplePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class ExamplePageState extends State<ExamplePage> {
   TypeInput _typeInput = TypeInput.start;
 
   // benchmark timing
   TimeTracker? timeTracker;
-  int benchmark = 0;
 
   bool _showDoneList = true;
   bool _withDiagonals = true;
   Point<int> start = Point<int>(0, 0);
   List<Tile> tiles = [];
   List<Point<int>> barriers = [
-    ...List.generate(6,(i)=> Point(2 , 4 + i)),
+    ...List.generate(6, (i) => Point(2, 4 + i)),
     Point(3, 4),
-    ...List.generate(5,(i)=> Point(4 , 4 + i)),
-    Point(2,10),
-    Point(3,10),
-    Point(4,10),
-
-    ...List.generate(5,(i)=> Point(4 + i, 0 + i)),
+    ...List.generate(5, (i) => Point(4, 4 + i)),
+    Point(2, 10),
+    Point(3, 10),
+    Point(4, 10),
+    ...List.generate(5, (i) => Point(4 + i, 0 + i)),
   ];
   List<WeightedPoint> weighted = [
     ...List.generate(4, (i) => WeightedPoint(5 + i, 5, weight: 5)),
@@ -291,7 +291,9 @@ class _MyHomePageState extends State<MyHomePage> {
     late List<Point<int>> result;
     timeTracker = SyncTimeTracker()
       ..track(() {
-        _astar.setDiagonalMovement(_withDiagonals ? DiagonalMovement.euclidean : DiagonalMovement.manhattan);
+        _astar.setDiagonalMovement(_withDiagonals
+            ? DiagonalMovement.euclidean
+            : DiagonalMovement.manhattan);
         _astar.setPoints(weighted);
         _astar.setBarriers([...barriers, ...targets]
             .map((p) => BarrierPoint(p.x, p.y, barrier: Barrier.block))
@@ -323,11 +325,11 @@ class _MyHomePageState extends State<MyHomePage> {
           return r.x == element.position.x && r.y == element.position.y;
         });
 
-        if (_showDoneList) {
-          element.done = done.where((r) {
+        // if (_showDoneList) {
+          element.done = done.any((r) {
             return r == element.position;
-          }).isNotEmpty;
-        }
+          });
+        // }
       }
     });
   }

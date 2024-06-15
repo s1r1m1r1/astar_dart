@@ -337,10 +337,10 @@ class AStarSquareGrid extends AstarGrid {
 
   bool _isNeighbors(Point<int> start, Point<int> end) {
     if (_diagonalMovement == DiagonalMovement.euclidean) {
-      if (start.x + 1 == end.x ||
-          start.x - 1 == end.x ||
-          start.y + 1 == end.y ||
-          start.y - 1 == end.y) {
+      if (start.x + 1 == end.x && start.y - 1 == end.y ||
+          start.x + 1 == end.x && start.y + 1 == end.y ||
+          start.x - 1 == end.x && start.y - 1 == end.y ||
+          start.x - 1 == end.x && start.y + 1 == end.y) {
         return true;
       }
     }

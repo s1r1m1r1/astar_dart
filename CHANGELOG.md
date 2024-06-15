@@ -31,6 +31,11 @@
   Fixed bugs with barriers using diagonals
   Improved example
 
+## 0.0.9
+  Fixed bugs with clothes path using diagonals
+  Improved example
+
+
 
 
 
