@@ -2,6 +2,14 @@
 # astar_dart
 
 
+# TODO
+  - Random movement
+     Variable pathfinding. Receive different ways for the same input
+  - Hex astar
+  - Search for neighbors at the finishing point. Useful for tbs games
+  - Search for nearby goals and move towards it.
+     Useful for AI behavior such as npc
+
 # Usage
 To use this plugin, add `astar_dart` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/).
 

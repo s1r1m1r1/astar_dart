@@ -266,8 +266,8 @@ class ExamplePageState extends State<ExamplePage> {
     return 'benchmark: inMilliseconds: ${duration.inMilliseconds}';
   }
 
-  MaterialStateProperty<Color> _getColorSelected(TypeInput input) {
-    return MaterialStateProperty.all(
+  WidgetStateProperty<Color> _getColorSelected(TypeInput input) {
+    return WidgetStateProperty.all(
       _typeInput == input ? _getColorByType(input) : Colors.grey,
     );
   }
@@ -326,9 +326,9 @@ class ExamplePageState extends State<ExamplePage> {
         });
 
         // if (_showDoneList) {
-          element.done = done.any((r) {
-            return r == element.position;
-          });
+        element.done = done.any((r) {
+          return r == element.position;
+        });
         // }
       }
     });

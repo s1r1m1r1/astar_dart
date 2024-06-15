@@ -1,15 +1,16 @@
 import 'dart:math';
-
-import 'package:flutter/foundation.dart';
+import 'package:collection/collection.dart';
 
 import '../astar_dart.dart';
 import 'astar_grid.dart';
+import 'package:meta/meta.dart';
 
 class AStarSquareGrid extends AstarGrid {
   final int _rows;
   final int _columns;
   late Point<int> _start;
   late Point<int> _end;
+  late final _random = Random();
   late final Array2d<Barrier> _barriers;
   late final Array2d<int> _grounds;
 
@@ -96,13 +97,13 @@ class AStarSquareGrid extends AstarGrid {
 
     List<ANode> path = [_grid[_end.x][_end.y]];
     if (winner?.parent != null) {
-      ANode tileAux = winner!.parent!;
+      ANode nodeAux = winner!.parent!;
       for (int i = 0; i < winner.g - 1; i++) {
-        if (tileAux.x == _start.x && tileAux.y == _start.y) {
+        if (nodeAux.x == _start.x && nodeAux.y == _start.y) {
           break;
         }
-        path.add(tileAux);
-        tileAux = tileAux.parent!;
+        path.add(nodeAux);
+        nodeAux = nodeAux.parent!;
       }
     }
     doneList?.call(_doneList.map((e) => Point(e.x, e.y)).toList());
@@ -130,6 +131,35 @@ class AStarSquareGrid extends AstarGrid {
     }
   }
 
+  @experimental
+  ANode? _findFirstTarget(List<Point<int>> availableTargets) {
+    final pq = PriorityQueue<Point<int>>(
+        (a, b) => _estimateDistance(a).compareTo(_estimateDistance(b)));
+
+    // Add targets with estimated distances to the priority queue
+    for (final target in availableTargets) {
+      pq.add(target);
+    }
+
+    while (pq.isNotEmpty) {
+      final target = pq.removeFirst();
+      final path = findPath(start: _start, end: target);
+      if (path.isNotEmpty) {
+        return _grid[_end.x][_end.y]; // Update target node on the grid
+      }
+    }
+
+    return null;
+  }
+
+  @experimental
+  double _estimateDistance(Point<int> target) {
+    // Implement a simple heuristic to estimate distance (e.g., Manhattan distance)
+    final dx = (_start.x - target.x).abs();
+    final dy = (_start.y - target.y).abs();
+    return (dx + dy).toDouble();
+  }
+
   /// find steps area , useful for Turn Based Game
   /// example 3 steps
   /// ```
@@ -150,7 +180,7 @@ class AStarSquareGrid extends AstarGrid {
 
     final List<ANode> currentArea = [...startANode.neighbors];
     if (currentArea.isEmpty) {
-      return totalArea.map((tile) => Point(tile.x, tile.y)).toList();
+      return totalArea.map((node) => Point(node.x, node.y)).toList();
     }
     for (var element in startANode.neighbors) {
       element.parent = startANode;
@@ -177,7 +207,7 @@ class AStarSquareGrid extends AstarGrid {
       currentArea.addAll(waitArea);
       waitArea.clear();
     }
-    return totalArea.map((tile) => Point(tile.x, tile.y)).toList();
+    return totalArea.map((node) => Point(node.x, node.y)).toList();
   }
 
   /// MIT
@@ -186,7 +216,10 @@ class AStarSquareGrid extends AstarGrid {
   ANode? _getANodeWinner(ANode current, ANode end) {
     _waitList.remove(current);
     if (end == current) return current;
-    for (final n in current.neighbors) {
+    final isReversed = _random.nextBool();
+    for (int i = 0; i < current.neighbors.length; i++) {
+      final index = isReversed ? current.neighbors.length - (i + 1) : i;
+      final n = current.neighbors[index];
       if (n.parent == null) {
         _analiseDistance(n, end, parent: current);
       }
@@ -194,9 +227,12 @@ class AStarSquareGrid extends AstarGrid {
         _waitList.add(n);
       }
     }
-    _doneList.add(current);
-    _waitList.sort((a, b) => a.f.compareTo(b.f));
 
+    _doneList.add(current);
+    _waitList.sort((a, b) {
+      return a.f.compareTo(b.f);
+    });
+    for (var i = 0; i < _waitList.length; i++) {}
     for (final element in _waitList) {
       if (!_doneList.contains(element)) {
         final result = _getANodeWinner(element, end);
@@ -213,7 +249,7 @@ class AStarSquareGrid extends AstarGrid {
     current.h = _distance(current, end);
   }
 
-  /// Calculates the distance between two tiles.
+  /// Calculates the distance between two nodes.
   double _distance(ANode current, ANode target) {
     int toX = current.x - target.x;
     int toY = current.y - target.y;
@@ -356,23 +392,23 @@ class AStarSquareGrid extends AstarGrid {
   /// Adds neighbors to cells
   void _addNeighbors() {
     for (var row in _grid.array) {
-      for (ANode tile in row) {
-        _chainNeigbors(tile);
+      for (ANode node in row) {
+        _chainNeigbors(node);
       }
     }
   }
 
   void _chainNeigbors(
-    ANode tile,
+    ANode node,
   ) {
-    final x = tile.x;
-    final y = tile.y;
+    final x = node.x;
+    final y = node.y;
 
     /// adds in top
     if (y > 0) {
       final t = _grid[x][y - 1];
       if (!_barriers[t.x][t.y].isBlock) {
-        tile.neighbors.add(t);
+        node.neighbors.add(t);
       }
     }
 
@@ -380,7 +416,7 @@ class AStarSquareGrid extends AstarGrid {
     if (y < (_grid.first.length - 1)) {
       final t = _grid[x][y + 1];
       if (!_barriers[t.x][t.y].isBlock) {
-        tile.neighbors.add(t);
+        node.neighbors.add(t);
       }
     }
 
@@ -388,7 +424,7 @@ class AStarSquareGrid extends AstarGrid {
     if (x > 0) {
       final t = _grid[x - 1][y];
       if (!_barriers[t.x][t.y].isBlock) {
-        tile.neighbors.add(t);
+        node.neighbors.add(t);
       }
     }
 
@@ -396,7 +432,7 @@ class AStarSquareGrid extends AstarGrid {
     if (x < (_grid.length - 1)) {
       final t = _grid[x + 1][y];
       if (!_barriers[t.x][t.y].isBlock) {
-        tile.neighbors.add(t);
+        node.neighbors.add(t);
       }
     }
 
@@ -405,7 +441,7 @@ class AStarSquareGrid extends AstarGrid {
       if (y > 0 && x > 0) {
         final t = _grid[x - 1][y - 1];
         if (!_barriers[t.x][t.y].isBlock) {
-          tile.neighbors.add(t);
+          node.neighbors.add(t);
         }
       }
 
@@ -413,7 +449,7 @@ class AStarSquareGrid extends AstarGrid {
       if (y > 0 && x < (_grid.length - 1)) {
         final t = _grid[x + 1][y - 1];
         if (!_barriers[t.x][t.y].isBlock) {
-          tile.neighbors.add(t);
+          node.neighbors.add(t);
         }
       }
 
@@ -421,7 +457,7 @@ class AStarSquareGrid extends AstarGrid {
       if (x > 0 && y < (_grid.first.length - 1)) {
         final t = _grid[x - 1][y + 1];
         if (!_barriers[t.x][t.y].isBlock) {
-          tile.neighbors.add(t);
+          node.neighbors.add(t);
         }
       }
 
@@ -429,7 +465,7 @@ class AStarSquareGrid extends AstarGrid {
       if (x < (_grid.length - 1) && y < (_grid.first.length - 1)) {
         final t = _grid[x + 1][y + 1];
         if (!_barriers[t.x][t.y].isBlock) {
-          tile.neighbors.add(t);
+          node.neighbors.add(t);
         }
       }
     }
