@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:collection/collection.dart';
+// import 'package:collection/collection.dart';
 
 import '../astar_dart.dart';
 import 'astar_grid.dart';
@@ -69,8 +69,14 @@ class AStarSquareGrid extends AstarGrid {
   }
 
   /// return full path without Start position
+  /// for Point(0,0) to Point(0,3) result will be [Point(0,3),Point(0,2),Point(0,1)]
+  /// ```dart
+  /// final result = _astar.findPath(start: Point(0,0),end: Point(0,3));
+  /// final moveTo = result.removeLast();
+  /// final moveNext = result.removeLast();
+  /// ```
   @override
-  List<ANode> findPath(
+  Future<List<ANode>> findPath(
       {void Function(List<Point<int>>)? doneList,
       required Point<int> start,
       required Point<int> end}) {
@@ -80,26 +86,26 @@ class AStarSquareGrid extends AstarGrid {
     _waitList.clear();
 
     if (_barriers[_end.x][_end.y].isBlock) {
-      return [];
+      return Future.value([]);
     }
+
+    ANode startNode = _grid[_start.x][_start.y];
+
+    ANode endNode = _grid[_end.x][_end.y];
     if (_isNeighbors(start, end)) {
-      return [];
+      return Future.value([endNode]);
     }
-
-    ANode startANode = _grid[_start.x][_start.y];
-
-    ANode endANode = _grid[_end.x][_end.y];
     _addNeighbors();
     ANode? winner = _getANodeWinner(
-      startANode,
-      endANode,
+      startNode,
+      endNode,
     );
 
     List<ANode> path = [_grid[_end.x][_end.y]];
     if (winner?.parent != null) {
       ANode nodeAux = winner!.parent!;
       for (int i = 0; i < winner.g - 1; i++) {
-        if (nodeAux.x == _start.x && nodeAux.y == _start.y) {
+        if (nodeAux == startNode) {
           break;
         }
         path.add(nodeAux);
@@ -112,7 +118,7 @@ class AStarSquareGrid extends AstarGrid {
       path.clear();
     }
 
-    return path.reversed.toList();
+    return Future.value(path.toList());
   }
 
   void _createGrid({
@@ -131,26 +137,26 @@ class AStarSquareGrid extends AstarGrid {
     }
   }
 
-  @experimental
-  ANode? _findFirstTarget(List<Point<int>> availableTargets) {
-    final pq = PriorityQueue<Point<int>>(
-        (a, b) => _estimateDistance(a).compareTo(_estimateDistance(b)));
+  // @experimental
+  // ANode? _findFirstTarget(List<Point<int>> availableTargets) {
+  //   final pq = PriorityQueue<Point<int>>(
+  //       (a, b) => _estimateDistance(a).compareTo(_estimateDistance(b)));
 
-    // Add targets with estimated distances to the priority queue
-    for (final target in availableTargets) {
-      pq.add(target);
-    }
+  //   // Add targets with estimated distances to the priority queue
+  //   for (final target in availableTargets) {
+  //     pq.add(target);
+  //   }
 
-    while (pq.isNotEmpty) {
-      final target = pq.removeFirst();
-      final path = findPath(start: _start, end: target);
-      if (path.isNotEmpty) {
-        return _grid[_end.x][_end.y]; // Update target node on the grid
-      }
-    }
+  //   while (pq.isNotEmpty) {
+  //     final target = pq.removeFirst();
+  //     final path = findPath(start: _start, end: target);
+  //     if (path.isNotEmpty) {
+  //       return _grid[_end.x][_end.y]; // Update target node on the grid
+  //     }
+  //   }
 
-    return null;
-  }
+  //   return null;
+  // }
 
   @experimental
   double _estimateDistance(Point<int> target) {
@@ -256,121 +262,6 @@ class AStarSquareGrid extends AstarGrid {
     return Point(toX, toY).magnitude * 2;
   }
 
-  /// MIT
-  /// https://github.com/RafaelBarbosatec/a_star/blob/main/lib/a_star_algorithm.dart
-  /// Example:
-  /// [(1,2),(1,3),(1,4),(1,5)] = [(1,2),(1,5)]
-  static List<Point<int>> resumePath(Iterable<Point<int>> path) {
-    List<Point<int>> newPath =
-        _resumeDirection(path, TypeResumeDirection.axisX);
-    newPath = _resumeDirection(newPath, TypeResumeDirection.axisY);
-    newPath = _resumeDirection(newPath, TypeResumeDirection.bottomLeft);
-    newPath = _resumeDirection(newPath, TypeResumeDirection.bottomRight);
-    newPath = _resumeDirection(newPath, TypeResumeDirection.topLeft);
-    newPath = _resumeDirection(newPath, TypeResumeDirection.topRight);
-    return newPath;
-  }
-
-  /// MIT
-  /// https://github.com/RafaelBarbosatec/a_star/blob/main/lib/a_star_algorithm.dart
-  static List<Point<int>> _resumeDirection(
-    Iterable<Point<int>> path,
-    TypeResumeDirection type,
-  ) {
-    List<Point<int>> newPath = [];
-    List<List<Point<int>>> listPoint = [];
-    int indexList = -1;
-    int currentX = 0;
-    int currentY = 0;
-
-    for (var element in path) {
-      final dxDiagonal = element.x;
-      final dyDiagonal = element.y;
-
-      switch (type) {
-        case TypeResumeDirection.axisX:
-          if (element.x == currentX && listPoint.isNotEmpty) {
-            listPoint[indexList].add(element);
-          } else {
-            listPoint.add([element]);
-            indexList++;
-          }
-          break;
-        case TypeResumeDirection.axisY:
-          if (element.y == currentY && listPoint.isNotEmpty) {
-            listPoint[indexList].add(element);
-          } else {
-            listPoint.add([element]);
-            indexList++;
-          }
-          break;
-        case TypeResumeDirection.topLeft:
-          final nextDxDiagonal = (currentX - 1);
-          final nextDyDiagonal = (currentY - 1);
-          if (dxDiagonal == nextDxDiagonal &&
-              dyDiagonal == nextDyDiagonal &&
-              listPoint.isNotEmpty) {
-            listPoint[indexList].add(element);
-          } else {
-            listPoint.add([element]);
-            indexList++;
-          }
-          break;
-        case TypeResumeDirection.bottomLeft:
-          final nextDxDiagonal = (currentX - 1);
-          final nextDyDiagonal = (currentY + 1);
-          if (dxDiagonal == nextDxDiagonal &&
-              dyDiagonal == nextDyDiagonal &&
-              listPoint.isNotEmpty) {
-            listPoint[indexList].add(element);
-          } else {
-            listPoint.add([element]);
-            indexList++;
-          }
-          break;
-        case TypeResumeDirection.topRight:
-          final nextDxDiagonal = (currentX + 1).floor();
-          final nextDyDiagonal = (currentY - 1).floor();
-          if (dxDiagonal == nextDxDiagonal &&
-              dyDiagonal == nextDyDiagonal &&
-              listPoint.isNotEmpty) {
-            listPoint[indexList].add(element);
-          } else {
-            listPoint.add([element]);
-            indexList++;
-          }
-          break;
-        case TypeResumeDirection.bottomRight:
-          final nextDxDiagonal = (currentX + 1);
-          final nextDyDiagonal = (currentY + 1);
-          if (dxDiagonal == nextDxDiagonal &&
-              dyDiagonal == nextDyDiagonal &&
-              listPoint.isNotEmpty) {
-            listPoint[indexList].add(element);
-          } else {
-            listPoint.add([element]);
-            indexList++;
-          }
-          break;
-      }
-
-      currentX = element.x;
-      currentY = element.y;
-    }
-
-    // for in faster than forEach
-    for (final element in listPoint) {
-      if (element.length > 1) {
-        newPath.add(element.first);
-        newPath.add(element.last);
-      } else {
-        newPath.add(element.first);
-      }
-    }
-
-    return newPath;
-  }
-
   bool _isNeighbors(Point<int> start, Point<int> end) {
     if (_diagonalMovement == DiagonalMovement.euclidean) {
       if (start.x + 1 == end.x && start.y - 1 == end.y ||
@@ -473,15 +364,4 @@ class AStarSquareGrid extends AstarGrid {
 
   @visibleForTesting
   Array2d<ANode> get grid => _grid;
-}
-
-/// MIT
-/// https://github.com/RafaelBarbosatec/a_star/blob/main/lib/a_star_algorithm.dart
-enum TypeResumeDirection {
-  axisX,
-  axisY,
-  topLeft,
-  bottomLeft,
-  topRight,
-  bottomRight,
 }

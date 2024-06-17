@@ -2,7 +2,6 @@ class ANode {
   final int x;
   final int y;
   ANode? parent;
-  // AstarNode? next;
   final List<ANode> neighbors;
   late double _weight;
 

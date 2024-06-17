@@ -39,8 +39,14 @@
   Improved example
   add topics
 
+## 0.0.11
+  ```dart
+  // before 
+  final path = _astar.findPath(.....);
 
-
+  // after 
+  final path = await _astar.findPath(.....);
+  ```
 
 
 

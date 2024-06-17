@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
 import 'package:flutter/material.dart';
-import 'package:timing/timing.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -30,9 +29,8 @@ class ExamplePage extends StatefulWidget {
 
 class ExamplePageState extends State<ExamplePage> {
   TypeInput _typeInput = TypeInput.start;
-
-  // benchmark timing
-  TimeTracker? timeTracker;
+  final _stopwatch = Stopwatch();
+  String _timeTrackerMessage = '';
 
   bool _showDoneList = true;
   bool _withDiagonals = true;
@@ -87,7 +85,7 @@ class ExamplePageState extends State<ExamplePage> {
               children: [
                 if (_showDoneList)
                   Text(
-                    'done list ${tiles.where((i) => i.done).length},\npath length ${tiles.where((i) => i.selected).length} ${_getBenchmark()}',
+                    'done list ${tiles.where((i) => i.done).length},\npath length ${tiles.where((i) => i.selected).length} ${_timeTrackerMessage}',
                   )
               ],
             ),
@@ -160,8 +158,8 @@ class ExamplePageState extends State<ExamplePage> {
           Expanded(
             child: GridView.count(
               crossAxisCount: _columns,
-              children: tiles.map((e) {
-                return _buildItem(e);
+              children: tiles.map((t) {
+                return _buildItem(t);
               }).toList(),
             ),
           ),
@@ -200,8 +198,10 @@ class ExamplePageState extends State<ExamplePage> {
     if (e.done) {
       color = Colors.black.withOpacity(.2);
     }
-    if (e.selected && _showDoneList) {
+    if (e.selected) {
       color = Colors.green.withOpacity(.7);
+      text = '$text\n'
+          'index: ${e.selectedIndex}';
     }
 
     if (targets.contains(e.position)) {
@@ -259,13 +259,6 @@ class ExamplePageState extends State<ExamplePage> {
     );
   }
 
-  String _getBenchmark() {
-    if (timeTracker == null) return '';
-    if (!timeTracker!.isFinished) return '';
-    final duration = timeTracker!.duration;
-    return 'benchmark: inMilliseconds: ${duration.inMilliseconds}';
-  }
-
   WidgetStateProperty<Color> _getColorSelected(TypeInput input) {
     return WidgetStateProperty.all(
       _typeInput == input ? _getColorByType(input) : Colors.grey,
@@ -285,33 +278,33 @@ class ExamplePageState extends State<ExamplePage> {
     }
   }
 
-  void _start(Point<int> target) {
+  Future<void> _start(Point<int> target) async {
     _cleanTiles();
     List<Point<int>> done = [];
     late List<Point<int>> result;
-    timeTracker = SyncTimeTracker()
-      ..track(() {
-        _astar.setDiagonalMovement(_withDiagonals
-            ? DiagonalMovement.euclidean
-            : DiagonalMovement.manhattan);
-        _astar.setPoints(weighted);
-        _astar.setBarriers([...barriers, ...targets]
-            .map((p) => BarrierPoint(p.x, p.y, barrier: Barrier.block))
-            .toList());
-        _astar.calculateGrid();
-        result = _astar
-            .findPath(
-              doneList: (
-                doneList,
-              ) {
-                done = doneList;
-              },
-              start: start,
-              end: target,
-            )
-            .toPointList();
-        ;
-      });
+    _stopwatch.reset();
+    _stopwatch.start();
+    _astar.setDiagonalMovement(_withDiagonals
+        ? DiagonalMovement.euclidean
+        : DiagonalMovement.manhattan);
+    _astar.setPoints(weighted);
+    _astar.setBarriers([...barriers, ...targets]
+        .map((p) => BarrierPoint(p.x, p.y, barrier: Barrier.block))
+        .toList());
+    _astar.calculateGrid();
+    result = (await _astar.findPath(
+      doneList: (
+        doneList,
+      ) {
+        done = doneList;
+      },
+      start: start,
+      end: target,
+    ))
+        .toPointList();
+    _stopwatch.stop();
+    _timeTrackerMessage =
+        "[Benchmark ${_stopwatch.elapsedMicroseconds >= 1000 ? "miliseconds ${(_stopwatch.elapsedMicroseconds / 1000).toStringAsFixed(1)}" : "microseconds ${_stopwatch.elapsedMicroseconds}"}]";
 
     for (var element in result) {
       done.remove(element);
@@ -321,9 +314,13 @@ class ExamplePageState extends State<ExamplePage> {
 
     setState(() {
       for (var element in tiles) {
-        element.selected = result.any((r) {
+        final selectedIndex = result.indexWhere((r) {
           return r.x == element.position.x && r.y == element.position.y;
         });
+        if (selectedIndex != -1) {
+          element.selected = true;
+          element.selectedIndex = selectedIndex;
+        }
 
         // if (_showDoneList) {
         element.done = done.any((r) {
@@ -345,6 +342,7 @@ class ExamplePageState extends State<ExamplePage> {
 class Tile {
   final Point<int> position;
   bool selected = false;
+  int selectedIndex = -1;
   bool done = false;
 
   Tile(this.position);
