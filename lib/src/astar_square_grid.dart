@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 // import 'package:collection/collection.dart';
 
@@ -250,8 +251,10 @@ class AStarSquareGrid extends AstarGrid {
   }
 
   void _analiseDistance(ANode current, ANode end, {required ANode parent}) {
+    final notDiagonal = current.x == parent.x || current.y == parent.y;
     current.parent = parent;
-    current.g = parent.g + current.weight;
+    /// minimal cost 1.414 diagonal
+    current.g = notDiagonal ? parent.g + current.weight : parent.g + current.weight + 1.414;
     current.h = _distance(current, end);
   }
 
@@ -327,7 +330,8 @@ class AStarSquareGrid extends AstarGrid {
       }
     }
 
-    if (_diagonalMovement == DiagonalMovement.euclidean) {
+    if (_diagonalMovement == DiagonalMovement.euclidean ||
+        _diagonalMovement == DiagonalMovement.chebychev) {
       /// adds in top-left
       if (y > 0 && x > 0) {
         final t = _grid[x - 1][y - 1];

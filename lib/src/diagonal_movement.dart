@@ -4,4 +4,8 @@ enum DiagonalMovement {
 
   /// Allow vertical, horizontal, and diagonal movement
   euclidean,
+
+  /// Allow vertical, horizontal, and diagonal movement
+  /// with same cost chain
+  chebychev,
 }
