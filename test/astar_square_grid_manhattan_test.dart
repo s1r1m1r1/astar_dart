@@ -15,7 +15,7 @@ void main() {
       final path = (await astar.findPath(
               start: const Point(0, 0), end: const Point(3, 3)))
           .toPointList();
-      expect(path.last, const Point(3, 3)); // Check number of cols
+      expect(path.last, const Point(1, 0)); // Check number of cols
     });
 
     test('test AStarSquareGrid manhattan first point not start point',

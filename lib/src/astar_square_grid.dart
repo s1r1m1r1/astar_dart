@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 // import 'package:collection/collection.dart';
 
@@ -24,12 +23,18 @@ class AStarSquareGrid extends AstarGrid {
   AStarSquareGrid({
     required int rows,
     required int columns,
+    Array2d<Barrier>? barriers,
+    Array2d<int>? grounds,
     DiagonalMovement diagonalMovement = DiagonalMovement.euclidean,
   })  : _rows = rows,
         _columns = columns,
         _diagonalMovement = diagonalMovement {
-    _grounds = Array2d<int>(rows, columns, defaultValue: 1);
-    _barriers = Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass);
+    _grounds = grounds != null
+        ? grounds
+        : Array2d<int>(rows, columns, defaultValue: 1);
+    _barriers = barriers != null
+        ? barriers
+        : Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass);
     _grid = Array2d(rows, columns, defaultValue: ANode.wrong);
   }
   void setDiagonalMovement(DiagonalMovement diagonalMovement) {
@@ -77,10 +82,11 @@ class AStarSquareGrid extends AstarGrid {
   /// final moveNext = result.removeLast();
   /// ```
   @override
-  Future<List<ANode>> findPath(
-      {void Function(List<Point<int>>)? doneList,
-      required Point<int> start,
-      required Point<int> end}) {
+  Future<List<ANode>> findPath({
+    void Function(List<Point<int>>)? doneList,
+    required Point<int> start,
+    required Point<int> end,
+  }) {
     _start = start;
     _end = end;
     _doneList.clear();
@@ -253,8 +259,11 @@ class AStarSquareGrid extends AstarGrid {
   void _analiseDistance(ANode current, ANode end, {required ANode parent}) {
     final notDiagonal = current.x == parent.x || current.y == parent.y;
     current.parent = parent;
+
     /// minimal cost 1.414 diagonal
-    current.g = notDiagonal ? parent.g + current.weight : parent.g + current.weight + 1.414;
+    current.g = notDiagonal
+        ? parent.g + current.weight
+        : parent.g + current.weight + 1.414;
     current.h = _distance(current, end);
   }
 
