@@ -4,9 +4,9 @@ import 'package:astar_dart/astar_dart.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  late final AStarSquareGrid astar;
+  late final AStarSquare astar;
   setUpAll(() {
-    astar = AStarSquareGrid(
+    astar = AStarSquare(
         rows: 4, columns: 4, diagonalMovement: DiagonalMovement.manhattan);
     astar.calculateGrid();
   });
@@ -15,7 +15,7 @@ void main() {
       final path = (await astar.findPath(
               start: const Point(0, 0), end: const Point(3, 3)))
           .toPointList();
-      expect(path.last, const Point(3, 3)); // Check number of cols
+      expect(path.last, const Point(1, 0)); // Check number of cols
     });
 
     test('test AStarSquareGrid manhattan first point not start point',
@@ -32,7 +32,7 @@ void main() {
       final path = (await astar.findPath(
               start: const Point(0, 0), end: const Point(0, 1)))
           .toPointList();
-      expect(path.isEmpty, true); // Check number of cols
+      expect(path.length, 0); // Check number of cols
     });
 
     test(

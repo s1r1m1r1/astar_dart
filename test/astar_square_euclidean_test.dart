@@ -4,9 +4,9 @@ import 'package:astar_dart/astar_dart.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  late final AStarSquareGrid astar;
+  late final AStarSquare astar;
   setUpAll(() {
-    astar = AStarSquareGrid(
+    astar = AStarSquare(
         rows: 4, columns: 4, diagonalMovement: DiagonalMovement.euclidean);
     astar.calculateGrid();
   });
@@ -38,7 +38,7 @@ void main() {
       final path = (await astar.findPath(
               start: const Point(0, 0), end: const Point(1, 1)))
           .toPointList();
-      expect(path.length == 1, true);
+      expect(path.length, 0);
     });
   });
 }

@@ -7,4 +7,7 @@ enum Barrier {
 
   // Can move through but cannot stop on it
   passThrough,
+
+  // cannot move through , but can be founded as target
+  target,
 }

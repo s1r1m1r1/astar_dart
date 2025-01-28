@@ -4,9 +4,9 @@ import 'package:astar_dart/astar_dart.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  late final AStarSquareGrid astar;
+  late final AStarSquare astar;
   setUpAll(() {
-    astar = AStarSquareGrid(
+    astar = AStarSquare(
         rows: 6, columns: 6, diagonalMovement: DiagonalMovement.euclidean);
     astar.setBarriers(<Point<int>>[
       const Point(0, 3),

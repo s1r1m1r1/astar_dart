@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 // import 'package:collection/collection.dart';
 
@@ -6,12 +5,11 @@ import '../astar_dart.dart';
 import 'astar_grid.dart';
 import 'package:meta/meta.dart';
 
-class AStarSquareGrid extends AstarGrid {
+class AStarSquare extends AstarGrid {
   final int _rows;
   final int _columns;
   late Point<int> _start;
   late Point<int> _end;
-  late final _random = Random();
   late final Array2d<Barrier> _barriers;
   late final Array2d<int> _grounds;
 
@@ -21,15 +19,18 @@ class AStarSquareGrid extends AstarGrid {
 
   late Array2d<ANode> _grid;
 
-  AStarSquareGrid({
+  AStarSquare({
     required int rows,
     required int columns,
+    Array2d<Barrier>? barriers,
+    Array2d<int>? grounds,
     DiagonalMovement diagonalMovement = DiagonalMovement.euclidean,
   })  : _rows = rows,
         _columns = columns,
         _diagonalMovement = diagonalMovement {
-    _grounds = Array2d<int>(rows, columns, defaultValue: 1);
-    _barriers = Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass);
+    _grounds = grounds ?? Array2d<int>(rows, columns, defaultValue: 1);
+    _barriers =
+        barriers ?? Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass);
     _grid = Array2d(rows, columns, defaultValue: ANode.wrong);
   }
   void setDiagonalMovement(DiagonalMovement diagonalMovement) {
@@ -77,10 +78,11 @@ class AStarSquareGrid extends AstarGrid {
   /// final moveNext = result.removeLast();
   /// ```
   @override
-  Future<List<ANode>> findPath(
-      {void Function(List<Point<int>>)? doneList,
-      required Point<int> start,
-      required Point<int> end}) {
+  Future<List<ANode>> findPath({
+    void Function(List<Point<int>>)? doneList,
+    required Point<int> start,
+    required Point<int> end,
+  }) {
     _start = start;
     _end = end;
     _doneList.clear();
@@ -94,10 +96,10 @@ class AStarSquareGrid extends AstarGrid {
 
     ANode endNode = _grid[_end.x][_end.y];
     if (_isNeighbors(start, end)) {
-      return Future.value([endNode]);
+      return Future.value([]);
     }
     _addNeighbors();
-    ANode? winner = _getANodeWinner(
+    ANode? winner = _getWinner(
       startNode,
       endNode,
     );
@@ -159,13 +161,6 @@ class AStarSquareGrid extends AstarGrid {
   //   return null;
   // }
 
-  @experimental
-  double _estimateDistance(Point<int> target) {
-    // Implement a simple heuristic to estimate distance (e.g., Manhattan distance)
-    final dx = (_start.x - target.x).abs();
-    final dy = (_start.y - target.y).abs();
-    return (dx + dy).toDouble();
-  }
 
   /// find steps area , useful for Turn Based Game
   /// example 3 steps
@@ -178,83 +173,87 @@ class AStarSquareGrid extends AstarGrid {
   ///       3  2  3
   ///          3
   /// ```
-  List<Point<int>> findSteps({required int steps, required Point<int> start}) {
+  Future<List<Point<int>>> findSteps(
+      {required int steps, required Point<int> start}) async {
     _addNeighbors();
 
-    ANode startANode = _grid[start.x][start.y];
-    final List<ANode> totalArea = [startANode];
-    final List<ANode> waitArea = [];
+    ANode a = _grid[start.x][start.y];
+    final List<ANode> total = [a];
+    final List<ANode> next = [];
 
-    final List<ANode> currentArea = [...startANode.neighbors];
-    if (currentArea.isEmpty) {
-      return totalArea.map((node) => Point(node.x, node.y)).toList();
+    final List<ANode> current = [...a.neighbors];
+    if (current.isEmpty) {
+      return Future.value(total.map((node) => Point(node.x, node.y)).toList());
     }
-    for (var element in startANode.neighbors) {
-      element.parent = startANode;
-      element.g = element.weight + startANode.weight;
+    for (var element in a.neighbors) {
+      element.parent = a;
+      element.g = element.weight + 0;
     }
-    for (var i = 1; i < steps + 2; i++) {
-      if (currentArea.isEmpty) continue;
-      for (var currentANode in currentArea) {
-        if (currentANode.g <= i) {
-          totalArea.add(currentANode);
-          for (var n in currentANode.neighbors) {
-            if (totalArea.contains(n)) continue;
+    current.sort((a, b) => a.g.compareTo(b.g));
+    while (current.isNotEmpty) {
+      for (var c in current) {
+        if (c.g <= steps) {
+          total.add(c);
+          for (var n in c.neighbors) {
+            if (total.contains(n)) continue;
             if (n.parent == null) {
-              n.parent = currentANode;
-              n.g = n.weight + currentANode.g;
+              n.parent = c;
+              n.g = n.weight + c.g;
             }
-            waitArea.add(n);
+            if (!next.contains(n)) next.add(n);
           }
-        } else {
-          waitArea.add(currentANode);
         }
       }
-      currentArea.clear();
-      currentArea.addAll(waitArea);
-      waitArea.clear();
+      current.clear();
+      current.addAll(next);
+      current.sort((a, b) => a.g.compareTo(b.g));
+      next.clear();
     }
-    return totalArea.map((node) => Point(node.x, node.y)).toList();
+
+    return Future.value(total.map((node) => Point(node.x, node.y)).toList());
   }
 
-  /// MIT
-  /// https://github.com/RafaelBarbosatec/a_star/blob/main/lib/a_star_algorithm.dart
-  /// Method recursive that execute the A* algorithm
-  ANode? _getANodeWinner(ANode current, ANode end) {
-    _waitList.remove(current);
+  ANode? _getWinner(ANode current, ANode end) {
+    _waitList.clear();
+    _doneList.clear();
+    ANode? winner;
+    // developer.log("_getAHexNodeWinner2 current:${current.x},${current.y}");
     if (end == current) return current;
-    final isReversed = _random.nextBool();
-    for (int i = 0; i < current.neighbors.length; i++) {
-      final index = isReversed ? current.neighbors.length - (i + 1) : i;
-      final n = current.neighbors[index];
+    for (var n in current.neighbors) {
       if (n.parent == null) {
-        _analiseDistance(n, end, parent: current);
+        _checkDistance(n, end, parent: current);
       }
       if (!_doneList.contains(n)) {
         _waitList.add(n);
       }
     }
 
-    _doneList.add(current);
-    _waitList.sort((a, b) {
-      return a.f.compareTo(b.f);
-    });
-    for (var i = 0; i < _waitList.length; i++) {}
-    for (final element in _waitList) {
-      if (!_doneList.contains(element)) {
-        final result = _getANodeWinner(element, end);
-        return result;
+    while (_waitList.isNotEmpty) {
+      final c = _waitList.removeLast();
+      if (end == c) return c;
+      for (var n in c.neighbors) {
+        if (n.parent == null) {
+          _checkDistance(n, end, parent: c);
+        }
+        if (!_doneList.contains(n)) {
+          _waitList.add(n);
+        }
       }
+      _doneList.add(c);
+      _waitList.sort((a, b) => b.f.compareTo(a.f));
     }
 
-    return null;
+    return winner;
   }
 
-  void _analiseDistance(ANode current, ANode end, {required ANode parent}) {
+  void _checkDistance(ANode current, ANode end, {required ANode parent}) {
     final notDiagonal = current.x == parent.x || current.y == parent.y;
     current.parent = parent;
+
     /// minimal cost 1.414 diagonal
-    current.g = notDiagonal ? parent.g + current.weight : parent.g + current.weight + 1.414;
+    current.g = notDiagonal
+        ? parent.g + current.weight
+        : parent.g + current.weight + 1.414;
     current.h = _distance(current, end);
   }
 

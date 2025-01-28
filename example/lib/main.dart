@@ -1,349 +1,271 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(MaterialApp(
-    title: 'Astar demo',
-    theme: ThemeData(
-      primarySwatch: Colors.blue,
-    ),
-    home: const ExamplePage(),
-  ));
+  runApp(const MyApp());
 }
 
-enum TypeInput {
-  start,
-  barrier,
-  target,
-  water,
-}
-
-class ExamplePage extends StatefulWidget {
-  const ExamplePage({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
-  State<ExamplePage> createState() => ExamplePageState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Welcome to Astar  example',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const GridExample(),
+    );
+  }
 }
 
-class ExamplePageState extends State<ExamplePage> {
-  TypeInput _typeInput = TypeInput.start;
-  final _stopwatch = Stopwatch();
-  String _timeTrackerMessage = '';
+class GridExample extends StatefulWidget {
+  const GridExample({super.key});
 
-  bool _showDoneList = true;
-  bool _withDiagonals = true;
-  Point<int> start = Point<int>(0, 0);
-  List<Tile> tiles = [];
-  List<Point<int>> barriers = [
-    ...List.generate(6, (i) => Point(2, 4 + i)),
-    Point(3, 4),
-    ...List.generate(5, (i) => Point(4, 4 + i)),
-    Point(2, 10),
-    Point(3, 10),
-    Point(4, 10),
-    ...List.generate(5, (i) => Point(4 + i, 0 + i)),
-  ];
-  List<WeightedPoint> weighted = [
-    ...List.generate(4, (i) => WeightedPoint(5 + i, 5, weight: 5)),
-    ...List.generate(8, (i) => WeightedPoint(8, 5 + i, weight: 5)),
-    ...List.generate(10, (i) => WeightedPoint(8 + i, 13, weight: 5)),
-  ];
-  List<Point<int>> targets = [];
-  late int _rows;
-  late int _columns;
-  late AStarSquareGrid _astar;
+  @override
+  State<GridExample> createState() => _GridExampleState();
+}
 
+class _GridExampleState extends State<GridExample> {
+  late ValueNotifier<bool> update;
+  IconData lastTapped = Icons.notifications;
+  late final Array2d<Floor> array2d;
   @override
   void initState() {
     super.initState();
-    _rows = 20;
-    _columns = 20;
-    _astar = AStarSquareGrid(rows: _rows, columns: _columns);
-    for (int x = 0; x < _rows; x++) {
-      for (int y = 0; y < _columns; y++) {
-        final point = Point(x, y);
-        tiles.add(Tile(point));
+    update = ValueNotifier(false);
+    array2d = Array2d<Floor>(10, 10, defaultValue: Floor.none);
+    for (var x = 0; x < 10; x++) {
+      for (var y = 0; y < 10; y++) {
+        if ((x >= 1 && x < 4 && y == 1) || (x == 1 && y == 2) ||(x >=1 && x < 4 && y ==3)) {
+          array2d[x][y] = Floor(
+            x: x,
+            y: y,
+            ground: GroundType.water,
+            target: Target.none,
+          );
+        } else if (x >= 4 && x < 8 && y >= 5 && y < 9) {
+          array2d[x][y] = Floor(
+            x: x,
+            y: y,
+            ground: GroundType.forest,
+            target: Target.none,
+          );
+        } else if (x >= 2 && x < 4 && y >= 4 && y < 6) {
+          array2d[x][y] = Floor(
+            x: x,
+            y: y,
+            ground: GroundType.barrier,
+            target: Target.none,
+          );
+        } else if (x == 0 && y == 0) {
+          array2d[x][y] = Floor(
+            x: x,
+            y: y,
+            ground: GroundType.field,
+            target: Target.player,
+          );
+        } else {
+          array2d[x][y] = Floor(
+            x: x,
+            y: y,
+            ground: GroundType.field,
+            target: Target.none,
+          );
+        }
       }
     }
+  }
+
+  Future<void> _updateMenu(Floor floor) async {
+    final astar = AStarSquare(
+      rows: 10,
+      columns: 10,
+      diagonalMovement: DiagonalMovement.manhattan
+    )
+      ..setPoints([
+        ...array2d.array.expand((row) {
+          return row.map((floor) => WeightedPoint(floor.x, floor.y,
+              weight: switch (floor.ground) {
+                GroundType.field => 1,
+                GroundType.water => 7,
+                GroundType.forest => 10,
+                GroundType.barrier => 1,
+              }));
+        })
+      ])
+      ..setBarriers([
+        ...array2d.array.expand((row) {
+          return row.map((floor) => floor.ground == GroundType.barrier
+              ? BarrierPoint(floor.x, floor.y, barrier: Barrier.block)
+              : BarrierPoint(
+                  floor.x,
+                  floor.y,
+                  barrier: Barrier.pass,
+                ));
+        })
+      ])
+      ..calculateGrid();
+    final path = await astar.findPath(
+        start: Point<int>(0, 0), end: Point(floor.x, floor.y));
+    debugPrint("PATH ${path.length} ${update.value}");
+    array2d.forEach((floor, x, y) => floor.isPath = false);
+    for (var p in path) {
+      array2d[p.x][p.y].isPath = true;
+    }
+    setState(() {
+      update.value = !(update.value);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('A* double tap to find path'),
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 40,
-            child: Row(
-              children: [
-                if (_showDoneList)
-                  Text(
-                    'done list ${tiles.where((i) => i.done).length},\npath length ${tiles.where((i) => i.selected).length} ${_timeTrackerMessage}',
-                  )
-              ],
-            ),
-          ),
-          Row(
+    return DefaultTextStyle(
+      style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: 10 * 200),
+          child: Flow(
+            delegate: MyFlowDelegate(updater: update),
             children: [
-              Text('with diagonals'),
-              Switch(
-                value: _withDiagonals,
-                onChanged: (value) {
-                  setState(() {
-                    _withDiagonals = value;
-                  });
-                },
-              ),
+              for (var x = 0; x < 10; x++)
+                for (var y = 0; y < 10; y++) flowMenuItem(array2d[x][y])
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _typeInput = TypeInput.start;
-                    });
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: _getColorSelected(TypeInput.start),
-                  ),
-                  child: Text('START'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _typeInput = TypeInput.water;
-                    });
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: _getColorSelected(TypeInput.water),
-                  ),
-                  child: Text('WATER'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _typeInput = TypeInput.barrier;
-                    });
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: _getColorSelected(TypeInput.barrier),
-                  ),
-                  child: Text('BARRIES'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _typeInput = TypeInput.target;
-                    });
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: _getColorSelected(TypeInput.target),
-                  ),
-                  child: Text('TARGETS'),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: _columns,
-              children: tiles.map((t) {
-                return _buildItem(t);
-              }).toList(),
-            ),
-          ),
-          Row(
-            children: [
-              Switch(
-                value: _showDoneList,
-                onChanged: (value) {
-                  setState(() {
-                    _showDoneList = value;
-                  });
-                },
-              ),
-              Text('Show done list')
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildItem(Tile e) {
-    Color color = Colors.white;
-    String text = '1';
-    if (weighted.contains(e.position)) {
-      color = Colors.cyan;
-      text = weighted
-          .firstWhere((i) => i.x == e.position.x && i.y == e.position.y)
-          .weight
-          .toString();
-    }
-    if (barriers.contains(e.position)) {
-      color = Colors.red.withOpacity(.7);
-      text = 'barrier';
-    }
-    if (e.done) {
-      color = Colors.black.withOpacity(.2);
-    }
-    if (e.selected) {
-      color = Colors.green.withOpacity(.7);
-      text = '$text\n'
-          'index: ${e.selectedIndex}';
-    }
-
-    if (targets.contains(e.position)) {
-      color = Colors.purple.withOpacity(.7);
-      text = text + '\ntarget';
-    }
-
-    if (e.position == start) {
-      color = Colors.yellow.withOpacity(.7);
-      text = text + '\nstart';
-    }
-
-    return Ink(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black54, width: 1.0),
-        color: color,
-      ),
-      height: 10,
-      child: InkWell(
-        child: Text(
-          text,
-          style: TextStyle(fontSize: 9, color: Colors.black),
         ),
-        onDoubleTap: () => _start(e.position),
-        onTap: () {
-          if (_typeInput == TypeInput.start) {
-            start = e.position;
-          }
-
-          if (_typeInput == TypeInput.barrier) {
-            if (barriers.contains(e.position)) {
-              barriers.remove(e.position);
-            } else {
-              barriers.add(e.position);
-            }
-          }
-          if (_typeInput == TypeInput.target) {
-            if (targets.contains(e.position)) {
-              targets.remove(e.position);
-            } else {
-              targets.add(e.position);
-            }
-          }
-          if (_typeInput == TypeInput.water) {
-            if (weighted.contains(e.position)) {
-              weighted.remove(e.position);
-            } else {
-              weighted
-                  .add(WeightedPoint(e.position.x, e.position.y, weight: 5));
-            }
-          }
-          setState(() {});
-        },
       ),
     );
   }
 
-  WidgetStateProperty<Color> _getColorSelected(TypeInput input) {
-    return WidgetStateProperty.all(
-      _typeInput == input ? _getColorByType(input) : Colors.grey,
+  Widget flowMenuItem(Floor floor) {
+    return GestureDetector(
+      onTap: () async {
+        await _updateMenu(floor);
+      },
+      child: Center(
+        child: ListenableBuilder(
+          listenable: update,
+          builder: (context, _) {
+            return Container(
+              margin: EdgeInsets.all(8),
+              constraints: BoxConstraints(
+                maxHeight: 96,
+                maxWidth: 96,
+                minWidth: 96,
+                minHeight: 96,
+              ),
+              color: switch (floor.ground) {
+                _ when floor.isPath => Colors.grey,
+                GroundType.field => Colors.green[200],
+                GroundType.water => Colors.cyanAccent,
+                GroundType.forest => Colors.green[700],
+                GroundType.barrier => Colors.red[700],
+              }!,
+              child: Column(
+                children: [
+                  Icon(
+                    switch (floor.ground) {
+                      GroundType.field => Icons.grass,
+                      GroundType.water => Icons.water,
+                      GroundType.forest => Icons.forest,
+                      GroundType.barrier => Icons.block,
+                    },
+                    color: Colors.white,
+                    size: 20.0,
+                  ),
+                  Text(
+                    switch (floor.target) {
+                      Target.player => 'PLAYER',
+                      Target.enemy => 'ENEMY',
+                      Target.none => '',
+                    },
+                  ),
+                  Text(
+                    switch (floor.ground) {
+                      GroundType.field => '1',
+                      GroundType.water => '7',
+                      GroundType.forest => '10',
+                      GroundType.barrier => 'x',
+                    },
+                  )
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
+}
 
-  Color _getColorByType(TypeInput input) {
-    switch (input) {
-      case TypeInput.start:
-        return Colors.yellow;
-      case TypeInput.barrier:
-        return Colors.red;
-      case TypeInput.target:
-        return Colors.purple;
-      case TypeInput.water:
-        return Colors.blue;
-    }
+class MyFlowDelegate extends FlowDelegate {
+  MyFlowDelegate({required this.updater})
+      : super(
+          repaint: updater,
+        );
+
+  final ValueNotifier<bool> updater;
+
+  @override
+  bool shouldRepaint(MyFlowDelegate oldDelegate) {
+    return updater != oldDelegate.updater;
   }
 
-  Future<void> _start(Point<int> target) async {
-    _cleanTiles();
-    List<Point<int>> done = [];
-    late List<Point<int>> result;
-    _stopwatch.reset();
-    _stopwatch.start();
-    _astar.setDiagonalMovement(_withDiagonals
-        ? DiagonalMovement.euclidean
-        : DiagonalMovement.manhattan);
-    _astar.setPoints(weighted);
-    _astar.setBarriers([...barriers, ...targets]
-        .map((p) => BarrierPoint(p.x, p.y, barrier: Barrier.block))
-        .toList());
-    _astar.calculateGrid();
-    result = (await _astar.findPath(
-      doneList: (
-        doneList,
-      ) {
-        done = doneList;
-      },
-      start: start,
-      end: target,
-    ))
-        .toPointList();
-    _stopwatch.stop();
-    _timeTrackerMessage =
-        "[Benchmark ${_stopwatch.elapsedMicroseconds >= 1000 ? "miliseconds ${(_stopwatch.elapsedMicroseconds / 1000).toStringAsFixed(1)}" : "microseconds ${_stopwatch.elapsedMicroseconds}"}]";
+  @override
+  void paintChildren(FlowPaintingContext context) {
+    final startPoint = (context.size / 3);
+    for (int i = 0; i < context.childCount; ++i) {
+      final y = i % 10;
+      final x = i ~/ 10;
 
-    for (var element in result) {
-      done.remove(element);
-    }
-
-    done.remove(start);
-
-    setState(() {
-      for (var element in tiles) {
-        final selectedIndex = result.indexWhere((r) {
-          return r.x == element.position.x && r.y == element.position.y;
-        });
-        if (selectedIndex != -1) {
-          element.selected = true;
-          element.selectedIndex = selectedIndex;
-        }
-
-        // if (_showDoneList) {
-        element.done = done.any((r) {
-          return r == element.position;
-        });
-        // }
-      }
-    });
-  }
-
-  void _cleanTiles() {
-    for (var element in tiles) {
-      element.selected = false;
-      element.done = false;
+      context.paintChild(
+        i,
+        transform: Matrix4.translationValues(-startPoint.width + (x * 100.0),
+            -startPoint.height + (y * 100.0), 0),
+      );
     }
   }
 }
 
-class Tile {
-  final Point<int> position;
-  bool selected = false;
-  int selectedIndex = -1;
-  bool done = false;
+// --------------------- Create world --------------------------
+enum GroundType {
+  field,
+  water,
+  forest,
+  barrier,
+}
 
-  Tile(this.position);
+enum Target {
+  player,
+  enemy,
+  none,
+}
+
+class Floor {
+  Floor({
+    required this.x,
+    required this.y,
+    required this.target,
+    required this.ground,
+    this.isPath = false,
+  });
+  late int x;
+  late int y;
+  late GroundType ground;
+  late Target target;
+  late bool isPath;
+
+  static final none = Floor(
+    x: -1,
+    y: -1,
+    ground: GroundType.field,
+    target: Target.none,
+    isPath: false,
+  );
 }
