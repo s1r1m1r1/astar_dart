@@ -1,23 +1,23 @@
 import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
-import 'package:collection/collection.dart';
+import 'package:astar_dart/src/astar_euclidean.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  late AStarSquare astar;
+  late AStarEuclidean astar;
 
   setUpAll(() {
-    astar = AStarSquare(rows: 10, columns: 10,diagonalMovement: DiagonalMovement.manhattan); // Default is Euclidean
+    astar = AStarEuclidean(rows: 10, columns: 10); // Default is Euclidean
     astar.calculateGrid();
   });
 
   group('AStarSquare (Euclidean)', () {
     test('Finds path in simple grid (Euclidean)', () async {
-      print('START');
       final path = await astar.findPath(
           start: const Point(0, 0), end: const Point(9, 9));
-      expect(path.length, 10);
+    final points = path.toPointList();
+      expect(points.length, 9);
     });
 
 //     test('Finds path with obstacles (Euclidean)', () async {

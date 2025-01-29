@@ -4,10 +4,12 @@ import 'package:astar_dart/astar_dart.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  late final AStarSquare astar;
+  late final AStarManhattan astar;
   setUpAll(() {
-    astar = AStarSquare(
-        rows: 4, columns: 4, diagonalMovement: DiagonalMovement.manhattan);
+    astar = AStarManhattan(
+      rows: 4,
+      columns: 4,
+    );
     astar.calculateGrid();
   });
   group('test AStarSquareGrid manhattan', () {

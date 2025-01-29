@@ -1,13 +1,13 @@
 import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
+import 'package:astar_dart/src/astar_euclidean.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  late final AStarSquare astar;
+  late final AStarEuclidean astar;
   setUpAll(() {
-    astar = AStarSquare(
-        rows: 4, columns: 4, diagonalMovement: DiagonalMovement.euclidean);
+    astar = AStarEuclidean(rows: 4, columns: 4);
     astar.calculateGrid();
   });
 
@@ -31,7 +31,7 @@ void main() {
       final path = (await astar.findPath(
               start: const Point(0, 0), end: const Point(0, 2)))
           .toPointList();
-      expect(path.length , 2);
+      expect(path.length, 2);
     });
 
     test('test neighbors DiagonalMovement.manhattan diagonal return one item',

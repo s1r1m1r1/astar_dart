@@ -11,9 +11,6 @@ extension BarrierExt on Barrier {
 extension ListNodeExt on List<ANode> {
   List<Point<int>> toPointList() => map((n) => Point(n.x, n.y)).toList();
 }
-extension ListHexNodeExt on List<AHexNode> {
-  List<Point<int>> toPointList() => map((n) => Point(n.x, n.y)).toList();
-}
 
 extension ANodeExt on ANode {
   Point<int> toPoint() => Point<int>(x, y);

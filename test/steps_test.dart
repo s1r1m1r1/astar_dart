@@ -1,13 +1,14 @@
 import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
+import 'package:astar_dart/src/find_steps_ext.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  late final AStarSquare astar;
+  late final AStarManhattan astar;
   setUpAll(() {
-    astar = AStarSquare(
-        rows: 7, columns: 7, diagonalMovement: DiagonalMovement.manhattan);
+    astar = AStarManhattan(
+        rows: 7, columns: 7 );
     astar.setBarriers([
       const BarrierPoint(2, 0, barrier: Barrier.block),
       // const BarrierPoint(3, 2, barrier: Barrier.block),

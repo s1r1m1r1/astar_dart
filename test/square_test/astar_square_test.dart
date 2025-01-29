@@ -1,14 +1,15 @@
 import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
+import 'package:astar_dart/src/find_steps_ext.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  late AStarSquare astar;
+  late AStarManhattan astar;
 
   setUpAll(() {
-    astar = AStarSquare(rows: 10, columns: 10,diagonalMovement: DiagonalMovement.manhattan);
+    astar = AStarManhattan(rows: 10, columns: 10);
     astar.calculateGrid();
   });
 
@@ -35,7 +36,8 @@ void main() {
       astar.calculateGrid();
       astar.setBarrier(const BarrierPoint(5, 5, barrier: Barrier.block));
       final path = (await astar.findPath(
-          start: const Point(5, 4), end: const Point(5, 6))).toPointList();
+              start: const Point(5, 4), end: const Point(5, 6)))
+          .toPointList();
       expect(path.length, 4);
     });
 

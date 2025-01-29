@@ -1,6 +1,6 @@
 name: astar_dart
 description: "a pathfinding implementation in Dart. Efficiently finds shortest paths on grids, supporting barriers and weights."
-version: 1.0.1
+version: 1.1.0
 homepage: https://github.com/Sproute777/astar_dart
 
 environment:

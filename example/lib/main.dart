@@ -83,10 +83,9 @@ class _GridExampleState extends State<GridExample> {
   }
 
   Future<void> _updateMenu(Floor floor) async {
-    final astar = AStarSquare(
+    final astar = AStarManhattan(
       rows: 10,
       columns: 10,
-      diagonalMovement: DiagonalMovement.manhattan
     )
       ..setPoints([
         ...array2d.array.expand((row) {
