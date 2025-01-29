@@ -1,13 +1,13 @@
-
 class Array2d<T> {
   late final List<List<T>> array;
-  final T defaultValue;
+  final T Function(int x, int y) valueBuilder;
 
-  Array2d(int width, int height, {required this.defaultValue}) {
+  Array2d(int width, int height, {required this.valueBuilder}) {
     if (width <= 0 || height <= 0) {
       throw ArgumentError("Width and height must be positive integers.");
     }
-    array = List.generate(width, (_) => List.filled(height, defaultValue),
+    array = List.generate(
+        width, (x) => List.generate(height, (y) => valueBuilder(x, y)),
         growable: false);
   }
 
@@ -25,7 +25,7 @@ class Array2d<T> {
     }
 
     final newArray = List.generate(
-        newWidth, (_) => List<T>.filled(newHeight, defaultValue),
+        newWidth, (x) => List<T>.generate(newHeight, (y) => valueBuilder(x, y)),
         growable: false);
 
     // Copy existing data (as much as possible)

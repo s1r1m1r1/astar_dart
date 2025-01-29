@@ -35,7 +35,7 @@ abstract class AstarGrid {
     required this.barriers,
     required this.grounds,
   }) {
-    grid = Array2d(rows, columns, defaultValue: ANode.wrong);
+    grid = Array2d(rows, columns, valueBuilder: (x,y)=> ANode.wrong);
   }
 // abstract
   addNeighbors();

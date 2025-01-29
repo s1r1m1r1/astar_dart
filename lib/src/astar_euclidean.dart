@@ -23,10 +23,11 @@ class AStarEuclidean {
     Array2d<int>? grounds,
   })  : _rows = rows,
         _columns = columns {
-    _grounds = grounds ?? Array2d<int>(rows, columns, defaultValue: 1);
-    _barriers =
-        barriers ?? Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass);
-    _grid = Array2d(rows, columns, defaultValue: ANode.wrong);
+    _grounds =
+        grounds ?? Array2d<int>(rows, columns, valueBuilder: (x, y) => 1);
+    _barriers = barriers ??
+        Array2d<Barrier>(rows, columns, valueBuilder: (x, y) => Barrier.pass);
+    _grid = Array2d(rows, columns, valueBuilder: (x, y) => ANode.wrong);
   }
 
   void setBarrier(BarrierPoint point) {
@@ -76,6 +77,8 @@ class AStarEuclidean {
   }) {
     _start = start;
     _end = end;
+    _doneList.clear();
+    _waitList.clear();
 
     if (_barriers[_end.x][_end.y].isBlock) {
       return Future.value([]);

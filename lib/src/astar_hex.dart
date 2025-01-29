@@ -26,8 +26,9 @@ class AStarHex extends AstarGrid {
   }) : super(
           rows: rows,
           columns: columns,
-          barriers: Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass),
-          grounds: Array2d<int>(rows, columns, defaultValue: 1),
+          barriers: Array2d<Barrier>(rows, columns,
+              valueBuilder: (x, y) => Barrier.pass),
+          grounds: Array2d<int>(rows, columns, valueBuilder: (x, y) => 1),
         ) {
     if (barriers != null) {
       for (var b in barriers) {
@@ -51,10 +52,11 @@ class AStarHex extends AstarGrid {
   }) : super(
           rows: rows,
           columns: columns,
-          barriers: Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass),
-          grounds: Array2d<int>(rows, columns, defaultValue: 1),
+          barriers: Array2d<Barrier>(rows, columns,
+              valueBuilder: (x, y) => Barrier.pass),
+          grounds: Array2d<int>(rows, columns, valueBuilder: (x, y) => 1),
         ) {
-    grid = Array2d(rows, columns, defaultValue: ANode.wrong);
+    grid = Array2d(rows, columns, valueBuilder: (x, y) => ANode.wrong);
     _createGrid(rows: rows, columns: columns);
   }
 

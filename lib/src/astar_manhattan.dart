@@ -19,8 +19,10 @@ class AStarManhattan extends AstarGrid {
           rows: rows,
           columns: columns,
           barriers: barriers ??
-              Array2d<Barrier>(rows, columns, defaultValue: Barrier.pass),
-          grounds: grounds ?? Array2d<int>(rows, columns, defaultValue: 1),
+              Array2d<Barrier>(rows, columns,
+                  valueBuilder: (x, y) => Barrier.pass),
+          grounds:
+              grounds ?? Array2d<int>(rows, columns, valueBuilder: (x, y) => 1),
         );
 
   void setBarrier(BarrierPoint point) {
@@ -71,6 +73,8 @@ class AStarManhattan extends AstarGrid {
   }) {
     super.start = start;
     super.end = end;
+    _doneList.clear();
+    _waitList.clear();
 
     if (barriers[end.x][end.y].isBlock) {
       return [];
@@ -88,7 +92,7 @@ class AStarManhattan extends AstarGrid {
       startNode,
       endNode,
     );
-
+    print('winner ${winner?.g}');
     List<ANode> path = [grid[end.x][end.y]];
     if (winner?.parent != null) {
       ANode nodeAux = winner!.parent!;
