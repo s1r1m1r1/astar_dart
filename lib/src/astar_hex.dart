@@ -118,15 +118,7 @@ class AStarHex {
       return Future.value([endNode]);
     }
     _addNeighbors();
-    // for (var i = 0; i < _grid.length; i++) {
-    //   final StringBuffer _buffer = StringBuffer();
-    //   _buffer.writeln("chain: Row: $i\n");
-    //   for (var j = 0; j < _grid.length; j++) {
-    //     // final n = grid[i][j];
-    //     _buffer.writeln("${grid[i][j]}");
-    //   }
-    //   developer.log(_buffer.toString());
-    // }
+    
     AHexNode? winner = _getWinner(
       startNode,
       endNode,
@@ -290,7 +282,6 @@ class AStarHex {
     _waitList.clear();
     _doneList.clear();
     AHexNode? winner;
-    developer.log("_getAHexNodeWinner2 current:${current.x},${current.y}");
     if (end == current) return current;
     for (var n in current.neighbors) {
       if (n.parent == null) {
@@ -311,6 +302,7 @@ class AStarHex {
         if (!_doneList.contains(n)) {
           _waitList.add(n);
         }
+
       }
       _doneList.add(c);
       _waitList.sort((a, b) => b.f.compareTo(a.f));

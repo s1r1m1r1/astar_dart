@@ -10,6 +10,7 @@ void main() {
         rows: 4, columns: 4, diagonalMovement: DiagonalMovement.euclidean);
     astar.calculateGrid();
   });
+
   group('test AStarSquareGrid euclidean', () {
     test('test firs point is end point', () async {
       final path = (await astar.findPath(
@@ -28,9 +29,9 @@ void main() {
 
     test('test neighbors DiagonalMovement.manhattan return one item', () async {
       final path = (await astar.findPath(
-              start: const Point(0, 0), end: const Point(0, 1)))
+              start: const Point(0, 0), end: const Point(0, 2)))
           .toPointList();
-      expect(path.length == 1, true);
+      expect(path.length , 2);
     });
 
     test('test neighbors DiagonalMovement.manhattan diagonal return one item',
