@@ -361,7 +361,7 @@ class AStarHex {
     for (var row in _grid.array) {
       for (AHexNode node in row) {
         node.parent = null;
-        node.h = 0.0;
+        node.g = 0.0;
         _chainNeighbors(node);
       }
     }

@@ -161,7 +161,6 @@ class AStarSquare extends AstarGrid {
   //   return null;
   // }
 
-
   /// find steps area , useful for Turn Based Game
   /// example 3 steps
   /// ```
@@ -192,15 +191,15 @@ class AStarSquare extends AstarGrid {
     current.sort((a, b) => a.g.compareTo(b.g));
     while (current.isNotEmpty) {
       for (var c in current) {
-        if (c.g <= steps) {
-          total.add(c);
+        if (c.g <= steps ) {
+          if (!total.contains(c)) total.add(c);
           for (var n in c.neighbors) {
             if (total.contains(n)) continue;
             if (n.parent == null) {
               n.parent = c;
               n.g = n.weight + c.g;
             }
-            if (!next.contains(n)) next.add(n);
+            if (!next.contains(n) && !total.contains(n)) next.add(n);
           }
         }
       }
@@ -214,8 +213,6 @@ class AStarSquare extends AstarGrid {
   }
 
   ANode? _getWinner(ANode current, ANode end) {
-    _waitList.clear();
-    _doneList.clear();
     ANode? winner;
     // developer.log("_getAHexNodeWinner2 current:${current.x},${current.y}");
     if (end == current) return current;
@@ -286,6 +283,8 @@ class AStarSquare extends AstarGrid {
   void _addNeighbors() {
     for (var row in _grid.array) {
       for (ANode node in row) {
+        node.parent = null;
+        node.g = 0.0;
         _chainNeigbors(node);
       }
     }
