@@ -1,11 +1,11 @@
+import 'dart:async';
 import 'dart:math';
 // import 'package:collection/collection.dart';
 
 import '../astar_dart.dart';
-import 'astar_grid.dart';
 import 'package:meta/meta.dart';
 
-class AStarSquare extends AstarGrid {
+class AStarSquare {
   final int _rows;
   final int _columns;
   late Point<int> _start;
@@ -77,32 +77,37 @@ class AStarSquare extends AstarGrid {
   /// final moveTo = result.removeLast();
   /// final moveNext = result.removeLast();
   /// ```
-  @override
-  Future<List<ANode>> findPath({
+  FutureOr<List<ANode>> findPath({
     void Function(List<Point<int>>)? doneList,
     required Point<int> start,
     required Point<int> end,
   }) {
+    print("ONe");
     _start = start;
     _end = end;
-    _doneList.clear();
-    _waitList.clear();
 
+    print("TWO");
     if (_barriers[_end.x][_end.y].isBlock) {
       return Future.value([]);
     }
 
+    print("3");
     ANode startNode = _grid[_start.x][_start.y];
 
     ANode endNode = _grid[_end.x][_end.y];
     if (_isNeighbors(start, end)) {
       return Future.value([]);
     }
+    print("4");
     _addNeighbors();
+
+    print("5");
     ANode? winner = _getWinner(
       startNode,
       endNode,
     );
+
+    print("6");
 
     List<ANode> path = [_grid[_end.x][_end.y]];
     if (winner?.parent != null) {
@@ -161,7 +166,6 @@ class AStarSquare extends AstarGrid {
   //   return null;
   // }
 
-
   /// find steps area , useful for Turn Based Game
   /// example 3 steps
   /// ```
@@ -217,7 +221,6 @@ class AStarSquare extends AstarGrid {
     _waitList.clear();
     _doneList.clear();
     ANode? winner;
-    // developer.log("_getAHexNodeWinner2 current:${current.x},${current.y}");
     if (end == current) return current;
     for (var n in current.neighbors) {
       if (n.parent == null) {
@@ -247,13 +250,7 @@ class AStarSquare extends AstarGrid {
   }
 
   void _checkDistance(ANode current, ANode end, {required ANode parent}) {
-    final notDiagonal = current.x == parent.x || current.y == parent.y;
     current.parent = parent;
-
-    /// minimal cost 1.414 diagonal
-    current.g = notDiagonal
-        ? parent.g + current.weight
-        : parent.g + current.weight + 1.414;
     current.h = _distance(current, end);
   }
 
@@ -261,106 +258,99 @@ class AStarSquare extends AstarGrid {
   double _distance(ANode current, ANode target) {
     int toX = current.x - target.x;
     int toY = current.y - target.y;
-    return Point(toX, toY).magnitude * 2;
+
+    if (_diagonalMovement == DiagonalMovement.manhattan) {
+      return (toX.abs() + toY.abs()).toDouble();
+    } else {
+      // Euclidean or Chebyshev
+      return sqrt(toX * toX + toY * toY); // Standard Euclidean distance
+    }
   }
 
   bool _isNeighbors(Point<int> start, Point<int> end) {
-    if (_diagonalMovement == DiagonalMovement.euclidean) {
-      if (start.x + 1 == end.x && start.y - 1 == end.y ||
-          start.x + 1 == end.x && start.y + 1 == end.y ||
-          start.x - 1 == end.x && start.y - 1 == end.y ||
-          start.x - 1 == end.x && start.y + 1 == end.y) {
-        return true;
-      }
+    int dx = (start.x - end.x).abs();
+    int dy = (start.y - end.y).abs();
+
+    if (_diagonalMovement == DiagonalMovement.euclidean ||
+        _diagonalMovement == DiagonalMovement.chebychev) {
+      return dx <= 1 && dy <= 1;
+    } else {
+      // Manhattan
+      return (dx == 1 && dy == 0) || (dx == 0 && dy == 1);
     }
-    if (_diagonalMovement == DiagonalMovement.manhattan) {
-      if ((start.x + 1 == end.x || start.x - 1 == end.x) && start.y == end.y ||
-          (start.y + 1 == end.y || start.y - 1 == end.y) && start.x == end.x) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /// Adds neighbors to cells
   void _addNeighbors() {
     for (var row in _grid.array) {
       for (ANode node in row) {
-        _chainNeigbors(node);
+        if (_diagonalMovement == DiagonalMovement.manhattan) {
+          _chainNeighborsManhattan(node);
+        } else {
+          _chainNeighbors(node);
+        }
       }
     }
   }
 
-  void _chainNeigbors(
-    ANode node,
-  ) {
+  void _chainNeighbors(ANode node) {
     final x = node.x;
     final y = node.y;
+    final maxX = grid.length - 1; // Cache max values for efficiency
+    final maxY = grid.first.length - 1;
 
-    /// adds in top
+    // Optimized neighbor adding (combined conditions, removed redundant checks)
+    for (int i = -1; i <= 1; i++) {
+      for (int j = -1; j <= 1; j++) {
+        if (i == 0 && j == 0) continue; // Skip the current node itself
+
+        final nx = x + i;
+        final ny = y + j;
+
+        if (nx >= 0 && nx <= maxX && ny >= 0 && ny <= maxY) {
+          // Check bounds once
+          final neighbor = grid[nx][ny];
+          if (!_barriers[nx][ny].isBlock) {
+            node.neighbors.add(neighbor);
+          }
+        }
+      }
+    }
+  }
+
+  void _chainNeighborsManhattan(ANode node) {
+    final x = node.x;
+    final y = node.y;
+    final maxX = grid.length - 1;
+    final maxY = grid.first.length - 1;
+
+    // Optimized neighbor adding for Manhattan distance (only cardinal directions)
     if (y > 0) {
-      final t = _grid[x][y - 1];
-      if (!_barriers[t.x][t.y].isBlock) {
-        node.neighbors.add(t);
+      // Top
+      final neighbor = grid[x][y - 1];
+      if (!_barriers[x][y - 1].isBlock) {
+        node.neighbors.add(neighbor);
       }
     }
-
-    /// adds in bottom
-    if (y < (_grid.first.length - 1)) {
-      final t = _grid[x][y + 1];
-      if (!_barriers[t.x][t.y].isBlock) {
-        node.neighbors.add(t);
+    if (y < maxY) {
+      // Bottom
+      final neighbor = grid[x][y + 1];
+      if (!_barriers[x][y + 1].isBlock) {
+        node.neighbors.add(neighbor);
       }
     }
-
-    /// adds in left
     if (x > 0) {
-      final t = _grid[x - 1][y];
-      if (!_barriers[t.x][t.y].isBlock) {
-        node.neighbors.add(t);
+      // Left
+      final neighbor = grid[x - 1][y];
+      if (!_barriers[x - 1][y].isBlock) {
+        node.neighbors.add(neighbor);
       }
     }
-
-    /// adds in right
-    if (x < (_grid.length - 1)) {
-      final t = _grid[x + 1][y];
-      if (!_barriers[t.x][t.y].isBlock) {
-        node.neighbors.add(t);
-      }
-    }
-
-    if (_diagonalMovement == DiagonalMovement.euclidean ||
-        _diagonalMovement == DiagonalMovement.chebychev) {
-      /// adds in top-left
-      if (y > 0 && x > 0) {
-        final t = _grid[x - 1][y - 1];
-        if (!_barriers[t.x][t.y].isBlock) {
-          node.neighbors.add(t);
-        }
-      }
-
-      /// adds in top-right
-      if (y > 0 && x < (_grid.length - 1)) {
-        final t = _grid[x + 1][y - 1];
-        if (!_barriers[t.x][t.y].isBlock) {
-          node.neighbors.add(t);
-        }
-      }
-
-      /// adds in bottom-left
-      if (x > 0 && y < (_grid.first.length - 1)) {
-        final t = _grid[x - 1][y + 1];
-        if (!_barriers[t.x][t.y].isBlock) {
-          node.neighbors.add(t);
-        }
-      }
-
-      /// adds in bottom-right
-      if (x < (_grid.length - 1) && y < (_grid.first.length - 1)) {
-        final t = _grid[x + 1][y + 1];
-        if (!_barriers[t.x][t.y].isBlock) {
-          node.neighbors.add(t);
-        }
+    if (x < maxX) {
+      // Right
+      final neighbor = grid[x + 1][y];
+      if (!_barriers[x + 1][y].isBlock) {
+        node.neighbors.add(neighbor);
       }
     }
   }
