@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'dart:developer' as developer;
-import 'package:meta/meta.dart';
 
 import '../astar_dart.dart';
-import 'astar_grid.dart';
 
 enum AStarHexAlignment {
   odd,
@@ -16,49 +14,15 @@ class AStarHex extends AstarGrid {
   final List<ANode> _doneList = [];
   final List<ANode> _waitList = [];
 
-  late AStarHexAlignment alignment;
-  AStarHex.useList({
-    required int rows,
-    required int columns,
-    List<BarrierPoint>? barriers,
-    List<WeightedPoint>? grounds,
-    this.alignment = AStarHexAlignment.even,
-  }) : super(
-          rows: rows,
-          columns: columns,
-          barriers: Array2d<Barrier>(rows, columns,
-              valueBuilder: (x, y) => Barrier.pass),
-          grounds: Array2d<int>(rows, columns, valueBuilder: (x, y) => 1),
-        ) {
-    if (barriers != null) {
-      for (var b in barriers) {
-        super.barriers[b.x][b.y] = Barrier.block;
-      }
-    }
-    if (grounds != null) {
-      for (var g in grounds) {
-        super.grounds[g.x][g.y] = g.weight;
-      }
-    }
-    _createGrid(rows: super.rows, columns: super.columns);
-  }
-
   AStarHex({
     required int rows,
     required int columns,
-    Array2d<Barrier>? barriers,
-    Array2d<int>? grounds,
-    this.alignment = AStarHexAlignment.even,
+    required GridBuilder gridBuilder,
   }) : super(
           rows: rows,
           columns: columns,
-          barriers: Array2d<Barrier>(rows, columns,
-              valueBuilder: (x, y) => Barrier.pass),
-          grounds: Array2d<int>(rows, columns, valueBuilder: (x, y) => 1),
-        ) {
-    grid = Array2d(rows, columns, valueBuilder: (x, y) => ANode.wrong);
-    _createGrid(rows: rows, columns: columns);
-  }
+          gridBuilder: gridBuilder,
+        );
 
   @override
   FutureOr<List<ANode>> findPath({
@@ -71,7 +35,7 @@ class AStarHex extends AstarGrid {
     _doneList.clear();
     _waitList.clear();
 
-    if (super.barriers[super.end.x][super.end.y].isBlock) {
+    if (grid[super.end.x][super.end.y].barrier.isBlock) {
       return [];
     }
 
@@ -81,7 +45,6 @@ class AStarHex extends AstarGrid {
     if (_isNeighbors(start, end)) {
       return Future.value([endNode]);
     }
-    addNeighbors();
 
     ANode? winner = _getWinner(
       startNode,
@@ -111,22 +74,6 @@ class AStarHex extends AstarGrid {
     return Future.value(path.toList());
   }
 
-  void _createGrid({
-    required int rows,
-    required int columns,
-  }) {
-    for (int x = 0; x < rows; x++) {
-      for (int y = 0; y < columns; y++) {
-        grid[x][y] = ANode(
-          x: x,
-          y: y,
-          neighbors: [],
-          weight: grounds[x][y].toDouble(),
-        );
-      }
-    }
-  }
-
   ANode? _getWinner(ANode current, ANode end) {
     _waitList.clear();
     _doneList.clear();
@@ -153,7 +100,7 @@ class AStarHex extends AstarGrid {
         }
       }
       _doneList.add(c);
-      _waitList.sort((a, b) => b.f.compareTo(a.f));
+      _waitList.sort((a, b) => b.compareTo(a));
     }
 
     return winner;
@@ -161,14 +108,13 @@ class AStarHex extends AstarGrid {
 
   void _analyzeDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
-
-    /// minimal cost 1.414 diagonal
     current.g = parent.g + current.weight;
-
-    current.h = _distance(current, end) * 1.0;
+    // make short distance stronger by multiply by 2.0
+    current.h = _distance(current, end) * 2.0;
   }
 
   /// Calculates the distance between two nodes.
+  /// 6 triangle zone , calculate for each zone correct func
   int _distance(ANode from, ANode to) {
     if (from.y >= to.y) {
       // 1
@@ -196,13 +142,14 @@ class AStarHex extends AstarGrid {
   }
 
   /// Adds neighbors to cells
-  @internal
   @override
   void addNeighbors() {
     for (var row in grid.array) {
       for (ANode node in row) {
         node.parent = null;
+        node.h = 0.0;
         node.g = 0.0;
+        node.neighbors.clear();
         _chainNeighbors(node);
       }
     }
@@ -217,7 +164,7 @@ class AStarHex extends AstarGrid {
     /// adds in left
     if (x > 0) {
       final t = grid[x - 1][y];
-      if (!barriers[t.x][t.y].isBlock) {
+      if (!grid[t.x][t.y].barrier.isBlock) {
         node.neighbors.add(t);
       }
     }
@@ -225,7 +172,7 @@ class AStarHex extends AstarGrid {
     /// adds in right
     if (x < (grid.length - 1)) {
       final t = grid[x + 1][y];
-      if (!barriers[t.x][t.y].isBlock) {
+      if (!grid[t.x][t.y].barrier.isBlock) {
         node.neighbors.add(t);
       }
     }
@@ -233,12 +180,12 @@ class AStarHex extends AstarGrid {
     /// adds in top
     if (y > 0) {
       final t = grid[x][y - 1];
-      if (!barriers[t.x][t.y].isBlock) {
+      if (!grid[t.x][t.y].barrier.isBlock) {
         node.neighbors.add(t);
       }
       if (x < (grid.length - 1)) {
         final t2 = grid[x + 1][y - 1];
-        if (!barriers[t2.x][t2.y].isBlock) {
+        if (!grid[t2.x][t2.y].barrier.isBlock) {
           node.neighbors.add(t2);
         }
       }
@@ -247,13 +194,13 @@ class AStarHex extends AstarGrid {
     /// adds in bottom
     if (y < (grid.first.length - 1)) {
       final t = grid[x][y + 1];
-      if (!barriers[t.x][t.y].isBlock) {
+      if (!grid[t.x][t.y].barrier.isBlock) {
         node.neighbors.add(t);
       }
 
       if (x > 0) {
         final t2 = grid[x - 1][y + 1];
-        if (!barriers[t2.x][t2.y].isBlock) {
+        if (!grid[t2.x][t2.y].barrier.isBlock) {
           node.neighbors.add(t2);
         }
       }

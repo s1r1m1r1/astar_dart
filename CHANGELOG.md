@@ -6,7 +6,10 @@
 ## 1.2.0
   - improve example 
   - Array2D added valueBuilder
-
+## 2.0.0
+   - make it faster 
+   - added gridBuilder
+  
 
 
 

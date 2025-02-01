@@ -3,65 +3,19 @@ import 'dart:math';
 
 import '../astar_dart.dart';
 
-class AStarEuclidean {
-  final int _rows;
-  final int _columns;
-  late Point<int> _start;
-  late Point<int> _end;
-  late final Array2d<Barrier> _barriers;
-  late final Array2d<int> _grounds;
-
+class AStarEuclidean extends AstarGrid {
   final List<ANode> _doneList = [];
   final List<ANode> _waitList = [];
-
-  late Array2d<ANode> _grid;
 
   AStarEuclidean({
     required int rows,
     required int columns,
-    Array2d<Barrier>? barriers,
-    Array2d<int>? grounds,
-  })  : _rows = rows,
-        _columns = columns {
-    _grounds =
-        grounds ?? Array2d<int>(rows, columns, valueBuilder: (x, y) => 1);
-    _barriers = barriers ??
-        Array2d<Barrier>(rows, columns, valueBuilder: (x, y) => Barrier.pass);
-    _grid = Array2d(rows, columns, valueBuilder: (x, y) => ANode.wrong);
-  }
-
-  void setBarrier(BarrierPoint point) {
-    assert(point.x <= _rows, "Point can't be bigger than Array2d rows");
-    assert(point.y <= _columns, "Point can't be bigger than Array2d column");
-    _barriers[point.x][point.y] = point.barrier;
-  }
-
-  void setBarriers(List<BarrierPoint> points) {
-    for (final point in points) {
-      assert(point.x <= _rows, "Point can't be bigger than Array2d rows");
-      assert(point.y <= _columns, "Point can't be bigger than Array2d columns");
-
-      _barriers[point.x][point.y] = point.barrier;
-    }
-  }
-
-  void setPoint(WeightedPoint point) {
-    assert(point.x <= _rows, "Point can't be bigger than Array2d rows");
-    assert(point.y <= _columns, "Point can't be bigger than Array2d columns");
-    _grounds[point.x][point.y] = point.weight;
-  }
-
-  void setPoints(List<WeightedPoint> points) {
-    for (final point in points) {
-      assert(point.x <= _rows, "Point can't be bigger than Array2d rows");
-      assert(point.y <= _columns, "Point can't be bigger than Array2d columns");
-      _grounds[point.x][point.y] = point.weight;
-    }
-  }
-
-  void calculateGrid() {
-    _createGrid(rows: _rows, columns: _columns);
-  }
+    required GridBuilder gridBuilder,
+  }) : super(
+          rows: rows,
+          columns: columns,
+          gridBuilder: gridBuilder
+        );
 
   /// return full path without Start position
   /// for Point(0,0) to Point(0,3) result will be [Point(0,3),Point(0,2),Point(0,1)]
@@ -70,34 +24,34 @@ class AStarEuclidean {
   /// final moveTo = result.removeLast();
   /// final moveNext = result.removeLast();
   /// ```
+  @override
   FutureOr<List<ANode>> findPath({
     void Function(List<Point<int>>)? doneList,
     required Point<int> start,
     required Point<int> end,
   }) {
-    _start = start;
-    _end = end;
+    super.start = start;
+    super.end = end;
     _doneList.clear();
     _waitList.clear();
 
-    if (_barriers[_end.x][_end.y].isBlock) {
+    if (grid[end.x][end.y].barrier.isBlock) {
       return Future.value([]);
     }
 
-    ANode startNode = _grid[_start.x][_start.y];
+    ANode startNode = grid[start.x][start.y];
 
-    ANode endNode = _grid[_end.x][_end.y];
+    ANode endNode = grid[end.x][end.y];
     if (_isNeighbors(start, end)) {
       return [];
     }
-    _addNeighbors();
 
     ANode? winner = _getWinner(
       startNode,
       endNode,
     );
 
-    List<ANode> path = [_grid[_end.x][_end.y]];
+    List<ANode> path = [grid[end.x][end.y]];
     if (winner?.parent != null) {
       ANode nodeAux = winner!.parent!;
       for (int i = 0; i < winner.g - 1; i++) {
@@ -110,27 +64,11 @@ class AStarEuclidean {
     }
     doneList?.call(_doneList.map((e) => Point(e.x, e.y)).toList());
 
-    if (winner == null && !_isNeighbors(_start, _end)) {
+    if (winner == null && !_isNeighbors(start, end)) {
       path.clear();
     }
 
     return Future.value(path.toList());
-  }
-
-  void _createGrid({
-    required int rows,
-    required int columns,
-  }) {
-    for (int x = 0; x < rows; x++) {
-      for (int y = 0; y < columns; y++) {
-        _grid[x][y] = ANode(
-          x: x,
-          y: y,
-          neighbors: [],
-          weight: _grounds[x][y].toDouble(),
-        );
-      }
-    }
   }
 
   ANode? _getWinner(ANode current, ANode end) {
@@ -157,7 +95,7 @@ class AStarEuclidean {
         }
       }
       _doneList.add(c);
-      _waitList.sort((a, b) => b.f.compareTo(a.f));
+      _waitList.sort((a, b) => b.compareTo(a));
     }
 
     return winner;
@@ -169,13 +107,24 @@ class AStarEuclidean {
     current.h = _distance(current, end);
   }
 
-  /// Calculates the distance between two nodes.
-  double _distance(ANode current, ANode target) {
-    int toX = current.x - target.x;
-    int toY = current.y - target.y;
+  static const lineConst = 1.0; // Straight move cost
+  static const diagonalConst =
+      1.414; // Diagonal move cost (sqrt(2) for an even grid)
 
-    return sqrt(toX * toX + toY * toY); // Standard Euclidean distance
+  double _distance(ANode current, ANode target) {
+    int dx = (current.x - target.x).abs();
+    int dy = (current.y - target.y).abs();
+    return lineConst * (dx + dy) +
+        (diagonalConst - 2 * lineConst) * min(dx, dy);
   }
+
+  /// Calculates the distance between two nodes.
+  // double _distance(ANode current, ANode target) {
+  //   int toX = current.x - target.x;
+  //   int toY = current.y - target.y;
+
+  //   return sqrt(toX * toX + toY * toY); // Standard Euclidean distance
+  // }
 
   bool _isNeighbors(Point<int> start, Point<int> end) {
     int dx = (start.x - end.x).abs();
@@ -185,12 +134,14 @@ class AStarEuclidean {
   }
 
   /// Adds neighbors to cells
-  void _addNeighbors() {
+  @override
+  void addNeighbors() {
     for (var row in grid.array) {
       for (ANode node in row) {
         node.parent = null;
         node.g = 0.0;
-
+        node.h = 0.0;
+        node.neighbors.clear();
         _chainNeighbors(node);
       }
     }
@@ -213,13 +164,11 @@ class AStarEuclidean {
         if (nx >= 0 && nx <= maxX && ny >= 0 && ny <= maxY) {
           // Check bounds once
           final neighbor = grid[nx][ny];
-          if (!_barriers[nx][ny].isBlock) {
+          if (!grid[nx][ny].barrier.isBlock) {
             node.neighbors.add(neighbor);
           }
         }
       }
     }
   }
-
-  Array2d<ANode> get grid => _grid;
 }

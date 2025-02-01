@@ -8,15 +8,25 @@ void main() {
   late AStarEuclidean astar;
 
   setUpAll(() {
-    astar = AStarEuclidean(rows: 10, columns: 10); // Default is Euclidean
-    astar.calculateGrid();
+    astar = AStarEuclidean(
+        rows: 10,
+        columns: 10,
+        gridBuilder: (int x, int y) {
+          return ANode(
+            x: x,
+            y: y,
+            neighbors: [],
+          );
+        }); // Default is Euclidean
+    astar.addNeighbors();
+    // astar.calculateGrid();
   });
 
   group('AStarSquare (Euclidean)', () {
     test('Finds path in simple grid (Euclidean)', () async {
       final path = await astar.findPath(
           start: const Point(0, 0), end: const Point(9, 9));
-    final points = path.toPointList();
+      final points = path.toPointList();
       expect(points.length, 9);
     });
 

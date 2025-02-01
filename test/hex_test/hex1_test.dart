@@ -7,7 +7,14 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   late final AStarHex astar;
   setUpAll(() {
-    astar = AStarHex(rows: 7, columns: 7);
+    astar = AStarHex(
+      rows: 7,
+      columns: 7,
+      gridBuilder: (x, y) {
+        return ANode(x: x, y: y, neighbors: []);
+      },
+    );
+    astar.addNeighbors();
   });
 
   // top-left to bottom-right
@@ -58,7 +65,7 @@ void main() {
     });
     test('test 8', () async {
       final path = (await astar.findPath(
-              start: const Point(3, 3), end: const Point(6,6)))
+              start: const Point(3, 3), end: const Point(6, 6)))
           .toPointList();
       expect(path.length, 6); // Check number of cols
     });
