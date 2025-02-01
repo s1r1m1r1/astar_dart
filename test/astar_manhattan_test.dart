@@ -9,8 +9,17 @@ void main() {
     astar = AStarManhattan(
       rows: 4,
       columns: 4,
+      gridBuilder: (x, y) {
+        return ANode(
+          x: x,
+          y: y,
+          neighbors: [],
+          barrier: Barrier.pass
+        );
+      },
     );
-    astar.calculateGrid();
+    astar.addNeighbors();
+    // astar.calculateGrid();
   });
   group('test AStarSquareGrid manhattan', () {
     test('test AStarSquareGrid manhattan last point', () async {

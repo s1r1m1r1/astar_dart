@@ -4,6 +4,8 @@ import 'dart:math';
 
 import '../astar_dart.dart';
 
+typedef GridBuilder = ANode Function(int x, int y);
+
 /// base class for all AstarGrid
 abstract class AstarGrid {
   // Future<List<ANode>> findPath(
@@ -21,22 +23,32 @@ abstract class AstarGrid {
 
   late final int rows;
   late final int columns;
-  late final Array2d<Barrier> barriers;
-  late final Array2d<int> grounds;
+  // late final Array2d<Barrier> barriers;
+  // late final Array2d<int> grounds;
   late final Array2d<ANode> grid;
   // ignore: prefer_const_constructors
   var start = Point<int>(0, 0);
   // ignore: prefer_const_constructors
   var end = Point<int>(0, 0);
 
+  final GridBuilder? gridBuilder;
   AstarGrid({
+    this.gridBuilder,
     required this.rows,
     required this.columns,
-    required this.barriers,
-    required this.grounds,
+    Array2d<ANode>? grid,
+    // required this.barriers,
+    // required this.grounds,
   }) {
-    grid = Array2d(rows, columns, valueBuilder: (x,y)=> ANode.wrong);
+    this.grid = gridBuilder != null
+        ? Array2d(rows, columns, valueBuilder: gridBuilder!)
+        : Array2d(rows, columns,
+            valueBuilder: (x, y) => ANode(x: x, y: y, neighbors: []));
   }
 // abstract
   addNeighbors();
+
+  // calculateGrid();
 }
+
+

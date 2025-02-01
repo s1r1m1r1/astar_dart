@@ -87,30 +87,29 @@ class _GridExampleState extends State<GridExample> {
     final astar = AStarManhattan(
       rows: 10,
       columns: 10,
-    )
-      ..setPoints([
-        ...array2d.array.expand((row) {
-          return row.map((floor) => WeightedPoint(floor.x, floor.y,
-              weight: switch (floor.ground) {
-                GroundType.field => 1,
-                GroundType.water => 7,
-                GroundType.forest => 10,
-                GroundType.barrier => 1,
-              }));
-        })
-      ])
-      ..setBarriers([
-        ...array2d.array.expand((row) {
-          return row.map((floor) => floor.ground == GroundType.barrier
-              ? BarrierPoint(floor.x, floor.y, barrier: Barrier.block)
-              : BarrierPoint(
-                  floor.x,
-                  floor.y,
-                  barrier: Barrier.pass,
-                ));
-        })
-      ])
-      ..calculateGrid();
+      gridBuilder: (x, y) {
+        final floor = array2d[x][y];
+        return ANode(
+            x: x,
+            y: y,
+            neighbors: [],
+            weight: switch (floor.ground) {
+              GroundType.field => 1,
+              GroundType.water => 7,
+              GroundType.forest => 10,
+              GroundType.barrier => 1,
+            },
+            barrier: switch (floor.ground) {
+              GroundType.field ||
+              GroundType.water ||
+              GroundType.forest =>
+                Barrier.pass,
+              GroundType.barrier => Barrier.block,
+            });
+      },
+    );
+    astar.addNeighbors();
+
     final path = await astar.findPath(
         start: Point<int>(0, 0), end: Point<int>(floor.x, floor.y));
     array2d.forEach((floor, x, y) => floor
@@ -121,46 +120,6 @@ class _GridExampleState extends State<GridExample> {
         ..isPath = true
         ..update();
     }
-  }
-
-  Future<void> _updateMenu(Floor floor) async {
-    final astar = AStarManhattan(
-      rows: 10,
-      columns: 10,
-    )
-      ..setPoints([
-        ...array2d.array.expand((row) {
-          return row.map((floor) => WeightedPoint(floor.x, floor.y,
-              weight: switch (floor.ground) {
-                GroundType.field => 1,
-                GroundType.water => 7,
-                GroundType.forest => 10,
-                GroundType.barrier => 1,
-              }));
-        })
-      ])
-      ..setBarriers([
-        ...array2d.array.expand((row) {
-          return row.map((floor) => floor.ground == GroundType.barrier
-              ? BarrierPoint(floor.x, floor.y, barrier: Barrier.block)
-              : BarrierPoint(
-                  floor.x,
-                  floor.y,
-                  barrier: Barrier.pass,
-                ));
-        })
-      ])
-      ..calculateGrid();
-    final path = await astar.findPath(
-        start: Point<int>(0, 0), end: Point(floor.x, floor.y));
-    debugPrint("PATH ${path.length} ${updater.value}");
-    array2d.forEach((floor, x, y) => floor.isPath = false);
-    for (var p in path) {
-      array2d[p.x][p.y].isPath = true;
-    }
-    setState(() {
-      updater.value = !(updater.value);
-    });
   }
 
   @override

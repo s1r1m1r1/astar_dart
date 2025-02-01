@@ -1,61 +1,43 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:math';
 // import 'package:collection/collection.dart';
 
 import '../astar_dart.dart';
 
-import 'astar_grid.dart';
-
 class AStarManhattan extends AstarGrid {
-  final List<ANode> _doneList = [];
+  final Set<ANode> _doneList = HashSet<ANode>();
   final List<ANode> _waitList = [];
 
-  AStarManhattan({
-    required int rows,
-    required int columns,
-    Array2d<Barrier>? barriers,
-    Array2d<int>? grounds,
-  }) : super(
+  AStarManhattan(
+      {required int rows,
+      required int columns,
+      GridBuilder? gridBuilder,
+      required})
+      : super(
+          gridBuilder: gridBuilder,
           rows: rows,
           columns: columns,
-          barriers: barriers ??
-              Array2d<Barrier>(rows, columns,
-                  valueBuilder: (x, y) => Barrier.pass),
-          grounds:
-              grounds ?? Array2d<int>(rows, columns, valueBuilder: (x, y) => 1),
         );
 
-  void setBarrier(BarrierPoint point) {
-    assert(point.x <= rows, "Point can't be bigger than Array2d rows");
-    assert(point.y <= columns, "Point can't be bigger than Array2d column");
-    barriers[point.x][point.y] = point.barrier;
-  }
-
-  void setBarriers(List<BarrierPoint> points) {
-    for (final point in points) {
-      assert(point.x <= rows, "Point can't be bigger than Array2d rows");
-      assert(point.y <= columns, "Point can't be bigger than Array2d columns");
-
-      barriers[point.x][point.y] = point.barrier;
-    }
+  void setBarrier({required int x, required int y, required Barrier barrier}) {
+    assert(x <= rows, "Point can't be bigger than Array2d rows");
+    assert(y <= columns, "Point can't be bigger than Array2d column");
+    grid[x][y].barrier = barrier;
   }
 
   void setPoint(WeightedPoint point) {
     assert(point.x <= rows, "Point can't be bigger than Array2d rows");
     assert(point.y <= columns, "Point can't be bigger than Array2d columns");
-    grounds[point.x][point.y] = point.weight;
+    grid[point.x][point.y].weight = point.weight.toDouble();
   }
 
   void setPoints(List<WeightedPoint> points) {
     for (final point in points) {
       assert(point.x <= rows, "Point can't be bigger than Array2d rows");
       assert(point.y <= columns, "Point can't be bigger than Array2d columns");
-      grounds[point.x][point.y] = point.weight;
+      grid[point.x][point.y].weight = point.weight.toDouble();
     }
-  }
-
-  void calculateGrid() {
-    _createGrid(rows: rows, columns: columns);
   }
 
   /// return full path without Start position
@@ -76,7 +58,7 @@ class AStarManhattan extends AstarGrid {
     _doneList.clear();
     _waitList.clear();
 
-    if (barriers[end.x][end.y].isBlock) {
+    if (grid[end.x][end.y].barrier == Barrier.block) {
       return [];
     }
 
@@ -86,13 +68,11 @@ class AStarManhattan extends AstarGrid {
     if (_isNeighbors(start, end)) {
       return [];
     }
-    addNeighbors();
 
     ANode? winner = _getWinner(
       startNode,
       endNode,
     );
-    print('winner ${winner?.g}');
     List<ANode> path = [grid[end.x][end.y]];
     if (winner?.parent != null) {
       ANode nodeAux = winner!.parent!;
@@ -111,22 +91,6 @@ class AStarManhattan extends AstarGrid {
     }
 
     return Future.value(path.toList());
-  }
-
-  void _createGrid({
-    required int rows,
-    required int columns,
-  }) {
-    for (int x = 0; x < rows; x++) {
-      for (int y = 0; y < columns; y++) {
-        grid[x][y] = ANode(
-          x: x,
-          y: y,
-          neighbors: [],
-          weight: grounds[x][y].toDouble(),
-        );
-      }
-    }
   }
 
   ANode? _getWinner(ANode current, ANode end) {
@@ -153,7 +117,7 @@ class AStarManhattan extends AstarGrid {
         }
       }
       _doneList.add(c);
-      _waitList.sort((a, b) => b.f.compareTo(a.f));
+      _waitList.sort((a,b) => b.compareTo(a));
     }
 
     return winner;
@@ -162,14 +126,12 @@ class AStarManhattan extends AstarGrid {
   void _checkDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
-    current.h = _distance(current, end);
+    // performance , make direction more stronger
+    current.h = _distance(current, end) * 2;
   }
 
-  /// Calculates the distance between two nodes.
-  double _distance(ANode current, ANode target) {
-    int toX = current.x - target.x;
-    int toY = current.y - target.y;
-    return (toX.abs() + toY.abs()).toDouble();
+  int _distance(ANode current, ANode target) {
+    return (current.x - target.x).abs() + (current.y - target.y).abs();
   }
 
   bool _isNeighbors(Point<int> start, Point<int> end) {
@@ -180,50 +142,55 @@ class AStarManhattan extends AstarGrid {
     return (dx == 1 && dy == 0) || (dx == 0 && dy == 1);
   }
 
-  /// Adds neighbors to cells
+  /// expensive not call every time,try reusing
   @override
   void addNeighbors() {
-    for (var row in grid.array) {
-      for (ANode node in row) {
+    final maxX = grid.length - 1;
+    final maxY = grid.first.length - 1;
+    for (var x = 0; x < grid.length; x++) {
+      final row = grid[x];
+      for (var y = 0; y < row.length; y++) {
+        final node = row[y];
         node.parent = null;
+        // improve performance x times
+        node.neighbors.clear();
+        node.h = 0.0;
         node.g = 0.0;
-        _chainNeighborsManhattan(node);
+        _chainNeighborsManhattan(node, maxX: maxX, maxY: maxY);
       }
     }
   }
 
-  void _chainNeighborsManhattan(ANode node) {
+  void _chainNeighborsManhattan(ANode node,
+      {required int maxX, required int maxY}) {
     final x = node.x;
     final y = node.y;
-    final maxX = grid.length - 1;
-    final maxY = grid.first.length - 1;
-
     // Optimized neighbor adding for Manhattan distance (only cardinal directions)
     if (y > 0) {
       // Top
       final neighbor = grid[x][y - 1];
-      if (!barriers[x][y - 1].isBlock) {
+      if (!grid[x][y - 1].barrier.isBlock) {
         node.neighbors.add(neighbor);
       }
     }
     if (y < maxY) {
       // Bottom
       final neighbor = grid[x][y + 1];
-      if (!barriers[x][y + 1].isBlock) {
+      if (!grid[x][y + 1].barrier.isBlock) {
         node.neighbors.add(neighbor);
       }
     }
     if (x > 0) {
       // Left
       final neighbor = grid[x - 1][y];
-      if (!barriers[x - 1][y].isBlock) {
+      if (!grid[x - 1][y].barrier.isBlock) {
         node.neighbors.add(neighbor);
       }
     }
     if (x < maxX) {
       // Right
       final neighbor = grid[x + 1][y];
-      if (!barriers[x + 1][y].isBlock) {
+      if (!grid[x + 1][y].barrier.isBlock) {
         node.neighbors.add(neighbor);
       }
     }

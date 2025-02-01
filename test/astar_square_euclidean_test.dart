@@ -1,14 +1,23 @@
 import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
-import 'package:astar_dart/src/astar_euclidean.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   late final AStarEuclidean astar;
   setUpAll(() {
-    astar = AStarEuclidean(rows: 4, columns: 4);
-    astar.calculateGrid();
+    astar = AStarEuclidean(
+        rows: 4,
+        columns: 4,
+        gridBuilder: (int x, int y) {
+          return ANode(
+            x: x,
+            y: y,
+            neighbors: [],
+          );
+        });
+    // astar.calculateGrid();
+    astar.addNeighbors();
   });
 
   group('test AStarSquareGrid euclidean', () {

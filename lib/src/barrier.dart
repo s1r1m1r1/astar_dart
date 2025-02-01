@@ -9,5 +9,7 @@ enum Barrier {
   passThrough,
 
   // cannot move through , but can be founded as target
-  target,
+  target;
+
+  bool get isBlock => this == Barrier.block;
 }

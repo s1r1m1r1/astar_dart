@@ -6,13 +6,16 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   late final AStarHex astar;
   setUpAll(() {
-    astar = AStarHex.useList(rows: 7, columns: 7, barriers: [
-      const BarrierPoint(3, 2, barrier: Barrier.block),
-      const BarrierPoint(3, 3, barrier: Barrier.block),
-      const BarrierPoint(3, 4, barrier: Barrier.block),
-    ]);
+    astar = AStarHex(
+        rows: 7,
+        columns: 7,
+        gridBuilder: (int x, int y) {
+          if ((x == 3 && y == 2) || (x == 3 && y == 3) || (x == 3 && y == 4)) {
+            return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+          }
+          return ANode(x: x, y: y, neighbors: []);
+        });
     // astar.setBarriers(<Point<int>>[].toListBarrier(Barrier.block));
-
   });
 
   // top-left to bottom-right
