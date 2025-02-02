@@ -4,30 +4,20 @@ import 'dart:math';
 import '../astar_dart.dart';
 
 class AStarEuclidean extends AstarGrid {
-  final List<ANode> _doneList = [];
-  final List<ANode> _waitList = [];
-
   AStarEuclidean({
     required int rows,
     required int columns,
     required GridBuilder gridBuilder,
   }) : super(rows: rows, columns: columns, gridBuilder: gridBuilder);
 
-  /// return full path without Start position
-  /// for Point(0,0) to Point(0,3) result will be [Point(0,3),Point(0,2),Point(0,1)]
-  /// ```dart
-  /// final result = _astar.findPath(start: Point(0,0),end: Point(0,3));
-  /// final moveTo = result.removeLast();
-  /// final moveNext = result.removeLast();
-  /// ```
   @override
   FutureOr<List<ANode>> findPath({
     void Function(List<Point<int>>)? doneList,
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
-    _doneList.clear();
-    _waitList.clear();
+    super.doneList.clear();
+    super.waitList.clear();
 
     if (grid[end.x][end.y].barrier.isBlock) {
       return Future.value([]);
@@ -56,7 +46,7 @@ class AStarEuclidean extends AstarGrid {
         nodeAux = nodeAux.parent!;
       }
     }
-    doneList?.call(_doneList.map((e) => Point(e.x, e.y)).toList());
+    doneList?.call(super.doneList.map((e) => Point(e.x, e.y)).toList());
 
     if (winner == null && !_isNeighbors(start, end)) {
       path.clear();
@@ -71,25 +61,25 @@ class AStarEuclidean extends AstarGrid {
       if (n.parent == null) {
         _checkDistance(n, end, parent: current);
       }
-      if (!_doneList.contains(n)) {
-        _waitList.add(n);
-        _doneList.add(n);
+      if (!super.doneList.contains(n)) {
+        super.waitList.add(n);
+        super.doneList.add(n);
       }
     }
 
-    while (_waitList.isNotEmpty) {
-      final c = _waitList.removeLast();
+    while (super.waitList.isNotEmpty) {
+      final c = super.waitList.removeLast();
       if (end == c) return c;
       for (var n in c.neighbors) {
         if (n.parent == null) {
           _checkDistance(n, end, parent: c);
         }
-        if (!_doneList.contains(n)) {
-          _waitList.add(n);
+        if (!super.doneList.contains(n)) {
+          super.waitList.add(n);
         }
       }
-      _doneList.add(c);
-      _waitList.sort((a, b) => b.compareTo(a));
+      super.doneList.add(c);
+      super.waitList.sort((a, b) => b.compareTo(a));
     }
 
     return null;
@@ -106,14 +96,6 @@ class AStarEuclidean extends AstarGrid {
     int toY = a.y - b.y;
     return toX.abs() + toY.abs();
   }
-
-  /// Calculates the distance between two nodes.
-  // double _distance(ANode current, ANode target) {
-  //   int toX = current.x - target.x;
-  //   int toY = current.y - target.y;
-
-  //   return sqrt(toX * toX + toY * toY); // Standard Euclidean distance
-  // }
 
   bool _isNeighbors(({int x, int y}) start, ({int x, int y}) end) {
     int dx = (start.x - end.x).abs();

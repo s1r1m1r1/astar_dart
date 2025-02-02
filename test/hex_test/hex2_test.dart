@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,36 +13,37 @@ void main() {
           }
           return ANode(x: x, y: y, neighbors: []);
         });
+    astar.addNeighbors();
     // astar.setBarriers(<Point<int>>[].toListBarrier(Barrier.block));
   });
 
   // top-left to bottom-right
   group('test AStarHex with barriers', () {
     test('test 1', () async {
-      final path = (await astar.findPath(
-              start: const Point(0, 0), end: const Point(6, 6)))
-          .toPointList();
+      final path =
+          (await astar.findPath(start: (x: 0, y: 0), end: (x: 6, y: 6)))
+              .toPointList();
       expect(path.length, 12); // Check number of cols
     });
 
     test('test 2', () async {
-      final path = (await astar.findPath(
-              start: const Point(6, 6), end: const Point(0, 0)))
-          .toPointList();
+      final path =
+          (await astar.findPath(start: (x: 6, y: 6), end: (x: 0, y: 0)))
+              .toPointList();
       expect(path.length, 12); // Check number of cols
     });
 
     test('test 3', () async {
-      final path = (await astar.findPath(
-              start: const Point(0, 6), end: const Point(6, 0)))
-          .toPointList();
+      final path =
+          (await astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
+              .toPointList();
       expect(
           path.length >= 7 && path.length <= 8, true); // Check number of cols
     });
     test('test 4', () async {
-      final path = (await astar.findPath(
-              start: const Point(0, 6), end: const Point(6, 0)))
-          .toPointList();
+      final path =
+          (await astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
+              .toPointList();
       expect(
           path.length >= 7 && path.length <= 8, true); // Check number of cols
     });

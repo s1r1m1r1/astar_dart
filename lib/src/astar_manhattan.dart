@@ -6,9 +6,6 @@ import 'dart:math';
 import '../astar_dart.dart';
 
 class AStarManhattan extends AstarGrid {
-  final Set<ANode> _doneList = HashSet<ANode>();
-  final List<ANode> _waitList = [];
-
   AStarManhattan(
       {required int rows,
       required int columns,
@@ -53,8 +50,8 @@ class AStarManhattan extends AstarGrid {
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
-    _doneList.clear();
-    _waitList.clear();
+    super.doneList.clear();
+    waitList.clear();
 
     if (grid[end.x][end.y].barrier == Barrier.block) {
       return [];
@@ -82,7 +79,7 @@ class AStarManhattan extends AstarGrid {
         nodeAux = nodeAux.parent!;
       }
     }
-    doneList?.call(_doneList.map((e) => Point(e.x, e.y)).toList());
+    doneList?.call(super.doneList.map((e) => Point(e.x, e.y)).toList());
 
     if (winner == null && !_isNeighbors(start, end)) {
       path.clear();
@@ -97,24 +94,24 @@ class AStarManhattan extends AstarGrid {
       if (n.parent == null) {
         _checkDistance(n, end, parent: current);
       }
-      if (!_doneList.contains(n)) {
-        _waitList.add(n);
+      if (!super.doneList.contains(n)) {
+        super.waitList.add(n);
       }
     }
 
-    while (_waitList.isNotEmpty) {
-      final c = _waitList.removeLast();
+    while (super.waitList.isNotEmpty) {
+      final c = super.waitList.removeLast();
       if (end == c) return c;
       for (var n in c.neighbors) {
         if (n.parent == null) {
           _checkDistance(n, end, parent: c);
         }
-        if (!_doneList.contains(n)) {
-          _waitList.add(n);
+        if (!super.doneList.contains(n)) {
+          super.waitList.add(n);
         }
       }
-      _doneList.add(c);
-      _waitList.sort((a, b) => b.compareTo(a));
+      super.doneList.add(c);
+      super.waitList.sort((a, b) => b.compareTo(a));
     }
 
     return null;

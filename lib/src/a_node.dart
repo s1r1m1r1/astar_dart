@@ -1,43 +1,55 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-// abstract class Node {}
-
 import '../astar_dart.dart';
 
+/// Represents a node in the A* search grid.
 class ANode implements Comparable<ANode> {
-  final int x;
-  final int y;
+  /// The x,y -coordinate of the node.
+  final int x, y;
+
+  /// The parent node in the path.
   ANode? parent;
   final List<ANode> neighbors;
+
+  /// The barrier status of the node (e.g., passable, blocked)
   Barrier barrier;
+
+  /// The weight or cost of moving to this node.
   double weight;
 
-  /// distanse from current to start
+  /// The actual cost of the path from the start node to this node (g-score).
   double g = 0;
 
-  /// distanse from current to end
+  /// The estimated cost of the path from this node to the end node (h-score).
   double h = 0;
 
-  /// total distance
+  /// The total estimated cost of the path from the start node to the end node through this node (f-score = g + h).
   double get f => g + h;
 
-  ANode(
-      {required this.x,
-      required this.y,
-      required this.neighbors,
-      this.barrier = Barrier.pass,
-      this.parent,
-      this.weight = 1});
+  /// Creates a new ANode.
+  ANode({
+    required this.x,
+    required this.y,
+    required this.neighbors,
+    this.barrier = Barrier.pass,
+    this.parent,
+    this.weight = 1,
+  });
 
+  /// Compares this node to another node based on their x and y coordinates.
   @override
   bool operator ==(covariant ANode other) {
     return other.x == x && other.y == y;
   }
 
+  /// Generates a hash code for this node based on its x, y coordinates, and runtime type.
   @override
   int get hashCode {
-    return Object.hashAll([x, y,runtimeType]);
+    return Object.hashAll([x, y, runtimeType]);
   }
 
+  /// Compares this node to another node for sorting purposes.
+  ///
+  /// Nodes are compared primarily by their f-scores. If f-scores are equal,
+  /// they are compared by their h-scores as a tie-breaker.
   @override
   int compareTo(ANode other) {
     int result = f.compareTo(other.f); // Compare f values first

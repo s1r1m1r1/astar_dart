@@ -9,6 +9,9 @@
 ## 2.0.0
    - make it faster 
    - added gridBuilder
+## 2.1.0
+   - improve performance 
+   - added hex example 
   
 
 

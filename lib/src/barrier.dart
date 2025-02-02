@@ -10,6 +10,4 @@ enum Barrier {
 
   // cannot move through , but can be founded as target
   target;
-
-  bool get isBlock => this == Barrier.block;
 }
