@@ -15,8 +15,7 @@ void main() {
 
   group('AStarSquare test 1', () {
     test('Finds path in simple grid', () async {
-      final path = await astar.findPath(
-          start: const Point(0, 0), end: const Point(9, 9));
+      final path = await astar.findPath(start: (x: 0, y: 0), end: (x: 9, y: 9));
       expect(path.isNotEmpty, true);
     });
     test('Finds path with obstacles', () async {
@@ -27,17 +26,16 @@ void main() {
         ..setBarrier(x: 5, y: 4, barrier: Barrier.block)
         ..setBarrier(x: 5, y: 5, barrier: Barrier.block);
 
-      final path = await astar.findPath(
-          start: const Point(0, 0), end: const Point(9, 9));
+      final path = await astar.findPath(start: (x: 0, y: 0), end: (x: 9, y: 9));
       expect(path.isNotEmpty, true);
     });
 
     test('No path if blocked', () async {
       // astar.calculateGrid();
       astar.setBarrier(x: 5, y: 5, barrier: Barrier.block);
-      final path = (await astar.findPath(
-              start: const Point(5, 4), end: const Point(5, 6)))
-          .toPointList();
+      final path =
+          (await astar.findPath(start: (x: 5, y: 4), end: (x: 5, y: 6)))
+              .toPointList();
       expect(path.length, 4);
     });
 
@@ -82,7 +80,7 @@ void main() {
       ];
 
       final path = await astar.findPath(
-          start: const Point(0, 0), end: const Point(0, 3));
+          start: (x:0,y: 0), end: (x:0,y: 3));
 
       // Use a deep equality check to compare the lists of ANodes
       expect(

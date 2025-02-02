@@ -25,7 +25,7 @@ void main() {
   group('AStarSquare (Euclidean)', () {
     test('Finds path in simple grid (Euclidean)', () async {
       final path = await astar.findPath(
-          start: const Point(0, 0), end: const Point(9, 9));
+          start: (x:0,y: 0), end: (x:9,y: 9));
       final points = path.toPointList();
       expect(points.length, 9);
     });

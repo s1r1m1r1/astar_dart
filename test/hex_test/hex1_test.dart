@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
 import 'package:astar_dart/src/astar_hex.dart';
@@ -21,51 +20,51 @@ void main() {
   group('test AStarHex simple', () {
     test('test 1', () async {
       final path = (await astar.findPath(
-              start: const Point(0, 0), end: const Point(6, 6)))
+              start: (x: 0, y: 0), end: (x: 6, y: 6)))
           .toPointList();
       expect(path.length, 12); // Check number of cols
     });
 
     test('test 2', () async {
       final path = (await astar.findPath(
-              start: const Point(6, 6), end: const Point(0, 0)))
+              start: (x: 6, y: 6), end: (x: 0, y: 0)))
           .toPointList();
       expect(path.length, 12); // Check number of cols
     });
 
     test('test 3', () async {
       final path = (await astar.findPath(
-              start: const Point(0, 6), end: const Point(6, 0)))
+              start: (x: 0, y: 6), end: (x: 6, y: 0)))
           .toPointList();
       expect(path.length, 6); // Check number of cols
     });
     test('test 4', () async {
       final path = (await astar.findPath(
-              start: const Point(0, 6), end: const Point(6, 0)))
+              start: (x: 0, y: 6), end: (x: 6, y: 0)))
           .toPointList();
       expect(path.length, 6); // Check number of cols
     });
     test('test 5', () async {
       final path = (await astar.findPath(
-              start: const Point(3, 3), end: const Point(0, 0)))
+              start: (x: 3, y: 3), end: (x: 0, y: 0)))
           .toPointList();
       expect(path.length, 6); // Check number of cols
     });
     test('test 6', () async {
       final path = (await astar.findPath(
-              start: const Point(3, 3), end: const Point(0, 6)))
+              start: (x: 3, y: 3), end: (x: 0, y: 6)))
           .toPointList();
       expect(path.length, 3); // Check number of cols
     });
     test('test 7', () async {
       final path = (await astar.findPath(
-              start: const Point(3, 3), end: const Point(6, 0)))
+              start: (x: 3, y: 3), end: (x: 6, y: 0)))
           .toPointList();
       expect(path.length, 3); // Check number of cols
     });
     test('test 8', () async {
       final path = (await astar.findPath(
-              start: const Point(3, 3), end: const Point(6, 6)))
+              start: (x: 3, y: 3), end: (x: 6, y: 6)))
           .toPointList();
       expect(path.length, 6); // Check number of cols
     });

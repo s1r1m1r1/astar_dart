@@ -50,11 +50,9 @@ class AStarManhattan extends AstarGrid {
   @override
   FutureOr<List<ANode>> findPath({
     void Function(List<Point<int>>)? doneList,
-    required Point<int> start,
-    required Point<int> end,
+    required ({int x, int y}) start,
+    required ({int x, int y}) end,
   }) {
-    super.start = start;
-    super.end = end;
     _doneList.clear();
     _waitList.clear();
 
@@ -94,7 +92,6 @@ class AStarManhattan extends AstarGrid {
   }
 
   ANode? _getWinner(ANode current, ANode end) {
-    ANode? winner;
     if (end == current) return current;
     for (var n in current.neighbors) {
       if (n.parent == null) {
@@ -117,10 +114,10 @@ class AStarManhattan extends AstarGrid {
         }
       }
       _doneList.add(c);
-      _waitList.sort((a,b) => b.compareTo(a));
+      _waitList.sort((a, b) => b.compareTo(a));
     }
 
-    return winner;
+    return null;
   }
 
   void _checkDistance(ANode current, ANode end, {required ANode parent}) {
@@ -134,7 +131,10 @@ class AStarManhattan extends AstarGrid {
     return (current.x - target.x).abs() + (current.y - target.y).abs();
   }
 
-  bool _isNeighbors(Point<int> start, Point<int> end) {
+  bool _isNeighbors(
+    ({int x, int y}) start,
+    ({int x, int y}) end,
+  ) {
     int dx = (start.x - end.x).abs();
     int dy = (start.y - end.y).abs();
 

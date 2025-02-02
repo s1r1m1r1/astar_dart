@@ -11,9 +11,6 @@ enum AStarHexAlignment {
 }
 
 class AStarHex extends AstarGrid {
-  final List<ANode> _doneList = [];
-  final List<ANode> _waitList = [];
-
   AStarHex({
     required int rows,
     required int columns,
@@ -27,14 +24,9 @@ class AStarHex extends AstarGrid {
   @override
   FutureOr<List<ANode>> findPath({
     void Function(List<Point<int>>)? doneList,
-    required Point<int> start,
-    required Point<int> end,
+    required ({int x, int y}) start,
+    required ({int x, int y}) end,
   }) async {
-    super.start = start;
-    super.end = end;
-    _doneList.clear();
-    _waitList.clear();
-
     if (grid[super.end.x][super.end.y].barrier.isBlock) {
       return [];
     }
@@ -65,7 +57,7 @@ class AStarHex extends AstarGrid {
 
     // developer.log("PATH:\n${path.length} $path\n\n");
 
-    doneList?.call(_doneList.map((e) => Point(e.x, e.y)).toList());
+    doneList?.call(super.doneList.map((e) => Point(e.x, e.y)).toList());
 
     if (winner == null) {
       path.clear();
@@ -75,35 +67,33 @@ class AStarHex extends AstarGrid {
   }
 
   ANode? _getWinner(ANode current, ANode end) {
-    _waitList.clear();
-    _doneList.clear();
-    ANode? winner;
+    super.waitList.clear();
+    super.doneList.clear();
     if (end == current) return current;
     for (var n in current.neighbors) {
       if (n.parent == null) {
         _analyzeDistance(n, end, parent: current);
       }
-      if (!_doneList.contains(n)) {
-        _waitList.add(n);
+      if (!super.doneList.contains(n)) {
+        super.waitList.add(n);
       }
     }
 
-    while (_waitList.isNotEmpty) {
-      final c = _waitList.removeLast();
+    while (super.waitList.isNotEmpty) {
+      final c = super.waitList.removeLast();
       if (end == c) return c;
       for (var n in c.neighbors) {
         if (n.parent == null) {
           _analyzeDistance(n, end, parent: c);
         }
-        if (!_doneList.contains(n)) {
-          _waitList.add(n);
+        if (!super.doneList.contains(n)) {
+          super.waitList.add(n);
         }
       }
-      _doneList.add(c);
-      _waitList.sort((a, b) => b.compareTo(a));
+      super.doneList.add(c);
+      super.waitList.sort((a, b) => b.compareTo(a));
     }
-
-    return winner;
+    return null;
   }
 
   void _analyzeDistance(ANode current, ANode end, {required ANode parent}) {
@@ -136,9 +126,14 @@ class AStarHex extends AstarGrid {
     return to.y - from.y;
   }
 
-  bool _isNeighbors(Point<int> a, Point<int> b) {
-    final s = (b - a);
-    return (s.x.abs() <= 1 && s.y.abs() <= 1);
+  bool _isNeighbors(
+    ({int x, int y}) a,
+    ({int x, int y}) b,
+  ) {
+    final s1 = (b.x - a.x);
+    final s2 = (b.y - a.y);
+
+    return (s1.abs() <= 1 && s2.abs() <= 1);
   }
 
   /// Adds neighbors to cells

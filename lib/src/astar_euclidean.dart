@@ -11,11 +11,7 @@ class AStarEuclidean extends AstarGrid {
     required int rows,
     required int columns,
     required GridBuilder gridBuilder,
-  }) : super(
-          rows: rows,
-          columns: columns,
-          gridBuilder: gridBuilder
-        );
+  }) : super(rows: rows, columns: columns, gridBuilder: gridBuilder);
 
   /// return full path without Start position
   /// for Point(0,0) to Point(0,3) result will be [Point(0,3),Point(0,2),Point(0,1)]
@@ -27,11 +23,9 @@ class AStarEuclidean extends AstarGrid {
   @override
   FutureOr<List<ANode>> findPath({
     void Function(List<Point<int>>)? doneList,
-    required Point<int> start,
-    required Point<int> end,
+    required ({int x, int y}) start,
+    required ({int x, int y}) end,
   }) {
-    super.start = start;
-    super.end = end;
     _doneList.clear();
     _waitList.clear();
 
@@ -72,7 +66,6 @@ class AStarEuclidean extends AstarGrid {
   }
 
   ANode? _getWinner(ANode current, ANode end) {
-    ANode? winner;
     if (end == current) return current;
     for (var n in current.neighbors) {
       if (n.parent == null) {
@@ -80,6 +73,7 @@ class AStarEuclidean extends AstarGrid {
       }
       if (!_doneList.contains(n)) {
         _waitList.add(n);
+        _doneList.add(n);
       }
     }
 
@@ -98,24 +92,19 @@ class AStarEuclidean extends AstarGrid {
       _waitList.sort((a, b) => b.compareTo(a));
     }
 
-    return winner;
+    return null;
   }
 
   void _checkDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
-    current.h = _distance(current, end);
+    current.h = _distance(current, end) * 1.0;
   }
 
-  static const lineConst = 1.0; // Straight move cost
-  static const diagonalConst =
-      1.414; // Diagonal move cost (sqrt(2) for an even grid)
-
-  double _distance(ANode current, ANode target) {
-    int dx = (current.x - target.x).abs();
-    int dy = (current.y - target.y).abs();
-    return lineConst * (dx + dy) +
-        (diagonalConst - 2 * lineConst) * min(dx, dy);
+  int _distance(ANode a, ANode b) {
+    int toX = a.x - b.x;
+    int toY = a.y - b.y;
+    return toX.abs() + toY.abs();
   }
 
   /// Calculates the distance between two nodes.
@@ -126,7 +115,7 @@ class AStarEuclidean extends AstarGrid {
   //   return sqrt(toX * toX + toY * toY); // Standard Euclidean distance
   // }
 
-  bool _isNeighbors(Point<int> start, Point<int> end) {
+  bool _isNeighbors(({int x, int y}) start, ({int x, int y}) end) {
     int dx = (start.x - end.x).abs();
     int dy = (start.y - end.y).abs();
 

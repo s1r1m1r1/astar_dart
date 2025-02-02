@@ -51,14 +51,12 @@ void main() {
   });
   group('test blocked path', () {
     test('test if blocked ', () async {
-      final path = await astar.findPath(
-          start: const Point(0, 0), end: const Point(5, 5));
+      final path = await astar.findPath(start: (x: 0, y: 0), end: (x: 5, y: 5));
       expect(path.isEmpty, true); // Check number of cols
     });
 
     test('test if not blocked ', () async {
-      final path = await astar.findPath(
-          start: const Point(0, 0), end: const Point(5, 2));
+      final path = await astar.findPath(start: (x: 0, y: 0), end: (x: 5, y: 2));
       expect(path.isNotEmpty, true); // Check number of cols
     });
   });

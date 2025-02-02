@@ -8,18 +8,13 @@ import 'package:benchmark_harness/benchmark_harness.dart';
 // dart run main.dart
 void main() {
   //------ size 50
-  AStarBenchmark(algorithm: Names.algorithmHex, size: 200).report();
-  AStarBenchmark(algorithm: Names.algorithmManhattan, size: 200).report();
-  AStarBenchmark(algorithm: Names.algorithmEuclidean, size: 200).report();
+  AStarBenchmark(algorithm: Names.algorithmHex, size: 256).report();
+  AStarBenchmark(algorithm: Names.algorithmManhattan, size: 256).report();
+  AStarBenchmark(algorithm: Names.algorithmEuclidean, size: 256).report();
   // too slow
-  // AstarTest2Benchmark(withDiagonal: false,size: 200).report();
-  AstarTest2Benchmark(withDiagonal: true, size: 200).report();
+  // AstarTest2Benchmark(withDiagonal: false,size: 50).report();
+  AstarTest2Benchmark(withDiagonal: true, size: 256).report();
   AstarTest3Benchmark().report();
-
-  // //------ size 200
-  // AStarBenchmark(algorithm: Names.algorithmHex, size: 200).report();
-  // AStarBenchmark(algorithm: Names.algorithmManhattan, size: 200).report();
-  // AStarBenchmark(algorithm: Names.algorithmEuclidean, size: 200).report();
 }
 
 enum Names {
@@ -28,18 +23,16 @@ enum Names {
   algorithmEuclidean,
 }
 
-class AStarBenchmark extends BenchmarkBase {
+class AStarBenchmark extends AsyncBenchmarkBase {
   final Names algorithm;
   late AstarGrid astar;
-  late Point<int> start;
-  late Point<int> end;
   final int size;
 
-  AStarBenchmark({required this.algorithm, this.size = 50})
+  AStarBenchmark({required this.algorithm, required this.size})
       : super(algorithm.name);
 
   @override
-  void run() {
+  Future<void> run() async {
     switch (algorithm) {
       case Names.algorithmHex:
         astar = AStarHex(
@@ -54,6 +47,12 @@ class AStarBenchmark extends BenchmarkBase {
           rows: size,
           columns: size,
           gridBuilder: (x, y) {
+            if (x == 3 && [0, 1, 2, 8].contains(y)) {
+              return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+            }
+            if (x == 8 && [3, 5, 9].contains(y)) {
+              return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+            }
             return ANode(x: x, y: y, neighbors: []);
           },
         );
@@ -63,14 +62,26 @@ class AStarBenchmark extends BenchmarkBase {
             rows: size,
             columns: size,
             gridBuilder: (int x, int y) {
+              if (x == 3 && [0, 1, 2, 7, 8].contains(y)) {
+                return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+              }
+              if (x == 8 && [3, 5, 6, 8, 9].contains(y)) {
+                return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+              }
               return ANode(x: x, y: y, neighbors: []);
             });
         break;
     }
-    start = const Point(0, 0);
-    end = Point(size - 1, size - 1);
+    const start = (x: 0, y: 0);
+    final ({int x, int y}) end = (x: size - 1, y: size - 1);
     astar.addNeighbors();
-    astar.findPath(start: start, end: end);
+    final path = await astar.findPath(
+        start: start,
+        end: end,
+        doneList: (list) {
+          // print('Done LENGTH ${list.length}');
+        });
+    // print('PATH LENGTH ${path.length}');
   }
 }
 
@@ -93,7 +104,10 @@ class AstarTest2Benchmark extends BenchmarkBase {
       columns: size,
       start: start,
       end: end,
-      barriers: [],
+      barriers: [
+        ...List.generate(size - 5, (i) => (3, i)),
+        ...List.generate(size - 3, (i) => (5, i + 2)),
+      ],
       withDiagonal: withDiagonal,
     );
     astar.findThePath();
@@ -123,7 +137,7 @@ class CoordinatesState extends astar3.AStarState<CoordinatesState> {
   final int y;
 
   const CoordinatesState(this.x, this.y,
-      {super.depth = 0, this.goalX = 200, this.goalY = 200});
+      {super.depth = 0, this.goalX = 256, this.goalY = 256});
 
   @override
   Iterable<CoordinatesState> expand() => [

@@ -110,8 +110,8 @@ class _GridExampleState extends State<GridExample> {
     );
     astar.addNeighbors();
 
-    final path = await astar.findPath(
-        start: Point<int>(0, 0), end: Point<int>(floor.x, floor.y));
+    final path = await astar
+        .findPath(start: (x: 0, y: 0), end: (x: floor.x, y: floor.y));
     array2d.forEach((floor, x, y) => floor
       ..isPath = false
       ..update());

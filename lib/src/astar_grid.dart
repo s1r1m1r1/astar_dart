@@ -8,17 +8,13 @@ typedef GridBuilder = ANode Function(int x, int y);
 
 /// base class for all AstarGrid
 abstract class AstarGrid {
-  // Future<List<ANode>> findPath(
-  //     {void Function(List<Point<int>>)? doneList,
-  //     required Point<int> start,
-  //     required Point<int> end});
-
-  // void addNeighbors();
+  final List<ANode> doneList = [];
+  final List<ANode> waitList = [];
 
   FutureOr<List<ANode>> findPath({
     void Function(List<Point<int>>)? doneList,
-    required Point<int> start,
-    required Point<int> end,
+    required ({int x, int y}) start,
+    required ({int x, int y}) end,
   });
 
   late final int rows;
@@ -50,5 +46,3 @@ abstract class AstarGrid {
 
   // calculateGrid();
 }
-
-

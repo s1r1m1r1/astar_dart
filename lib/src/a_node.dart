@@ -35,7 +35,7 @@ class ANode implements Comparable<ANode> {
 
   @override
   int get hashCode {
-    return Object.hashAll([x, y]);
+    return Object.hashAll([x, y,runtimeType]);
   }
 
   @override
