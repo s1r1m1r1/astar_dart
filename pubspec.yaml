@@ -18,7 +18,7 @@ dev_dependencies:
 
 topics:
   - astar
-  - path-finding
+  - pathfinding
   - manhattan
   - euclidean 
   - hex 
