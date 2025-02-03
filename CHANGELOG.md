@@ -13,7 +13,10 @@
    - improve performance 
    - added hex example 
   
-
+## 2.2.0
+   - remove BarrierPoint 
+   - added hex example 
+ 
 
 
 
