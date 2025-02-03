@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'dart:developer' as developer;
-
 import '../astar_dart.dart';
 
-enum AStarHexAlignment {
-  odd,
-  even,
-}
+// enum AStarHexAlignment {
+//   odd,
+//   even,
+// }
 
 class AStarHex extends AstarGrid {
   AStarHex({
@@ -27,22 +25,27 @@ class AStarHex extends AstarGrid {
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) async {
+    /// If the end node is blocked, return an empty path.
     if (grid[end.x][end.y].barrier.isBlock) {
       return [];
     }
 
+    /// Get the start and end nodes from the grid.
     ANode startNode = grid[start.x][start.y];
-
     ANode endNode = grid[end.x][end.y];
+
+    /// If start and end are neighbors, return a direct path.
     if (_isNeighbors(start, end)) {
       return Future.value([endNode]);
     }
 
+    /// Find the best path using the A* algorithm.
     ANode? winner = _getWinner(
       startNode,
       endNode,
     );
 
+    /// Reconstruct the path from the winner node.
     List<ANode> path = [grid[end.x][end.y]];
     if (winner?.parent != null) {
       ANode nodeAux = winner!.parent!;
@@ -55,10 +58,10 @@ class AStarHex extends AstarGrid {
       }
     }
 
-    // developer.log("PATH:\n${path.length} $path\n\n");
-
+    /// Call the doneList callback with the explored nodes.
     doneList?.call(super.doneList.map((e) => Point(e.x, e.y)).toList());
 
+    /// If no path was found, clear the path list.
     if (winner == null) {
       path.clear();
     }
@@ -66,6 +69,7 @@ class AStarHex extends AstarGrid {
     return Future.value(path.toList());
   }
 
+  /// Internal function to find the best path using the A* algorithm.
   ANode? _getWinner(ANode current, ANode end) {
     super.waitList.clear();
     super.doneList.clear();
@@ -96,6 +100,7 @@ class AStarHex extends AstarGrid {
     return null;
   }
 
+  /// Analyzes the distance between two nodes and updates the current node's parent, g, and h values
   void _analyzeDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
@@ -126,6 +131,7 @@ class AStarHex extends AstarGrid {
     return to.y - from.y;
   }
 
+  /// Checks if two points are neighbors on a hexagonal grid.
   bool _isNeighbors(
     ({int x, int y}) a,
     ({int x, int y}) b,
@@ -136,7 +142,7 @@ class AStarHex extends AstarGrid {
     return (s1.abs() <= 1 && s2.abs() <= 1);
   }
 
-  /// Adds neighbors to cells
+  /// Adds neighbors to each node in the grid.
   @override
   void addNeighbors() {
     for (var row in grid.array) {
@@ -150,6 +156,7 @@ class AStarHex extends AstarGrid {
     }
   }
 
+  /// Connects a node to its neighbors on a hexagonal grid.
   void _chainNeighbors(
     ANode node,
   ) {

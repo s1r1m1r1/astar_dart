@@ -17,6 +17,7 @@ void main() {
         return ANode(x: x, y: y, neighbors: []);
       },
     );
+    astar.addNeighbors();
     // astar.setBarriers(<Point<int>>[].toListBarrier(Barrier.block));
   });
 
@@ -26,6 +27,7 @@ void main() {
       'test 1',
       () async {
         final path = await astar.findTargets(
+          maxSteps: 14,
           start: const Point(0, 0),
           targets: const [
             Point(6, 6),

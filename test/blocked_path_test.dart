@@ -1,7 +1,5 @@
-import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
-import 'package:astar_dart/src/astar_euclidean.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
