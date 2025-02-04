@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:array2d/array2d.dart';
+
 import '../astar_dart.dart';
 
 typedef GridBuilder = ANode Function(int x, int y);

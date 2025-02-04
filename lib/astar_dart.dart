@@ -10,3 +10,5 @@ export 'package:astar_dart/src/points.dart';
 export 'package:astar_dart/src/a_node.dart';
 export 'package:astar_dart/src/extensions.dart';
 export 'package:astar_dart/src/version.dart';
+
+export 'package:array2d/array2d.dart';

@@ -34,7 +34,6 @@ class _GridExampleState extends State<GridExample> {
   late ValueNotifier<bool> updater;
   late final Array2d<Floor> array2d;
   ({int x, int y}) start = (x: 0, y: 0);
-  ({int x, int y}) end = (x: 9, y: 9);
 
   @override
   void initState() {
@@ -54,7 +53,6 @@ class _GridExampleState extends State<GridExample> {
     });
 
     array2d[start.x][start.y].target = Target.player;
-    array2d[end.x][end.y].target = Target.enemy;
 
     _setObstacles();
   }
@@ -68,29 +66,38 @@ class _GridExampleState extends State<GridExample> {
     array2d[7][2].ground = GroundType.forest;
   }
 
-  Future<void> _calculatePath(Floor flor) async {
-    final astar = AStarManhattan(
+  Future<void> _calculatePath(Floor floor) async {
+    debugPrint("calculate start ${floor.x} ${floor.y}");
+    final astar = AStarHex(
       // Manhattan heuristic is still ok for hex grid, but you can explore others.
-      rows: 10,
-      columns: 10,
-    )..setPoints([
-        ...array2d.array.expand((row) {
-          return row.map((floor) => WeightedPoint(floor.x, floor.y,
-              weight: switch (floor.ground) {
-                GroundType.field => 1,
-                GroundType.water => 7,
-                GroundType.forest => 10,
-                GroundType.barrier => 100,
-              }));
-        })
-      ]);
+      rows: array2d.width,
+      columns: array2d.height,
+      gridBuilder: (int x, int y) {
+        final floor = array2d[x][y];
+        return ANode(
+            x: x,
+            y: y,
+            neighbors: [],
+            weight: switch (floor.ground) {
+              GroundType.field => 1,
+              GroundType.water => 7,
+              GroundType.forest => 10,
+              GroundType.barrier => 1000,
+            });
+      },
+    );
+    astar.addNeighbors();
 
-    final path = await astar.findPath(start: start, end: end);
+    debugPrint("calculate start 2");
+    final path = await astar.findPath(start: start, end: (x: floor.x, y: floor.y));
 
+    debugPrint("calculate start 3");
     array2d.forEach((floor, x, y) => floor.isPath = false);
-    if (path != null) {
+    if (path.isNotEmpty) {
       for (var p in path) {
-        array2d[p.x][p.y].isPath = true;
+        array2d[p.x][p.y]
+          ..isPath = true
+          ..update();
       }
     } else {
       debugPrint("No path found!");
@@ -130,6 +137,19 @@ class _GridExampleState extends State<GridExample> {
                           child: FloorItemWidget(
                             floor: array2d[x][y],
                             onTap: (floor) => _calculatePath(floor),
+                            color: switch (array2d[x][y]) {
+                              Floor(:final x, :final y)
+                                  when x == start.x && y == start.y =>
+                                Colors.purple,
+                              Floor(isPath: true) => Colors.grey,
+                              Floor(ground: GroundType.field) =>
+                                Colors.greenAccent,
+                              Floor(ground: GroundType.water) =>
+                                Colors.lightBlue,
+                              Floor(ground: GroundType.forest) =>
+                                Colors.green[700],
+                              Floor(ground: GroundType.barrier) => Colors.black,
+                            }!,
                           ),
                         )
                   ],
@@ -148,71 +168,77 @@ class FloorItemWidget extends StatelessWidget {
     super.key,
     required this.floor,
     required this.onTap,
+    required this.color,
   });
   final Floor floor;
+  final Color color;
   final Function(Floor floor) onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: floor,
-      builder: (context, _) {
-        return ClipRRect(
-          child: CustomPaint(
-            painter: HexTilePainter(floor: floor),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(height: 20),
-                Text('x: ${floor.x}, y: ${floor.y}'),
-                Text(
-                  "weight: ${switch (floor.ground) {
-                    GroundType.field => '1',
-                    GroundType.water => '7',
-                    GroundType.forest => '10',
-                    GroundType.barrier => 'x',
-                  }}",
-                ),
-                // Row(
-                //   mainAxisSize: MainAxisSize.min,
-                //   children: [
-                //     // SizedBox(width: 32),
-                //     // Icon(
-                //     //   switch (floor.ground) {
-                //     //     GroundType.field => Icons.grass,
-                //     //     GroundType.water => Icons.water,
-                //     //     GroundType.forest => Icons.forest,
-                //     //     GroundType.barrier => Icons.block,
-                //     //   },
-                //     //   color: Colors.black,
-                //     //   size:10.0,
-                //     // ),
-                //     SizedBox(width: 32),
+    return ClipRRect(
+      child: GestureDetector(
+        onTap: () {
+          onTap(floor);
+        },
+        child: ListenableBuilder(
+            listenable: floor,
+            builder: (context, _) {
+              return CustomPaint(
+                painter: HexTilePainter(color: color),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(height: 20),
+                    Text('x: ${floor.x}, y: ${floor.y}'),
+                    Text(
+                      "weight: ${switch (floor.ground) {
+                        GroundType.field => '1',
+                        GroundType.water => '7',
+                        GroundType.forest => '10',
+                        GroundType.barrier => 'x',
+                      }}",
+                    ),
+                    // Row(
+                    //   mainAxisSize: MainAxisSize.min,
+                    //   children: [
+                    //     // SizedBox(width: 32),
+                    //     // Icon(
+                    //     //   switch (floor.ground) {
+                    //     //     GroundType.field => Icons.grass,
+                    //     //     GroundType.water => Icons.water,
+                    //     //     GroundType.forest => Icons.forest,
+                    //     //     GroundType.barrier => Icons.block,
+                    //     //   },
+                    //     //   color: Colors.black,
+                    //     //   size:10.0,
+                    //     // ),
+                    //     SizedBox(width: 32),
 
-                //   ],
-                // ),
-                // SizedBox(height: 32),
-                // Text(
-                //   switch (floor.target) {
-                //     Target.player => 'PLAYER',
-                //     Target.enemy => 'ENEMY',
-                //     Target.none => '',
-                //   },
-                // ),
-              ],
-            ),
-          ),
-        );
-      },
+                    //   ],
+                    // ),
+                    // SizedBox(height: 32),
+                    // Text(
+                    //   switch (floor.target) {
+                    //     Target.player => 'PLAYER',
+                    //     Target.enemy => 'ENEMY',
+                    //     Target.none => '',
+                    //   },
+                    // ),
+                  ],
+                ),
+              );
+            }),
+      ),
     );
   }
 }
 
 class HexTilePainter extends CustomPainter {
-  final Floor floor;
+  final Color color;
 
-  HexTilePainter({required this.floor});
+  HexTilePainter({required this.color});
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path()
@@ -225,16 +251,9 @@ class HexTilePainter extends CustomPainter {
       ..lineTo(0, (size.height * 0.25));
     // ..lineTo(0, (size.height * 0.25));
 
-    final fillColor = switch (floor.ground) {
-      _ when floor.isPath => Colors.grey.withOpacity(0.5),
-      GroundType.field => Colors.green[200],
-      GroundType.water => Colors.cyanAccent,
-      GroundType.forest => Colors.green[800],
-      GroundType.barrier => Colors.red,
-    };
     final paint = Paint();
     paint
-      ..color = fillColor!
+      ..color = color
       ..style = PaintingStyle.fill;
 
     canvas.drawPath(path, paint);
