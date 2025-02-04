@@ -17,7 +17,7 @@
    - remove BarrierPoint 
    - added hex example 
  
-## 2.2.1
+## 2.3.0
   - extract Array2d as package
   - update hex example 
 
