@@ -1,7 +1,6 @@
 name: astar_dart
 description: "A pathfinding implementation in Dart. Efficiently finds shortest paths on grids, supporting barriers and weights. Manhattan, Euclidean, Hex"
 version: 2.2.1
-license: MIT
 homepage: https://github.com/s1r1m1r1/astar_dart
 
 environment:
