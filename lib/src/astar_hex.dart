@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import '../astar_dart.dart';
@@ -20,11 +19,11 @@ class AStarHex extends AstarGrid {
         );
 
   @override
-  FutureOr<List<ANode>> findPath({
+  List<ANode> findPath({
     void Function(List<Point<int>>)? doneList,
     required ({int x, int y}) start,
     required ({int x, int y}) end,
-  }) async {
+  }) {
     /// If the end node is blocked, return an empty path.
     if (grid[end.x][end.y].barrier.isBlock) {
       return [];
@@ -36,10 +35,11 @@ class AStarHex extends AstarGrid {
 
     /// If start and end are neighbors, return a direct path.
     if (_isNeighbors(start, end)) {
-      return Future.value([endNode]);
+      return [endNode];
     }
 
     /// Find the best path using the A* algorithm.
+
     ANode? winner = _getWinner(
       startNode,
       endNode,
@@ -58,47 +58,51 @@ class AStarHex extends AstarGrid {
       }
     }
 
-    /// Call the doneList callback with the explored nodes.
-    doneList?.call(super.doneList.map((e) => Point(e.x, e.y)).toList());
-
     /// If no path was found, clear the path list.
     if (winner == null) {
       path.clear();
     }
+    waitList.clear();
+    this.doneList.clear();
 
-    return Future.value(path.toList());
+    /// Call the doneList callback with the explored nodes.
+    doneList?.call(this.doneList.map((e) => Point(e.x, e.y)).toList());
+
+    return path.toList();
   }
 
+//----------------------------------------------------------------------
   /// Internal function to find the best path using the A* algorithm.
   ANode? _getWinner(ANode current, ANode end) {
-    super.waitList.clear();
-    super.doneList.clear();
     if (end == current) return current;
     for (var n in current.neighbors) {
       if (n.parent == null) {
         _analyzeDistance(n, end, parent: current);
       }
-      if (!super.doneList.contains(n)) {
-        super.waitList.add(n);
+      if (!doneList.contains(n)) {
+        waitList.add(n);
+        doneList.add(n);
       }
     }
+    waitList.sort((a, b) => b.compareTo(a));
 
-    while (super.waitList.isNotEmpty) {
-      final c = super.waitList.removeLast();
+    while (waitList.isNotEmpty) {
+      final c = waitList.removeLast();
       if (end == c) return c;
       for (var n in c.neighbors) {
         if (n.parent == null) {
           _analyzeDistance(n, end, parent: c);
         }
-        if (!super.doneList.contains(n)) {
-          super.waitList.add(n);
+        if (!doneList.contains(n)) {
+          waitList.add(n);
+          doneList.add(c);
         }
       }
-      super.doneList.add(c);
-      super.waitList.sort((a, b) => b.compareTo(a));
+      waitList.sort((a, b) => b.compareTo(a));
     }
     return null;
   }
+  //----------------------------------------------------------------------
 
   /// Analyzes the distance between two nodes and updates the current node's parent, g, and h values
   void _analyzeDistance(ANode current, ANode end, {required ANode parent}) {

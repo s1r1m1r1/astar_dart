@@ -89,7 +89,8 @@ class _GridExampleState extends State<GridExample> {
     astar.addNeighbors();
 
     debugPrint("calculate start 2");
-    final path = await astar.findPath(start: start, end: (x: floor.x, y: floor.y));
+    final path = await Future.value(
+        astar.findPath(start: start, end: (x: floor.x, y: floor.y)));
 
     debugPrint("calculate start 3");
     array2d.forEach((floor, x, y) => floor.isPath = false);
@@ -249,7 +250,6 @@ class HexTilePainter extends CustomPainter {
       ..lineTo((size.width / 2), size.height)
       ..lineTo(0, (size.height * 0.75))
       ..lineTo(0, (size.height * 0.25));
-    // ..lineTo(0, (size.height * 0.25));
 
     final paint = Paint();
     paint

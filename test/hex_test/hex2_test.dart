@@ -19,31 +19,30 @@ void main() {
 
   // top-left to bottom-right
   group('test AStarHex with barriers', () {
-    test('test 1', () async {
-      final path =
-          (await astar.findPath(start: (x: 0, y: 0), end: (x: 6, y: 6)))
-              .toPointList();
+    test('test 1', () {
+      final path = (astar.findPath(start: (x: 0, y: 0), end: (x: 6, y: 6)))
+          .toPointList();
       expect(path.length, 12); // Check number of cols
     });
 
-    test('test 2', () async {
-      final path =
-          (await astar.findPath(start: (x: 6, y: 6), end: (x: 0, y: 0)))
-              .toPointList();
+    test('test 2', () {
+      astar.addNeighbors();
+      final path = (astar.findPath(start: (x: 6, y: 6), end: (x: 0, y: 0)))
+          .toPointList();
       expect(path.length, 12); // Check number of cols
     });
 
-    test('test 3', () async {
-      final path =
-          (await astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
-              .toPointList();
+    test('test 3', () {
+      astar.addNeighbors();
+      final path = (astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
+          .toPointList();
       expect(
           path.length >= 7 && path.length <= 8, true); // Check number of cols
     });
-    test('test 4', () async {
-      final path =
-          (await astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
-              .toPointList();
+    test('test 4', () {
+      astar.addNeighbors();
+      final path = (astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
+          .toPointList();
       expect(
           path.length >= 7 && path.length <= 8, true); // Check number of cols
     });

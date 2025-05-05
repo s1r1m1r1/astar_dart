@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import '../astar_dart.dart';
@@ -43,12 +42,12 @@ class AStarManhattan extends AstarGrid {
   /// final moveNext = result.removeLast();
   /// ```
   @override
-  FutureOr<List<ANode>> findPath({
+  List<ANode> findPath({
     void Function(List<Point<int>>)? doneList,
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
-    super.doneList.clear();
+    this.doneList.clear();
     waitList.clear();
 
     if (grid[end.x][end.y].barrier == Barrier.block) {
@@ -77,53 +76,57 @@ class AStarManhattan extends AstarGrid {
         nodeAux = nodeAux.parent!;
       }
     }
-    doneList?.call(super.doneList.map((e) => Point(e.x, e.y)).toList());
+    doneList?.call(this.doneList.map((e) => Point(e.x, e.y)).toList());
 
     if (winner == null && !_isNeighbors(start, end)) {
       path.clear();
     }
 
-    return Future.value(path.toList());
+    return path.toList();
   }
 
+//----------------------------------------------------------------------
   ANode? _getWinner(ANode current, ANode end) {
     if (end == current) return current;
     for (var n in current.neighbors) {
       if (n.parent == null) {
         _checkDistance(n, end, parent: current);
       }
-      if (!super.doneList.contains(n)) {
-        super.waitList.add(n);
+      if (!doneList.contains(n)) {
+        waitList.add(n);
+        doneList.add(n);
       }
     }
+    waitList.sort((a, b) => b.compareTo(a));
 
-    while (super.waitList.isNotEmpty) {
-      final c = super.waitList.removeLast();
+    while (waitList.isNotEmpty) {
+      final c = waitList.removeLast();
       if (end == c) return c;
       for (var n in c.neighbors) {
         if (n.parent == null) {
           _checkDistance(n, end, parent: c);
         }
-        if (!super.doneList.contains(n)) {
-          super.waitList.add(n);
+        if (!doneList.contains(n)) {
+          waitList.add(n);
+          doneList.add(c);
         }
       }
-      super.doneList.add(c);
-      super.waitList.sort((a, b) => b.compareTo(a));
+      waitList.sort((a, b) => b.compareTo(a));
     }
 
     return null;
   }
+  //----------------------------------------------------------------------
 
   void _checkDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
     // performance , make direction more stronger
-    current.h = _distance(current, end) * 2;
+    current.h = _distance(current, end) * 2.0;
   }
 
-  int _distance(ANode current, ANode target) {
-    return (current.x - target.x).abs() + (current.y - target.y).abs();
+  int _distance(ANode a, ANode b) {
+    return (a.x - b.x).abs() + (a.y - b.y).abs();
   }
 
   bool _isNeighbors(
@@ -148,9 +151,9 @@ class AStarManhattan extends AstarGrid {
         final node = row[y];
         node.parent = null;
         // improve performance x times
-        node.neighbors.clear();
         node.h = 0.0;
         node.g = 0.0;
+        node.neighbors.clear();
         _chainNeighborsManhattan(node, maxX: maxX, maxY: maxY);
       }
     }

@@ -22,7 +22,7 @@ abstract class AstarGrid {
   /// [start] The starting point for the path.
   /// [end] The ending point for the path.
   /// Returns a [FutureOr] containing a list of [ANode] representing the path.
-  FutureOr<List<ANode>> findPath({
+  List<ANode> findPath({
     void Function(List<Point<int>>)? doneList,
     required ({int x, int y}) start,
     required ({int x, int y}) end,

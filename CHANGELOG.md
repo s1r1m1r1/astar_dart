@@ -21,4 +21,8 @@
   - extract Array2d as package
   - update hex example 
 
+## 2.4.0
+  - fix degradation on euclidian algorithm 
+
+
 

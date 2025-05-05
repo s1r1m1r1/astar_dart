@@ -110,8 +110,8 @@ class _GridExampleState extends State<GridExample> {
     );
     astar.addNeighbors();
 
-    final path = await astar
-        .findPath(start: (x: 0, y: 0), end: (x: floor.x, y: floor.y));
+    final path = await Future.value(
+        astar.findPath(start: (x: 0, y: 0), end: (x: floor.x, y: floor.y)));
     array2d.forEach((floor, x, y) => floor
       ..isPath = false
       ..update());
@@ -282,56 +282,26 @@ enum Target {
 
 class Floor with ChangeNotifier {
   Floor({
-    required int x,
-    required int y,
-    required Target target,
-    required GroundType ground,
-    bool isPath = false,
-  }) {
-    _isPath = isPath;
-    _ground = ground;
-    _target = target;
-    _x = x;
-    _y = y;
-  }
-  late int _x;
-  set x(int value) {
-    _x = value;
-  }
+    required this.x,
+    required this.y,
+    required this.target,
+    required this.ground,
+    this.isPath = false,
+  });
 
-  int get x => _x;
+  int x;
 
-  late int _y;
-  set y(int value) {
-    _y = value;
-  }
+  int y;
 
-  int get y => _y;
+  bool isPath;
 
-  late bool _isPath;
-  set isPath(bool value) {
-    _isPath = value;
-  }
+  GroundType ground;
 
-  late GroundType _ground;
-  set ground(GroundType value) {
-    _ground = value;
-  }
-
-  GroundType get ground => _ground;
-
-  late Target _target;
-  set target(Target value) {
-    _target = value;
-  }
+  Target target;
 
   void update() {
     notifyListeners();
   }
-
-  Target get target => _target;
-
-  bool get isPath => _isPath;
 
   factory Floor.wrong() => Floor(
         x: -1,

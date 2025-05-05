@@ -16,54 +16,46 @@ void main() {
 
   // top-left to bottom-right
   group('test AStarHex simple', () {
-    test('test 1', () async {
-      final path =
-          (await astar.findPath(start: (x: 0, y: 0), end: (x: 6, y: 6)))
-              .toPointList();
+    test('test 1', () {
+      final path = (astar.findPath(start: (x: 0, y: 0), end: (x: 6, y: 6)))
+          .toPointList();
       expect(path.length, 12); // Check number of cols
     });
 
-    test('test 2', () async {
-      final path =
-          (await astar.findPath(start: (x: 6, y: 6), end: (x: 0, y: 0)))
-              .toPointList();
+    test('test 2', () {
+      final path = (astar.findPath(start: (x: 6, y: 6), end: (x: 0, y: 0)))
+          .toPointList();
       expect(path.length, 12); // Check number of cols
     });
 
-    test('test 3', () async {
-      final path =
-          (await astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
-              .toPointList();
+    test('test 3', () {
+      final path = (astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
+          .toPointList();
       expect(path.length, 6); // Check number of cols
     });
-    test('test 4', () async {
-      final path =
-          (await astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
-              .toPointList();
+    test('test 4', () {
+      final path = (astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
+          .toPointList();
       expect(path.length, 6); // Check number of cols
     });
-    test('test 5', () async {
-      final path =
-          (await astar.findPath(start: (x: 3, y: 3), end: (x: 0, y: 0)))
-              .toPointList();
+    test('test 5', () {
+      final path = (astar.findPath(start: (x: 3, y: 3), end: (x: 0, y: 0)))
+          .toPointList();
       expect(path.length, 6); // Check number of cols
     });
-    test('test 6', () async {
-      final path =
-          (await astar.findPath(start: (x: 3, y: 3), end: (x: 0, y: 6)))
-              .toPointList();
+    test('test 6', () {
+      final path = (astar.findPath(start: (x: 3, y: 3), end: (x: 0, y: 6)))
+          .toPointList();
       expect(path.length, 3); // Check number of cols
     });
-    test('test 7', () async {
-      final path =
-          (await astar.findPath(start: (x: 3, y: 3), end: (x: 6, y: 0)))
-              .toPointList();
+    test('test 7', () {
+      final path = (astar.findPath(start: (x: 3, y: 3), end: (x: 6, y: 0)))
+          .toPointList();
       expect(path.length, 3); // Check number of cols
     });
-    test('test 8', () async {
-      final path =
-          (await astar.findPath(start: (x: 3, y: 3), end: (x: 6, y: 6)))
-              .toPointList();
+    test('test 8', () {
+      final path = (astar.findPath(start: (x: 3, y: 3), end: (x: 6, y: 6)))
+          .toPointList();
       expect(path.length, 6); // Check number of cols
     });
   });

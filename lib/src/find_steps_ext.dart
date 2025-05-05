@@ -15,8 +15,8 @@ extension AstarGridExt on AstarGrid {
   ///       3  2  3
   ///          3
   /// ```
-  FutureOr<List<DistancePoint>> findSteps(
-      {required int steps, required Point<int> start}) async {
+  List<DistancePoint> findSteps(
+      {required int steps, required Point<int> start}) {
     ANode a = grid[start.x][start.y];
     final List<ANode> total = [a];
     final List<ANode> next = [];
@@ -53,9 +53,9 @@ extension AstarGridExt on AstarGrid {
       current.sort((a, b) => a.g.compareTo(b.g));
     }
 
-    return Future.value(
-      total.map((i) => DistancePoint(i.x, i.y, i.weight.toDouble())).toList(),
-    );
+    return total
+        .map((i) => DistancePoint(i.x, i.y, i.weight.toDouble()))
+        .toList();
   }
 
   FutureOr<List<DistancePoint>> findTargets({
