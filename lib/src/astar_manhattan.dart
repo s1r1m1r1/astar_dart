@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import '../astar_dart.dart';
+import 'package:astar_dart/astar_dart.dart';
 
 class AStarManhattan extends AstarGrid {
   AStarManhattan(

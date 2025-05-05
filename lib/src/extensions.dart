@@ -1,6 +1,5 @@
 import 'dart:math';
-
-import '../astar_dart.dart';
+import 'package:astar_dart/astar_dart.dart';
 
 extension BarrierExt on Barrier {
   bool get isBlock => this == Barrier.block;
