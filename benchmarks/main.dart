@@ -7,19 +7,16 @@ import 'package:benchmark_harness/benchmark_harness.dart';
 void main() {
   try {
     // too slow
-    AstarTest2Benchmark(withDiagonal: false, size: 32).report();
+    AstarTest2Benchmark(withDiagonal: false, size: 100).report();
     // maybe ok
-    AstarTest2Benchmark(withDiagonal: true, size: 32).report();
+    AstarTest2Benchmark(withDiagonal: true, size: 100).report();
 
     AStarBenchmark(algorithm: Names.algorithmManhattan, size: 32).report();
     AStarBenchmark(algorithm: Names.algorithmHex, size: 32).report();
     AStarBenchmark(algorithm: Names.algorithmEuclidean, size: 32).report();
   } catch (error, stack) {
-    print("ERROR\n");
     print('$error $stack');
   }
-
-  // AstarTest3Benchmark().report();
 }
 
 enum Names {
@@ -76,21 +73,11 @@ class AStarBenchmark extends BenchmarkBase {
           },
         );
     }
-    // const start = (x: 5, y: 5);
     const start = (x: 0, y: 0);
-    // final ({int x, int y}) end = (x: 0, y: 5);
     final ({int x, int y}) end = (x: size - 1, y: size - 1);
     astar.addNeighbors();
-    // print(astar.grid[10][10].neighbors
-    //     .map((i) => "N ${i.x},${i.y},${i.barrier}")
-    //     .join(' . ,'));
-    final path = astar.findPath(
-        start: start,
-        end: end,
-        doneList: (list) {
-          // print('Done LENGTH ${list.length}');
-        });
-    // print('PATH LENGTH ${path.length}');
+
+    final path = astar.findPath(start: start, end: end, doneList: (list) {});
   }
 }
 
@@ -116,20 +103,6 @@ class AstarTest2Benchmark extends BenchmarkBase {
       barriers: [
         ...List.generate(30, (x) => (x, 6)),
         ...List.generate(30, (x) => (31 - x, 18))
-        // (2, 3),
-        // (2, 4),
-        // (2, 5),
-        // (2, 6),
-        // (2, 7),
-        // (2, 8),
-        // (3, 3),
-        // (4, 3),
-        // (5, 3),
-        // (6, 3),
-        // (3, 8),
-        // (4, 8),
-        // (5, 8),
-        // (6, 8),
       ],
       withDiagonal: withDiagonal,
     );
@@ -168,11 +141,6 @@ class CoordinatesState extends astar3.AStarState<CoordinatesState> {
         CoordinatesState(x, y - 1, depth: depth + 1), // up
         CoordinatesState(x + 1, y, depth: depth + 1), // right
         CoordinatesState(x - 1, y, depth: depth + 1), // left
-
-        // CoordinatesState(x + 1, y + 1, depth: depth + 1), // right down
-        // CoordinatesState(x - 1, y - 1, depth: depth + 1), //left up
-        // CoordinatesState(x + 1, y - 1, depth: depth + 1), // right up
-        // CoordinatesState(x - 1, y + 1, depth: depth + 1), // left down
       ];
 
   @override

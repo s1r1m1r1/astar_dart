@@ -28,8 +28,6 @@ class AStarHex extends AstarGrid {
     if (grid[end.x][end.y].barrier.isBlock) {
       return [];
     }
-    waitList.clear();
-    this.doneList.clear();
 
     /// Get the start and end nodes from the grid.
     ANode startNode = grid[start.x][start.y];
@@ -60,13 +58,15 @@ class AStarHex extends AstarGrid {
       }
     }
 
-    /// Call the doneList callback with the explored nodes.
-    doneList?.call(this.doneList.map((e) => Point(e.x, e.y)).toList());
-
     /// If no path was found, clear the path list.
     if (winner == null) {
       path.clear();
     }
+    waitList.clear();
+    this.doneList.clear();
+
+    /// Call the doneList callback with the explored nodes.
+    doneList?.call(this.doneList.map((e) => Point(e.x, e.y)).toList());
 
     return path.toList();
   }

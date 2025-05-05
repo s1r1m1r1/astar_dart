@@ -14,11 +14,12 @@ void main() {
   });
 
   group('AStarSquare test 1', () {
-    test('Finds path in simple grid', () async {
-      final path = await astar.findPath(start: (x: 0, y: 0), end: (x: 9, y: 9));
+    test('Finds path in simple grid', () {
+      astar.addNeighbors();
+      final path = astar.findPath(start: (x: 0, y: 0), end: (x: 9, y: 9));
       expect(path.isNotEmpty, true);
     });
-    test('Finds path with obstacles', () async {
+    test('Finds path with obstacles', () {
       // astar.calculateGrid();
       astar
         ..setBarrier(x: 4, y: 4, barrier: Barrier.block)
@@ -26,16 +27,18 @@ void main() {
         ..setBarrier(x: 5, y: 4, barrier: Barrier.block)
         ..setBarrier(x: 5, y: 5, barrier: Barrier.block);
 
-      final path = await astar.findPath(start: (x: 0, y: 0), end: (x: 9, y: 9));
+      astar.addNeighbors();
+      final path = astar.findPath(start: (x: 0, y: 0), end: (x: 9, y: 9));
       expect(path.isNotEmpty, true);
     });
 
-    test('No path if blocked', () async {
+    test('No path if blocked', () {
       // astar.calculateGrid();
       astar.setBarrier(x: 5, y: 5, barrier: Barrier.block);
-      final path =
-          (await astar.findPath(start: (x: 5, y: 4), end: (x: 5, y: 6)))
-              .toPointList();
+
+      astar.addNeighbors();
+      final path = (astar.findPath(start: (x: 5, y: 4), end: (x: 5, y: 6)))
+          .toPointList();
       expect(path.length, 4);
     });
 
@@ -57,9 +60,11 @@ void main() {
     //       path.length, 4); // Manhattan path should be 4 steps (2 right, 2 up)
     // });
 
-    test('Finds steps within range', () async {
+    test('Finds steps within range', () {
       // astar.calculateGrid();
-      final steps = await astar.findSteps(steps: 3, start: const Point(5, 5));
+
+      astar.addNeighbors();
+      final steps = astar.findSteps(steps: 3, start: const Point(5, 5));
       expect(steps.isNotEmpty, true);
       // You might want to add more specific assertions about the reachable points
     });
@@ -71,7 +76,7 @@ void main() {
     //   expect(path.isEmpty, true);
     // });
 
-    test('Path contains correct nodes (deep equality)', () async {
+    test('Path contains correct nodes (deep equality)', () {
       // astar.calculateGrid();
       final expectedPath = [
         ANode(x: 0, y: 3, neighbors: [], weight: 1.0),
@@ -79,8 +84,8 @@ void main() {
         ANode(x: 0, y: 1, neighbors: [], weight: 1.0),
       ];
 
-      final path = await astar.findPath(
-          start: (x:0,y: 0), end: (x:0,y: 3));
+      astar.addNeighbors();
+      final path = astar.findPath(start: (x: 0, y: 0), end: (x: 0, y: 3));
 
       // Use a deep equality check to compare the lists of ANodes
       expect(
