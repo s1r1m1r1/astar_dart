@@ -27,6 +27,7 @@ void main() {
     });
 
     test('test last point is start ', () {
+      astar.resetNodes();
       final path = (astar.findPath(start: (x: 0, y: 0), end: (x: 3, y: 3)))
           .toPointList();
       expect(const [Point(0, 1), Point(1, 0), Point(1, 1)].contains(path.last),
@@ -34,13 +35,15 @@ void main() {
     });
 
     test('test neighbors DiagonalMovement.manhattan return one item', () {
+      astar.resetNodes();
       final path = (astar.findPath(start: (x: 0, y: 0), end: (x: 0, y: 2)))
           .toPointList();
       expect(path.length, 2);
     });
 
     test('test neighbors DiagonalMovement.manhattan diagonal return one item',
-        () async {
+        () {
+      astar.resetNodes();
       final path = (astar.findPath(start: (x: 0, y: 0), end: (x: 1, y: 1)))
           .toPointList();
       expect(path.length, 0);

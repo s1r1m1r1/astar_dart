@@ -43,13 +43,10 @@ class AStarManhattan extends AstarGrid {
   /// ```
   @override
   List<ANode> findPath({
-    void Function(List<Point<int>>)? doneList,
+    void Function(List<Point<int>>)? visited,
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
-    this.doneList.clear();
-    waitList.clear();
-
     if (grid[end.x][end.y].barrier == Barrier.block) {
       return [];
     }
@@ -76,7 +73,9 @@ class AStarManhattan extends AstarGrid {
         nodeAux = nodeAux.parent!;
       }
     }
-    doneList?.call(this.doneList.map((e) => Point(e.x, e.y)).toList());
+    visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
+    doneList.clear();
+    waitList.clear();
 
     if (winner == null && !_isNeighbors(start, end)) {
       path.clear();
@@ -134,30 +133,30 @@ class AStarManhattan extends AstarGrid {
     // Optimized neighbor adding for Manhattan distance (only cardinal directions)
     if (y > 0) {
       // Top
-      final neighbor = grid[x][y - 1];
-      if (!grid[x][y - 1].barrier.isBlock) {
-        node.neighbors.add(neighbor);
+      final n = grid[x][y - 1];
+      if (n.barrier != Barrier.block) {
+        node.neighbors.add(n);
       }
     }
     if (y < maxY) {
       // Bottom
-      final neighbor = grid[x][y + 1];
-      if (!grid[x][y + 1].barrier.isBlock) {
-        node.neighbors.add(neighbor);
+      final n = grid[x][y + 1];
+      if (n.barrier != Barrier.block) {
+        node.neighbors.add(n);
       }
     }
     if (x > 0) {
       // Left
-      final neighbor = grid[x - 1][y];
-      if (!grid[x - 1][y].barrier.isBlock) {
-        node.neighbors.add(neighbor);
+      final n = grid[x - 1][y];
+      if (n.barrier != Barrier.block) {
+        node.neighbors.add(n);
       }
     }
     if (x < maxX) {
       // Right
-      final neighbor = grid[x + 1][y];
-      if (!grid[x + 1][y].barrier.isBlock) {
-        node.neighbors.add(neighbor);
+      final n = grid[x + 1][y];
+      if (n.barrier != Barrier.block) {
+        node.neighbors.add(n);
       }
     }
   }

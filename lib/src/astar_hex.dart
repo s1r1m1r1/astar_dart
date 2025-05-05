@@ -20,7 +20,7 @@ class AStarHex extends AstarGrid {
 
   @override
   List<ANode> findPath({
-    void Function(List<Point<int>>)? doneList,
+    void Function(List<Point<int>>)? visited,
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
@@ -63,10 +63,10 @@ class AStarHex extends AstarGrid {
       path.clear();
     }
     waitList.clear();
-    this.doneList.clear();
+    doneList.clear();
 
     /// Call the doneList callback with the explored nodes.
-    doneList?.call(this.doneList.map((e) => Point(e.x, e.y)).toList());
+    visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
 
     return path.toList();
   }
@@ -138,7 +138,7 @@ class AStarHex extends AstarGrid {
     /// adds in left
     if (x > 0) {
       final t = grid[x - 1][y];
-      if (!grid[t.x][t.y].barrier.isBlock) {
+      if (t.barrier != Barrier.block) {
         node.neighbors.add(t);
       }
     }
@@ -146,7 +146,7 @@ class AStarHex extends AstarGrid {
     /// adds in right
     if (x < (grid.length - 1)) {
       final t = grid[x + 1][y];
-      if (!grid[t.x][t.y].barrier.isBlock) {
+      if (t.barrier != Barrier.block) {
         node.neighbors.add(t);
       }
     }
@@ -154,12 +154,12 @@ class AStarHex extends AstarGrid {
     /// adds in top
     if (y > 0) {
       final t = grid[x][y - 1];
-      if (!grid[t.x][t.y].barrier.isBlock) {
+      if (t.barrier != Barrier.block) {
         node.neighbors.add(t);
       }
       if (x < (grid.length - 1)) {
         final t2 = grid[x + 1][y - 1];
-        if (!grid[t2.x][t2.y].barrier.isBlock) {
+        if (t2.barrier != Barrier.block) {
           node.neighbors.add(t2);
         }
       }
@@ -168,13 +168,13 @@ class AStarHex extends AstarGrid {
     /// adds in bottom
     if (y < (grid.first.length - 1)) {
       final t = grid[x][y + 1];
-      if (!grid[t.x][t.y].barrier.isBlock) {
+      if (t.barrier != Barrier.block) {
         node.neighbors.add(t);
       }
 
       if (x > 0) {
         final t2 = grid[x - 1][y + 1];
-        if (!grid[t2.x][t2.y].barrier.isBlock) {
+        if (t2.barrier != Barrier.block) {
           node.neighbors.add(t2);
         }
       }

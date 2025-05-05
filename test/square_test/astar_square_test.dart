@@ -63,7 +63,7 @@ void main() {
     test('Finds steps within range', () {
       // astar.calculateGrid();
 
-      astar.addNeighbors();
+      astar.resetNodes();
       final steps = astar.findSteps(steps: 3, start: const Point(5, 5));
       expect(steps.isNotEmpty, true);
       // You might want to add more specific assertions about the reachable points

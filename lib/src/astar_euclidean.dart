@@ -11,13 +11,10 @@ class AStarEuclidean extends AstarGrid {
 
   @override
   List<ANode> findPath({
-    void Function(List<Point<int>>)? doneList,
+    void Function(List<Point<int>>)? visited,
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
-    this.doneList.clear();
-    waitList.clear();
-
     if (grid[end.x][end.y].barrier.isBlock) {
       return [];
     }
@@ -44,7 +41,10 @@ class AStarEuclidean extends AstarGrid {
         nodeAux = nodeAux.parent!;
       }
     }
-    doneList?.call(this.doneList.map((e) => Point(e.x, e.y)).toList());
+    visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
+
+    doneList.clear();
+    waitList.clear();
 
     if (winner == null && !_isNeighbors(start, end)) {
       path.clear();
@@ -59,7 +59,7 @@ class AStarEuclidean extends AstarGrid {
   void analyzeDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
-    current.h = _distance(current, end) * 2.0;
+    current.h = _distance(current, end) * 1.5;
   }
 
   int _distance(ANode a, ANode b) {
@@ -98,14 +98,14 @@ class AStarEuclidean extends AstarGrid {
     if (y > 0) {
       // Top
       final neighbor = grid[x][y - 1];
-      if (!grid[x][y - 1].barrier.isBlock) {
+      if (neighbor.barrier != Barrier.block) {
         node.neighbors.add(neighbor);
       }
     }
     if (y < maxY) {
       // Bottom
       final neighbor = grid[x][y + 1];
-      if (!grid[x][y + 1].barrier.isBlock) {
+      if (neighbor.barrier != Barrier.block) {
         node.neighbors.add(neighbor);
       }
     }
@@ -113,14 +113,14 @@ class AStarEuclidean extends AstarGrid {
     if (x > 0) {
       // Left
       final neighbor = grid[x - 1][y];
-      if (!grid[x - 1][y].barrier.isBlock) {
+      if (neighbor.barrier != Barrier.block) {
         node.neighbors.add(neighbor);
       }
     }
     if (x < maxX) {
       // Right
       final neighbor = grid[x + 1][y];
-      if (!grid[x + 1][y].barrier.isBlock) {
+      if (neighbor.barrier != Barrier.block) {
         node.neighbors.add(neighbor);
       }
     }
@@ -129,21 +129,21 @@ class AStarEuclidean extends AstarGrid {
     if (x > 0 && y > 0) {
       // Top-Left
       final neighbor = grid[x - 1][y - 1];
-      if (!grid[x - 1][y - 1].barrier.isBlock) {
+      if (neighbor.barrier != Barrier.block) {
         node.neighbors.add(neighbor);
       }
     }
     if (x > 0 && y < maxY) {
       // Bottom-Left
       final neighbor = grid[x - 1][y + 1];
-      if (!grid[x - 1][y + 1].barrier.isBlock) {
+      if (neighbor.barrier != Barrier.block) {
         node.neighbors.add(neighbor);
       }
     }
     if (x < maxX && y > 0) {
       // Top-Right
       final neighbor = grid[x + 1][y - 1];
-      if (!grid[x + 1][y - 1].barrier.isBlock) {
+      if (neighbor.barrier != Barrier.block) {
         node.neighbors.add(neighbor);
       }
     }
@@ -151,7 +151,7 @@ class AStarEuclidean extends AstarGrid {
     if (x < maxX && y < maxY) {
       // Bottom-Right
       final neighbor = grid[x + 1][y + 1];
-      if (!grid[x + 1][y + 1].barrier.isBlock) {
+      if (neighbor.barrier != Barrier.block) {
         node.neighbors.add(neighbor);
       }
     }

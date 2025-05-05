@@ -25,8 +25,8 @@ void main() {
   group('test AStarHex find targets', () {
     test(
       'test 1',
-      () async {
-        final path = await astar.findTargets(
+      () {
+        final path = astar.findTargets(
           maxSteps: 14,
           start: const Point(0, 0),
           targets: const [
