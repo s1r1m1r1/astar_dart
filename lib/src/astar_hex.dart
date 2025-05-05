@@ -84,6 +84,7 @@ class AStarHex extends AstarGrid {
         doneList.add(n);
       }
     }
+    waitList.sort((a, b) => b.compareTo(a));
 
     while (waitList.isNotEmpty) {
       final c = waitList.removeLast();
@@ -94,9 +95,9 @@ class AStarHex extends AstarGrid {
         }
         if (!doneList.contains(n)) {
           waitList.add(n);
+          doneList.add(c);
         }
       }
-      doneList.add(c);
       waitList.sort((a, b) => b.compareTo(a));
     }
     return null;

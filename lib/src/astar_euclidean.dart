@@ -64,8 +64,6 @@ class AStarEuclidean extends AstarGrid {
       if (!doneList.contains(n)) {
         waitList.add(n);
         doneList.add(n);
-
-        //:
       }
     }
     waitList.sort((a, b) => b.compareTo(a));

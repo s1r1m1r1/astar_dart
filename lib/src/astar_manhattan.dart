@@ -95,9 +95,9 @@ class AStarManhattan extends AstarGrid {
       if (!doneList.contains(n)) {
         waitList.add(n);
         doneList.add(n);
-        // ???
       }
     }
+    waitList.sort((a, b) => b.compareTo(a));
 
     while (waitList.isNotEmpty) {
       final c = waitList.removeLast();
@@ -108,9 +108,9 @@ class AStarManhattan extends AstarGrid {
         }
         if (!doneList.contains(n)) {
           waitList.add(n);
+          doneList.add(c);
         }
       }
-      doneList.add(c);
       waitList.sort((a, b) => b.compareTo(a));
     }
 
