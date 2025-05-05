@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import '../astar_dart.dart';
@@ -11,16 +10,16 @@ class AStarEuclidean extends AstarGrid {
   }) : super(rows: rows, columns: columns, gridBuilder: gridBuilder);
 
   @override
-  FutureOr<List<ANode>> findPath({
+  List<ANode> findPath({
     void Function(List<Point<int>>)? doneList,
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
-    super.doneList.clear();
-    super.waitList.clear();
+    this.doneList.clear();
+    waitList.clear();
 
     if (grid[end.x][end.y].barrier.isBlock) {
-      return Future.value([]);
+      return [];
     }
 
     ANode startNode = grid[start.x][start.y];
@@ -29,7 +28,6 @@ class AStarEuclidean extends AstarGrid {
     if (_isNeighbors(start, end)) {
       return [];
     }
-
     ANode? winner = _getWinner(
       startNode,
       endNode,
@@ -46,44 +44,52 @@ class AStarEuclidean extends AstarGrid {
         nodeAux = nodeAux.parent!;
       }
     }
-    doneList?.call(super.doneList.map((e) => Point(e.x, e.y)).toList());
+    doneList?.call(this.doneList.map((e) => Point(e.x, e.y)).toList());
 
     if (winner == null && !_isNeighbors(start, end)) {
       path.clear();
     }
 
-    return Future.value(path.toList());
+    return path.toList();
   }
 
+//----------------------------------------------------------------------
   ANode? _getWinner(ANode current, ANode end) {
     if (end == current) return current;
+    // first iteration
     for (var n in current.neighbors) {
       if (n.parent == null) {
         _checkDistance(n, end, parent: current);
       }
-      if (!super.doneList.contains(n)) {
-        super.waitList.add(n);
-        super.doneList.add(n);
+      if (!doneList.contains(n)) {
+        waitList.add(n);
+        doneList.add(n);
+
+        //:
       }
     }
+    waitList.sort((a, b) => b.compareTo(a));
 
-    while (super.waitList.isNotEmpty) {
-      final c = super.waitList.removeLast();
+    // loop iteration
+    while (waitList.isNotEmpty) {
+      final c = waitList.removeLast();
       if (end == c) return c;
       for (var n in c.neighbors) {
         if (n.parent == null) {
           _checkDistance(n, end, parent: c);
         }
-        if (!super.doneList.contains(n)) {
-          super.waitList.add(n);
+        if (!doneList.contains(n)) {
+          waitList.add(n);
+          doneList.add(n);
         }
       }
-      super.doneList.add(c);
-      super.waitList.sort((a, b) => b.compareTo(a));
+      waitList.sort((a, b) => b.compareTo(a));
     }
 
     return null;
   }
+
+//----------------------------------------------------------------------
 
   void _checkDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
@@ -107,38 +113,80 @@ class AStarEuclidean extends AstarGrid {
   /// Adds neighbors to cells
   @override
   void addNeighbors() {
+    final maxX = grid.length - 1;
+    final maxY = grid.first.length - 1;
     for (var row in grid.array) {
       for (ANode node in row) {
         node.parent = null;
         node.g = 0.0;
         node.h = 0.0;
         node.neighbors.clear();
-        _chainNeighbors(node);
+        _chainNeighbors(node, maxX: maxX, maxY: maxY);
       }
     }
   }
 
-  void _chainNeighbors(ANode node) {
+  void _chainNeighbors(ANode node, {required int maxX, required int maxY}) {
     final x = node.x;
     final y = node.y;
-    final maxX = grid.length - 1; // Cache max values for efficiency
-    final maxY = grid.first.length - 1;
+    if (y > 0) {
+      // Top
+      final neighbor = grid[x][y - 1];
+      if (!grid[x][y - 1].barrier.isBlock) {
+        node.neighbors.add(neighbor);
+      }
+    }
+    if (y < maxY) {
+      // Bottom
+      final neighbor = grid[x][y + 1];
+      if (!grid[x][y + 1].barrier.isBlock) {
+        node.neighbors.add(neighbor);
+      }
+    }
 
-    // Optimized neighbor adding (combined conditions, removed redundant checks)
-    for (int i = -1; i <= 1; i++) {
-      for (int j = -1; j <= 1; j++) {
-        if (i == 0 && j == 0) continue; // Skip the current node itself
+    if (x > 0) {
+      // Left
+      final neighbor = grid[x - 1][y];
+      if (!grid[x - 1][y].barrier.isBlock) {
+        node.neighbors.add(neighbor);
+      }
+    }
+    if (x < maxX) {
+      // Right
+      final neighbor = grid[x + 1][y];
+      if (!grid[x + 1][y].barrier.isBlock) {
+        node.neighbors.add(neighbor);
+      }
+    }
 
-        final nx = x + i;
-        final ny = y + j;
+    // Diagonals
+    if (x > 0 && y > 0) {
+      // Top-Left
+      final neighbor = grid[x - 1][y - 1];
+      if (!grid[x - 1][y - 1].barrier.isBlock) {
+        node.neighbors.add(neighbor);
+      }
+    }
+    if (x > 0 && y < maxY) {
+      // Bottom-Left
+      final neighbor = grid[x - 1][y + 1];
+      if (!grid[x - 1][y + 1].barrier.isBlock) {
+        node.neighbors.add(neighbor);
+      }
+    }
+    if (x < maxX && y > 0) {
+      // Top-Right
+      final neighbor = grid[x + 1][y - 1];
+      if (!grid[x + 1][y - 1].barrier.isBlock) {
+        node.neighbors.add(neighbor);
+      }
+    }
 
-        if (nx >= 0 && nx <= maxX && ny >= 0 && ny <= maxY) {
-          // Check bounds once
-          final neighbor = grid[nx][ny];
-          if (!grid[nx][ny].barrier.isBlock) {
-            node.neighbors.add(neighbor);
-          }
-        }
+    if (x < maxX && y < maxY) {
+      // Bottom-Right
+      final neighbor = grid[x + 1][y + 1];
+      if (!grid[x + 1][y + 1].barrier.isBlock) {
+        node.neighbors.add(neighbor);
       }
     }
   }
