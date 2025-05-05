@@ -28,7 +28,7 @@ class AStarEuclidean extends AstarGrid {
     if (_isNeighbors(start, end)) {
       return [];
     }
-    ANode? winner = _getWinner(
+    ANode? winner = getWinner(
       startNode,
       endNode,
     );
@@ -54,45 +54,12 @@ class AStarEuclidean extends AstarGrid {
   }
 
 //----------------------------------------------------------------------
-  ANode? _getWinner(ANode current, ANode end) {
-    if (end == current) return current;
-    // first iteration
-    for (var n in current.neighbors) {
-      if (n.parent == null) {
-        _checkDistance(n, end, parent: current);
-      }
-      if (!doneList.contains(n)) {
-        waitList.add(n);
-        doneList.add(n);
-      }
-    }
-    waitList.sort((a, b) => b.compareTo(a));
 
-    // loop iteration
-    while (waitList.isNotEmpty) {
-      final c = waitList.removeLast();
-      if (end == c) return c;
-      for (var n in c.neighbors) {
-        if (n.parent == null) {
-          _checkDistance(n, end, parent: c);
-        }
-        if (!doneList.contains(n)) {
-          waitList.add(n);
-          doneList.add(n);
-        }
-      }
-      waitList.sort((a, b) => b.compareTo(a));
-    }
-
-    return null;
-  }
-
-//----------------------------------------------------------------------
-
-  void _checkDistance(ANode current, ANode end, {required ANode parent}) {
+  @override
+  void analyzeDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
-    current.h = _distance(current, end) * 1.0;
+    current.h = _distance(current, end) * 2.0;
   }
 
   int _distance(ANode a, ANode b) {
@@ -115,9 +82,10 @@ class AStarEuclidean extends AstarGrid {
     final maxY = grid.first.length - 1;
     for (var row in grid.array) {
       for (ANode node in row) {
+        // node.reset();
         node.parent = null;
-        node.g = 0.0;
         node.h = 0.0;
+        node.g = 0.0;
         node.neighbors.clear();
         _chainNeighbors(node, maxX: maxX, maxY: maxY);
       }

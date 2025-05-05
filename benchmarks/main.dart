@@ -3,20 +3,22 @@ import 'package:astar_dart/astar_dart.dart';
 import 'package:a_star/a_star.dart' as astar3;
 import 'package:benchmark_harness/benchmark_harness.dart';
 
-// dart run main.dart
+///
+///```bash
+/// cd benchmarks;
+/// dart run main.dart;
+///```
+/// dart run main.dart
 void main() {
-  try {
-    // too slow
-    AstarTest2Benchmark(withDiagonal: false, size: 100).report();
-    // maybe ok
-    AstarTest2Benchmark(withDiagonal: true, size: 100).report();
+  // too slow
+  // AstarTest2Benchmark(withDiagonal: false, size: 32).report();
+  // // maybe ok
+  // AstarTest2Benchmark(withDiagonal: true, size: 32).report();
 
-    AStarBenchmark(algorithm: Names.algorithmManhattan, size: 32).report();
-    AStarBenchmark(algorithm: Names.algorithmHex, size: 32).report();
-    AStarBenchmark(algorithm: Names.algorithmEuclidean, size: 32).report();
-  } catch (error, stack) {
-    print('$error $stack');
-  }
+  // my astars
+  AStarBenchmark(algorithm: Names.algorithmManhattan, size: 32).report();
+  AStarBenchmark(algorithm: Names.algorithmHex, size: 32).report();
+  AStarBenchmark(algorithm: Names.algorithmEuclidean, size: 32).report();
 }
 
 enum Names {
