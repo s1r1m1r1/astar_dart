@@ -28,5 +28,6 @@
   - added reset() for ANode , clear h ,g , parent value , improve performance 
   - added resetNodes() to reset Grid, improve performance 
 
-
+## 2.4.2
+  - bugfix AStarHex _isNeighbors incorect check
 
