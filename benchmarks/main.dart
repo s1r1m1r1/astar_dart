@@ -3,20 +3,25 @@ import 'package:astar_dart/astar_dart.dart';
 import 'package:a_star/a_star.dart' as astar3;
 import 'package:benchmark_harness/benchmark_harness.dart';
 
-// dart run main.dart
+///
+///```bash
+/// cd benchmarks;
+/// dart run main.dart;
+///```
+/// dart run main.dart
 void main() {
-  try {
-    // too slow
-    AstarTest2Benchmark(withDiagonal: false, size: 100).report();
-    // maybe ok
-    AstarTest2Benchmark(withDiagonal: true, size: 100).report();
+  // too slow
+  AstarTest2Benchmark(withDiagonal: false, size: 32).report();
+  // maybe ok
+  AstarTest2Benchmark(withDiagonal: true, size: 32).report();
 
-    AStarBenchmark(algorithm: Names.algorithmManhattan, size: 32).report();
-    AStarBenchmark(algorithm: Names.algorithmHex, size: 32).report();
-    AStarBenchmark(algorithm: Names.algorithmEuclidean, size: 32).report();
-  } catch (error, stack) {
-    print('$error $stack');
-  }
+  // my astars
+  AStarBenchmark(algorithm: Names.algorithmManhattan, size: 32).report();
+  AStarBenchmark(algorithm: Names.algorithmHex, size: 32).report();
+  AStarBenchmark(algorithm: Names.algorithmEuclidean, size: 32).report();
+
+  // so simple , for empty world, is this useful?
+  AstarTest3Benchmark().report();
 }
 
 enum Names {
@@ -62,7 +67,7 @@ class AStarBenchmark extends BenchmarkBase {
           rows: size,
           columns: size,
           gridBuilder: (int x, int y) {
-            if (x == 6 && y > 2) {
+            if (x == 6 && y >= 0 && y < 10 && y > 12) {
               return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
             }
             if (x == 18 && y < 30) {
@@ -77,7 +82,7 @@ class AStarBenchmark extends BenchmarkBase {
     final ({int x, int y}) end = (x: size - 1, y: size - 1);
     astar.addNeighbors();
 
-    final path = astar.findPath(start: start, end: end, doneList: (list) {});
+    final path = astar.findPath(start: start, end: end);
   }
 }
 
@@ -101,7 +106,8 @@ class AstarTest2Benchmark extends BenchmarkBase {
       start: start,
       end: end,
       barriers: [
-        ...List.generate(30, (x) => (x, 6)),
+        ...List.generate(10, (x) => (x, 6)),
+        ...List.generate(20, (x) => (31 - x, 6)),
         ...List.generate(30, (x) => (31 - x, 18))
       ],
       withDiagonal: withDiagonal,
@@ -115,7 +121,7 @@ class AstarTest3Benchmark extends BenchmarkBase {
 
   @override
   void run() {
-    final settings = CoordinatesState(0, 0);
+    const settings = CoordinatesState(0, 0);
     final result = astar3.aStar<CoordinatesState>(settings);
     if (result == null) {
       print("No path");
@@ -133,7 +139,7 @@ class CoordinatesState extends astar3.AStarState<CoordinatesState> {
   final int y;
 
   const CoordinatesState(this.x, this.y,
-      {super.depth = 0, this.goalX = 256, this.goalY = 256});
+      {super.depth = 0, this.goalX = 32, this.goalY = 32});
 
   @override
   Iterable<CoordinatesState> expand() => [

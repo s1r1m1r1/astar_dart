@@ -20,27 +20,28 @@ void main() {
   // top-left to bottom-right
   group('test AStarHex with barriers', () {
     test('test 1', () {
+      astar.resetNodes();
       final path = (astar.findPath(start: (x: 0, y: 0), end: (x: 6, y: 6)))
           .toPointList();
       expect(path.length, 12); // Check number of cols
     });
 
     test('test 2', () {
-      astar.addNeighbors();
+      astar.resetNodes();
       final path = (astar.findPath(start: (x: 6, y: 6), end: (x: 0, y: 0)))
           .toPointList();
       expect(path.length, 12); // Check number of cols
     });
 
     test('test 3', () {
-      astar.addNeighbors();
+      astar.resetNodes();
       final path = (astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
           .toPointList();
       expect(
           path.length >= 7 && path.length <= 8, true); // Check number of cols
     });
     test('test 4', () {
-      astar.addNeighbors();
+      astar.resetNodes();
       final path = (astar.findPath(start: (x: 0, y: 6), end: (x: 6, y: 0)))
           .toPointList();
       expect(

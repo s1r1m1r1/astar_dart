@@ -24,5 +24,9 @@
 ## 2.4.0
   - fix degradation on euclidian algorithm 
 
+## 2.4.1
+  - added reset() for ANode , clear h ,g , parent value , improve performance 
+  - added resetNodes() to reset Grid, improve performance 
+
 
 

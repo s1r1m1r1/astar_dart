@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import '../astar_dart.dart';
+import 'package:astar_dart/astar_dart.dart';
 
 // enum AStarHexAlignment {
 //   odd,
@@ -20,7 +20,7 @@ class AStarHex extends AstarGrid {
 
   @override
   List<ANode> findPath({
-    void Function(List<Point<int>>)? doneList,
+    void Function(List<Point<int>>)? visited,
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
@@ -40,7 +40,7 @@ class AStarHex extends AstarGrid {
 
     /// Find the best path using the A* algorithm.
 
-    ANode? winner = _getWinner(
+    ANode? winner = getWinner(
       startNode,
       endNode,
     );
@@ -63,49 +63,19 @@ class AStarHex extends AstarGrid {
       path.clear();
     }
     waitList.clear();
-    this.doneList.clear();
+    doneList.clear();
 
     /// Call the doneList callback with the explored nodes.
-    doneList?.call(this.doneList.map((e) => Point(e.x, e.y)).toList());
+    visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
 
     return path.toList();
   }
 
-//----------------------------------------------------------------------
-  /// Internal function to find the best path using the A* algorithm.
-  ANode? _getWinner(ANode current, ANode end) {
-    if (end == current) return current;
-    for (var n in current.neighbors) {
-      if (n.parent == null) {
-        _analyzeDistance(n, end, parent: current);
-      }
-      if (!doneList.contains(n)) {
-        waitList.add(n);
-        doneList.add(n);
-      }
-    }
-    waitList.sort((a, b) => b.compareTo(a));
-
-    while (waitList.isNotEmpty) {
-      final c = waitList.removeLast();
-      if (end == c) return c;
-      for (var n in c.neighbors) {
-        if (n.parent == null) {
-          _analyzeDistance(n, end, parent: c);
-        }
-        if (!doneList.contains(n)) {
-          waitList.add(n);
-          doneList.add(c);
-        }
-      }
-      waitList.sort((a, b) => b.compareTo(a));
-    }
-    return null;
-  }
   //----------------------------------------------------------------------
 
   /// Analyzes the distance between two nodes and updates the current node's parent, g, and h values
-  void _analyzeDistance(ANode current, ANode end, {required ANode parent}) {
+  @override
+  void analyzeDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
     // make short distance stronger by multiply by 2.0
@@ -151,9 +121,7 @@ class AStarHex extends AstarGrid {
   void addNeighbors() {
     for (var row in grid.array) {
       for (ANode node in row) {
-        node.parent = null;
-        node.h = 0.0;
-        node.g = 0.0;
+        node.reset();
         node.neighbors.clear();
         _chainNeighbors(node);
       }
@@ -170,7 +138,7 @@ class AStarHex extends AstarGrid {
     /// adds in left
     if (x > 0) {
       final t = grid[x - 1][y];
-      if (!grid[t.x][t.y].barrier.isBlock) {
+      if (t.barrier != Barrier.block) {
         node.neighbors.add(t);
       }
     }
@@ -178,7 +146,7 @@ class AStarHex extends AstarGrid {
     /// adds in right
     if (x < (grid.length - 1)) {
       final t = grid[x + 1][y];
-      if (!grid[t.x][t.y].barrier.isBlock) {
+      if (t.barrier != Barrier.block) {
         node.neighbors.add(t);
       }
     }
@@ -186,12 +154,12 @@ class AStarHex extends AstarGrid {
     /// adds in top
     if (y > 0) {
       final t = grid[x][y - 1];
-      if (!grid[t.x][t.y].barrier.isBlock) {
+      if (t.barrier != Barrier.block) {
         node.neighbors.add(t);
       }
       if (x < (grid.length - 1)) {
         final t2 = grid[x + 1][y - 1];
-        if (!grid[t2.x][t2.y].barrier.isBlock) {
+        if (t2.barrier != Barrier.block) {
           node.neighbors.add(t2);
         }
       }
@@ -200,13 +168,13 @@ class AStarHex extends AstarGrid {
     /// adds in bottom
     if (y < (grid.first.length - 1)) {
       final t = grid[x][y + 1];
-      if (!grid[t.x][t.y].barrier.isBlock) {
+      if (t.barrier != Barrier.block) {
         node.neighbors.add(t);
       }
 
       if (x > 0) {
         final t2 = grid[x - 1][y + 1];
-        if (!grid[t2.x][t2.y].barrier.isBlock) {
+        if (t2.barrier != Barrier.block) {
           node.neighbors.add(t2);
         }
       }

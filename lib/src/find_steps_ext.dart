@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
@@ -58,11 +57,11 @@ extension AstarGridExt on AstarGrid {
         .toList();
   }
 
-  FutureOr<List<DistancePoint>> findTargets({
+  List<DistancePoint> findTargets({
     required Point<int> start,
     required List<Point<int>> targets,
     required int maxSteps,
-  }) async {
+  }) {
     ANode a = grid[start.x][start.y];
     final tNodes = targets.map((i) => grid[i.x][i.y]).toList();
     final List<ANode> founded = [];
@@ -100,8 +99,6 @@ extension AstarGridExt on AstarGrid {
       current.sort((a, b) => a.g.compareTo(b.g));
       next.clear();
     }
-    return Future.value(
-      founded.map((i) => DistancePoint(i.x, i.y, i.g)).toList(),
-    );
+    return founded.map((i) => DistancePoint(i.x, i.y, i.g)).toList();
   }
 }

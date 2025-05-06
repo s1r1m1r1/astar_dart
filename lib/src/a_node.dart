@@ -2,7 +2,7 @@ import '../astar_dart.dart';
 
 /// Represents a node in the A* search grid.
 class ANode implements Comparable<ANode> {
-  /// The x,y -coordinate of the node.
+  /// The x,y coordinate of the node.
   final int x, y;
 
   /// The parent node in the path.
@@ -58,5 +58,12 @@ class ANode implements Comparable<ANode> {
       result = h.compareTo(other.h);
     }
     return result;
+  }
+
+  /// reset [ANode] , but save [neighbors] and [barrier]
+  void reset() {
+    parent = null;
+    h = 0.0;
+    g = 0.0;
   }
 }

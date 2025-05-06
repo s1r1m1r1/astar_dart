@@ -1,4 +1,3 @@
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -48,13 +47,13 @@ void main() {
     // astar.calculateGrid();
   });
   group('test blocked path', () {
-    test('test if blocked ', () async {
-      final path = await astar.findPath(start: (x: 0, y: 0), end: (x: 5, y: 5));
+    test('test if blocked ', () {
+      final path = astar.findPath(start: (x: 0, y: 0), end: (x: 5, y: 5));
       expect(path.isEmpty, true); // Check number of cols
     });
 
-    test('test if not blocked ', () async {
-      final path = await astar.findPath(start: (x: 0, y: 0), end: (x: 5, y: 2));
+    test('test if not blocked ', () {
+      final path = astar.findPath(start: (x: 0, y: 0), end: (x: 5, y: 2));
       expect(path.isNotEmpty, true); // Check number of cols
     });
   });

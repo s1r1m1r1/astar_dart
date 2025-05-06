@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import '../astar_dart.dart';
+import 'package:astar_dart/astar_dart.dart';
 
 class AStarManhattan extends AstarGrid {
   AStarManhattan(
@@ -43,13 +43,10 @@ class AStarManhattan extends AstarGrid {
   /// ```
   @override
   List<ANode> findPath({
-    void Function(List<Point<int>>)? doneList,
+    void Function(List<Point<int>>)? visited,
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
-    this.doneList.clear();
-    waitList.clear();
-
     if (grid[end.x][end.y].barrier == Barrier.block) {
       return [];
     }
@@ -61,7 +58,7 @@ class AStarManhattan extends AstarGrid {
       return [];
     }
 
-    ANode? winner = _getWinner(
+    ANode? winner = getWinner(
       startNode,
       endNode,
     );
@@ -76,7 +73,9 @@ class AStarManhattan extends AstarGrid {
         nodeAux = nodeAux.parent!;
       }
     }
-    doneList?.call(this.doneList.map((e) => Point(e.x, e.y)).toList());
+    visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
+    doneList.clear();
+    waitList.clear();
 
     if (winner == null && !_isNeighbors(start, end)) {
       path.clear();
@@ -86,42 +85,13 @@ class AStarManhattan extends AstarGrid {
   }
 
 //----------------------------------------------------------------------
-  ANode? _getWinner(ANode current, ANode end) {
-    if (end == current) return current;
-    for (var n in current.neighbors) {
-      if (n.parent == null) {
-        _checkDistance(n, end, parent: current);
-      }
-      if (!doneList.contains(n)) {
-        waitList.add(n);
-        doneList.add(n);
-      }
-    }
-    waitList.sort((a, b) => b.compareTo(a));
 
-    while (waitList.isNotEmpty) {
-      final c = waitList.removeLast();
-      if (end == c) return c;
-      for (var n in c.neighbors) {
-        if (n.parent == null) {
-          _checkDistance(n, end, parent: c);
-        }
-        if (!doneList.contains(n)) {
-          waitList.add(n);
-          doneList.add(c);
-        }
-      }
-      waitList.sort((a, b) => b.compareTo(a));
-    }
-
-    return null;
-  }
-  //----------------------------------------------------------------------
-
-  void _checkDistance(ANode current, ANode end, {required ANode parent}) {
+  @override
+  void analyzeDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
-    // performance , make direction more stronger
+
+    /// performance , make direction more stronger
     current.h = _distance(current, end) * 2.0;
   }
 
@@ -149,10 +119,7 @@ class AStarManhattan extends AstarGrid {
       final row = grid[x];
       for (var y = 0; y < row.length; y++) {
         final node = row[y];
-        node.parent = null;
-        // improve performance x times
-        node.h = 0.0;
-        node.g = 0.0;
+        node.reset();
         node.neighbors.clear();
         _chainNeighborsManhattan(node, maxX: maxX, maxY: maxY);
       }
@@ -166,30 +133,30 @@ class AStarManhattan extends AstarGrid {
     // Optimized neighbor adding for Manhattan distance (only cardinal directions)
     if (y > 0) {
       // Top
-      final neighbor = grid[x][y - 1];
-      if (!grid[x][y - 1].barrier.isBlock) {
-        node.neighbors.add(neighbor);
+      final n = grid[x][y - 1];
+      if (n.barrier != Barrier.block) {
+        node.neighbors.add(n);
       }
     }
     if (y < maxY) {
       // Bottom
-      final neighbor = grid[x][y + 1];
-      if (!grid[x][y + 1].barrier.isBlock) {
-        node.neighbors.add(neighbor);
+      final n = grid[x][y + 1];
+      if (n.barrier != Barrier.block) {
+        node.neighbors.add(n);
       }
     }
     if (x > 0) {
       // Left
-      final neighbor = grid[x - 1][y];
-      if (!grid[x - 1][y].barrier.isBlock) {
-        node.neighbors.add(neighbor);
+      final n = grid[x - 1][y];
+      if (n.barrier != Barrier.block) {
+        node.neighbors.add(n);
       }
     }
     if (x < maxX) {
       // Right
-      final neighbor = grid[x + 1][y];
-      if (!grid[x + 1][y].barrier.isBlock) {
-        node.neighbors.add(neighbor);
+      final n = grid[x + 1][y];
+      if (n.barrier != Barrier.block) {
+        node.neighbors.add(n);
       }
     }
   }
