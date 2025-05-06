@@ -1,4 +1,4 @@
-import '../astar_dart.dart';
+import 'package:astar_dart/astar_dart.dart';
 
 /// Represents a node in the A* search grid.
 class ANode implements Comparable<ANode> {

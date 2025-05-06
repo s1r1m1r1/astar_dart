@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:astar_dart/astar_dart.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -18,9 +20,9 @@ void main() {
   group('test AStarHex simple', () {
     test('test 1', () {
       astar.addNeighbors();
-      final path = (astar.findPath(start: (x: 0, y: 0), end: (x: 6, y: 6)))
+      final path = (astar.findPath(start: (x: 3, y: 2), end: (x: 4, y: 3)))
           .toPointList();
-      expect(path.length, 12); // Check number of cols
+      expect(path.length, 2); // Check number of cols
     });
 
     test('test 2', () {

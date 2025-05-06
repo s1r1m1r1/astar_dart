@@ -110,10 +110,26 @@ class AStarHex extends AstarGrid {
     ({int x, int y}) a,
     ({int x, int y}) b,
   ) {
-    final s1 = (b.x - a.x);
-    final s2 = (b.y - a.y);
+    // 0,-1 ; +1 -1
+    // -1,0 ;0,0; +1,0
+    // -1,+1;0,+1
+    var top = a.y >= b.y ? a : b;
+    var bot = a.y >= b.y ? b : a;
 
-    return (s1.abs() <= 1 && s2.abs() <= 1);
+    // top
+    if ((top.x == bot.x || top.x == bot.x + 1) && top.y == bot.y - 1) {
+      return true;
+    }
+    // midle
+    if ((top.x == bot.x + 1 || top.x == bot.x - 1) && top.y == bot.y) {
+      return true;
+    }
+    // botom
+    if ((top.x == bot.x - 1 || top.x == bot.x) && top.y == bot.y + 1) {
+      return true;
+    }
+    // botom
+    return false;
   }
 
   /// Adds neighbors to each node in the grid.
