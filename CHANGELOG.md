@@ -34,3 +34,7 @@
 ## 2.4.3
   - added setBarrier() , setPoint() to AstarGrid
 
+## 2.4.4
+  - added option resetBarrier  to resetNodes()
+
+
