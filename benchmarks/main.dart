@@ -15,7 +15,7 @@ void main() {
   // maybe ok
   AstarTest2Benchmark(withDiagonal: true, size: 32).report();
 
-  // my astars
+  // my astar
   AStarBenchmark(algorithm: Names.algorithmManhattan, size: 32).report();
   AStarBenchmark(algorithm: Names.algorithmHex, size: 32).report();
   AStarBenchmark(algorithm: Names.algorithmEuclidean, size: 32).report();

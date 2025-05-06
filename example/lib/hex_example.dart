@@ -258,7 +258,7 @@ class HexTilePainter extends CustomPainter {
 
     canvas.drawPath(path, paint);
     paint
-      ..color = Colors.black!
+      ..color = Colors.black
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 

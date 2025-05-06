@@ -2,11 +2,6 @@ import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
 
-// enum AStarHexAlignment {
-//   odd,
-//   even,
-// }
-
 class AStarHex extends AstarGrid {
   AStarHex({
     required int rows,
@@ -25,7 +20,7 @@ class AStarHex extends AstarGrid {
     required ({int x, int y}) end,
   }) {
     /// If the end node is blocked, return an empty path.
-    if (grid[end.x][end.y].barrier.isBlock) {
+    if (grid[end.x][end.y].barrier == Barrier.block) {
       return [];
     }
 
@@ -110,9 +105,9 @@ class AStarHex extends AstarGrid {
     ({int x, int y}) a,
     ({int x, int y}) b,
   ) {
-    // 0,-1 ; +1 -1
-    // -1,0 ;0,0; +1,0
-    // -1,+1;0,+1
+    ///      0,-1;  +1 -1
+    /// -1,0 ; center:0,0;  +1,0
+    ///     -1,+1;  0,+1
     var top = a.y >= b.y ? a : b;
     var bot = a.y >= b.y ? b : a;
 
@@ -120,15 +115,14 @@ class AStarHex extends AstarGrid {
     if ((top.x == bot.x || top.x == bot.x + 1) && top.y == bot.y - 1) {
       return true;
     }
-    // midle
+    // middle
     if ((top.x == bot.x + 1 || top.x == bot.x - 1) && top.y == bot.y) {
       return true;
     }
-    // botom
+    // bottom
     if ((top.x == bot.x - 1 || top.x == bot.x) && top.y == bot.y + 1) {
       return true;
     }
-    // botom
     return false;
   }
 

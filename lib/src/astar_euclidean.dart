@@ -15,7 +15,7 @@ class AStarEuclidean extends AstarGrid {
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
-    if (grid[end.x][end.y].barrier.isBlock) {
+    if (grid[end.x][end.y].barrier == Barrier.block) {
       return [];
     }
 
