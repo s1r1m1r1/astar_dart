@@ -126,11 +126,19 @@ abstract class AstarGrid {
     grid[point.x][point.y].weight = point.weight.toDouble();
   }
 
-  void resetNodes() {
+  /// resetBarrier = ```true```, should connect grid with [addNeighbors] before [findPath]
+  ///
+  ///
+  ///  resetBarrier = ```false```, can reused directly to [findPath]
+  void resetNodes([resetBarrier = false]) {
     for (var x = 0; x < grid.length; x++) {
       final row = grid[x];
       for (var node in row) {
         node.reset();
+        if (resetBarrier) {
+          node.barrier = Barrier.pass;
+          node.neighbors.clear();
+        }
       }
     }
   }
