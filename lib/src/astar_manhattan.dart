@@ -14,26 +14,6 @@ class AStarManhattan extends AstarGrid {
           columns: columns,
         );
 
-  void setBarrier({required int x, required int y, required Barrier barrier}) {
-    assert(x <= rows, "Point can't be bigger than Array2d rows");
-    assert(y <= columns, "Point can't be bigger than Array2d column");
-    grid[x][y].barrier = barrier;
-  }
-
-  void setPoint(WeightedPoint point) {
-    assert(point.x <= rows, "Point can't be bigger than Array2d rows");
-    assert(point.y <= columns, "Point can't be bigger than Array2d columns");
-    grid[point.x][point.y].weight = point.weight.toDouble();
-  }
-
-  void setPoints(List<WeightedPoint> points) {
-    for (final point in points) {
-      assert(point.x <= rows, "Point can't be bigger than Array2d rows");
-      assert(point.y <= columns, "Point can't be bigger than Array2d columns");
-      grid[point.x][point.y].weight = point.weight.toDouble();
-    }
-  }
-
   /// return full path without Start position
   /// for Point(0,0) to Point(0,3) result will be [Point(0,3),Point(0,2),Point(0,1)]
   /// ```dart

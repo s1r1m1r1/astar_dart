@@ -114,7 +114,18 @@ abstract class AstarGrid {
     required ANode parent,
   });
 
-  //clear if it needed, without reconect if it needed , for  performance
+  void setBarrier({required int x, required int y, required Barrier barrier}) {
+    assert(x <= rows, "Point can't be bigger than Array2d rows");
+    assert(y <= columns, "Point can't be bigger than Array2d column");
+    grid[x][y].barrier = barrier;
+  }
+
+  void setPoint(WeightedPoint point) {
+    assert(point.x <= rows, "Point can't be bigger than Array2d rows");
+    assert(point.y <= columns, "Point can't be bigger than Array2d columns");
+    grid[point.x][point.y].weight = point.weight.toDouble();
+  }
+
   void resetNodes() {
     for (var x = 0; x < grid.length; x++) {
       final row = grid[x];

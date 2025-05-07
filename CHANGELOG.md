@@ -22,12 +22,15 @@
   - update hex example 
 
 ## 2.4.0
-  - fix degradation on euclidian algorithm 
+  - fix degradation on euclidean algorithm 
 
 ## 2.4.1
   - added reset() for ANode , clear h ,g , parent value , improve performance 
   - added resetNodes() to reset Grid, improve performance 
 
 ## 2.4.2
-  - bugfix AStarHex _isNeighbors incorect check
+  - bugfix AStarHex _isNeighbors incorrect check
+
+## 2.4.3
+  - added setBarrier() , setPoint() to AstarGrid
 
