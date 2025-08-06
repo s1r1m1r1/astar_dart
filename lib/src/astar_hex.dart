@@ -106,7 +106,7 @@ class AStarHex extends AstarGrid {
     ({int x, int y}) b,
   ) {
     ///      0,-1;  +1 -1
-    /// -1,0 ; center:0,0;  +1,0
+    /// -1,0 ; center ;  +1,0
     ///     -1,+1;  0,+1
     var top = a.y >= b.y ? a : b;
     var bot = a.y >= b.y ? b : a;

@@ -125,35 +125,43 @@ class _GridExampleState extends State<GridExample> {
               child: SizedBox(
                 height: 30 * 100.0,
                 width: 30 * 100.0,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    for (var x = 0; x < 10; x++)
-                      for (var y = 0; y < 10; y++)
-                        Positioned(
-                          left: (x * 100.0) + (y * 50),
-                          top: y * 75.0,
-                          height: 100,
-                          width: 100,
-                          child: FloorItemWidget(
-                            floor: array2d[x][y],
-                            onTap: (floor) => _calculatePath(floor),
-                            color: switch (array2d[x][y]) {
-                              Floor(:final x, :final y)
-                                  when x == start.x && y == start.y =>
-                                Colors.purple,
-                              Floor(isPath: true) => Colors.grey,
-                              Floor(ground: GroundType.field) =>
-                                Colors.greenAccent,
-                              Floor(ground: GroundType.water) =>
-                                Colors.lightBlue,
-                              Floor(ground: GroundType.forest) =>
-                                Colors.green[700],
-                              Floor(ground: GroundType.barrier) => Colors.black,
-                            }!,
-                          ),
-                        )
-                  ],
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: SizedBox(
+                    width: array2d.width * 200,
+                    height: array2d.height * 200.0,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        for (var x = 0; x < 10; x++)
+                          for (var y = 0; y < 10; y++)
+                            Positioned(
+                              left: (x * 100.0) + (y * 50),
+                              top: y * 75.0,
+                              height: 100,
+                              width: 100,
+                              child: FloorItemWidget(
+                                floor: array2d[x][y],
+                                onTap: (floor) => _calculatePath(floor),
+                                color: switch (array2d[x][y]) {
+                                  Floor(:final x, :final y)
+                                      when x == start.x && y == start.y =>
+                                    Colors.purple,
+                                  Floor(isPath: true) => Colors.grey,
+                                  Floor(ground: GroundType.field) =>
+                                    Colors.greenAccent,
+                                  Floor(ground: GroundType.water) =>
+                                    Colors.lightBlue,
+                                  Floor(ground: GroundType.forest) =>
+                                    Colors.green[700],
+                                  Floor(ground: GroundType.barrier) =>
+                                    Colors.black,
+                                }!,
+                              ),
+                            )
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -177,7 +185,8 @@ class FloorItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
+    return ClipPath(
+      clipper: HexTileClipper(),
       child: GestureDetector(
         onTap: () {
           onTap(floor);
@@ -233,6 +242,26 @@ class FloorItemWidget extends StatelessWidget {
             }),
       ),
     );
+  }
+}
+
+class HexTileClipper extends CustomClipper<Path> {
+  @override
+  getClip(Size size) {
+    return Path()
+      ..moveTo(0, (size.height * 0.25))
+      ..lineTo((size.width / 2), 0)
+      ..lineTo(size.width, (size.height * 0.25))
+      ..lineTo(size.width, (size.height * 0.75))
+      ..lineTo((size.width / 2), size.height)
+      ..lineTo(0, (size.height * 0.75))
+      ..lineTo(0, (size.height * 0.25))
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper oldClipper) {
+    return false;
   }
 }
 
