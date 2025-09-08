@@ -4,15 +4,10 @@ import 'package:astar_dart/astar_dart.dart';
 
 class AStarManhattan extends AstarGrid {
   AStarManhattan(
-      {required int rows,
-      required int columns,
-      GridBuilder? gridBuilder,
-      required})
-      : super(
-          gridBuilder: gridBuilder,
-          rows: rows,
-          columns: columns,
-        );
+      {required super.rows,
+      required super.columns,
+      super.gridBuilder,
+      required});
 
   /// return full path without Start position
   /// for Point(0,0) to Point(0,3) result will be [Point(0,3),Point(0,2),Point(0,1)]

@@ -1,4 +1,4 @@
-library astar_dart;
+library;
 
 export 'package:astar_dart/src/astar_manhattan.dart';
 export 'package:astar_dart/src/astar_euclidean.dart';

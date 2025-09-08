@@ -82,7 +82,8 @@ class AStarBenchmark extends BenchmarkBase {
     final ({int x, int y}) end = (x: size - 1, y: size - 1);
     astar.addNeighbors();
 
-    final path = astar.findPath(start: start, end: end);
+    // final path =
+    astar.findPath(start: start, end: end);
   }
 }
 
@@ -112,7 +113,8 @@ class AstarTest2Benchmark extends BenchmarkBase {
       ],
       withDiagonal: withDiagonal,
     );
-    final result = astar.findThePath();
+    // final result =
+    astar.findThePath();
   }
 }
 
@@ -127,7 +129,8 @@ class AstarTest3Benchmark extends BenchmarkBase {
       print("No path");
       return;
     }
-    final path = result.reconstructPath();
+    // final path =
+    result.reconstructPath();
   }
 }
 
