@@ -3,24 +3,16 @@
 
 
 Features
-A* pathfinding algorithm implementation.
+A* pathfinder algorithm implementation.
 
 Support for different types of movement or grids (e.g., Hex astar).
-
-Handling of random movement and variable pathfinding.
-
-Functionality for searching for neighbors and nearby goals.
 
 
  
 
 ## Packages Benchmarked
 
-
-
 ## Benchmark Results
-
-                🏎️ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 💨
 
 The benchmark was run, and the following average execution times were recorded:
 grid 32x32 with 60 barriers

@@ -37,4 +37,9 @@
 ## 2.4.4
   - added option resetBarrier  to resetNodes()
 
+## 2.4.5
+  - chore update dependencies
+
+
+
 
