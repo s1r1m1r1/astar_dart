@@ -9,7 +9,7 @@ void main() {
         columns: 7,
         gridBuilder: (int x, int y) {
           if ((x == 3 && y == 2) || (x == 3 && y == 3) || (x == 3 && y == 4)) {
-            return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+            return ANode(x: x, y: y, neighbors: [], isBarrier: true);
           }
           return ANode(x: x, y: y, neighbors: []);
         });

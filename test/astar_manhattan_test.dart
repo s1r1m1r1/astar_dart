@@ -10,7 +10,7 @@ void main() {
       rows: 4,
       columns: 4,
       gridBuilder: (x, y) {
-        return ANode(x: x, y: y, neighbors: [], barrier: Barrier.pass);
+        return ANode(x: x, y: y, neighbors: [], isBarrier: false);
       },
     );
     astar.addNeighbors();

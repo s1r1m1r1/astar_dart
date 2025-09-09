@@ -1,11 +1,11 @@
 name: astar_dart
-version: 2.4.5
+version: 3.0.0
 homepage: https://github.com/s1r1m1r1/astar_dart
 environment:
   sdk: ">=3.5.0 <4.0.0"
 description: A pathfinder implementation in Dart. Efficiently finds shortest paths on grids, supporting barriers and weights. Manhattan, Euclidean, Hex
 dependencies:
-  array2d: ^1.2.0
+  array2d: ^1.3.0
   collection: ^1.18.0
   meta: ^1.12.0
 dev_dependencies:

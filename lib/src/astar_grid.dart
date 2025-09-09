@@ -114,10 +114,10 @@ abstract class AstarGrid {
     required ANode parent,
   });
 
-  void setBarrier({required int x, required int y, required Barrier barrier}) {
+  void setBarrier({required int x, required int y, required bool isBarrier}) {
     assert(x <= rows, "Point can't be bigger than Array2d rows");
     assert(y <= columns, "Point can't be bigger than Array2d column");
-    grid[x][y].barrier = barrier;
+    grid[x][y].isBarrier = isBarrier;
   }
 
   void setPoint(WeightedPoint point) {
@@ -135,8 +135,10 @@ abstract class AstarGrid {
       final row = grid[x];
       for (var node in row) {
         node.reset();
+        node.visited = false;
+        node.isTarget = false;
         if (resetBarrier) {
-          node.barrier = Barrier.pass;
+          node.isBarrier = false;
           node.neighbors.clear();
         }
       }

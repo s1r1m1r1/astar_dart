@@ -98,12 +98,12 @@ class _GridExampleState extends State<GridExample> {
               GroundType.forest => 10,
               GroundType.barrier => 1,
             },
-            barrier: switch (floor.ground) {
+            isBarrier: switch (floor.ground) {
               GroundType.field ||
               GroundType.water ||
               GroundType.forest =>
-                Barrier.pass,
-              GroundType.barrier => Barrier.block,
+                false,
+              GroundType.barrier => true,
             });
       },
     );

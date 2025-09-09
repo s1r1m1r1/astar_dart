@@ -40,6 +40,14 @@
 ## 2.4.5
   - chore update dependencies
 
+## 3.0.0
+  - new version is really fast ,
+  - findPath() 80% performance improvement 
+  - findSteps() , findTargets() , more then 200x performance improvement
+  - findTarget() all target detected as not movable  , while search them
+
+  
+
 
 
 

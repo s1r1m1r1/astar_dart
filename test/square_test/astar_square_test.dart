@@ -21,10 +21,10 @@ void main() {
     test('Finds path with obstacles', () {
       // astar.calculateGrid();
       astar
-        ..setBarrier(x: 4, y: 4, barrier: Barrier.block)
-        ..setBarrier(x: 4, y: 5, barrier: Barrier.block)
-        ..setBarrier(x: 5, y: 4, barrier: Barrier.block)
-        ..setBarrier(x: 5, y: 5, barrier: Barrier.block);
+        ..setBarrier(x: 4, y: 4, isBarrier: true)
+        ..setBarrier(x: 4, y: 5, isBarrier: true)
+        ..setBarrier(x: 5, y: 4, isBarrier: true)
+        ..setBarrier(x: 5, y: 5, isBarrier: true);
 
       astar.addNeighbors();
       final path = astar.findPath(start: (x: 0, y: 0), end: (x: 9, y: 9));
@@ -33,7 +33,7 @@ void main() {
 
     test('No path if blocked', () {
       // astar.calculateGrid();
-      astar.setBarrier(x: 5, y: 5, barrier: Barrier.block);
+      astar.setBarrier(x: 5, y: 5, isBarrier: true);
 
       astar.addNeighbors();
       final path = (astar.findPath(start: (x: 5, y: 4), end: (x: 5, y: 6)))

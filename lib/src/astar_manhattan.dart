@@ -22,7 +22,7 @@ class AStarManhattan extends AstarGrid {
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
-    if (grid[end.x][end.y].barrier == Barrier.block) {
+    if (grid[end.x][end.y].isBarrier) {
       return [];
     }
 
@@ -109,28 +109,28 @@ class AStarManhattan extends AstarGrid {
     if (y > 0) {
       // Top
       final n = grid[x][y - 1];
-      if (n.barrier != Barrier.block) {
+      if (!n.isBarrier) {
         node.neighbors.add(n);
       }
     }
     if (y < maxY) {
       // Bottom
       final n = grid[x][y + 1];
-      if (n.barrier != Barrier.block) {
+      if (!n.isBarrier) {
         node.neighbors.add(n);
       }
     }
     if (x > 0) {
       // Left
       final n = grid[x - 1][y];
-      if (n.barrier != Barrier.block) {
+      if (!n.isBarrier) {
         node.neighbors.add(n);
       }
     }
     if (x < maxX) {
       // Right
       final n = grid[x + 1][y];
-      if (n.barrier != Barrier.block) {
+      if (!n.isBarrier) {
         node.neighbors.add(n);
       }
     }

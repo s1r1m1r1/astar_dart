@@ -54,10 +54,10 @@ class AStarBenchmark extends BenchmarkBase {
           columns: size,
           gridBuilder: (x, y) {
             if (x == 6 && y > 1) {
-              return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+              return ANode(x: x, y: y, neighbors: [], isBarrier: true);
             }
             if (x == 18 && y < 30) {
-              return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+              return ANode(x: x, y: y, neighbors: [], isBarrier: true);
             }
             return ANode(x: x, y: y, neighbors: []);
           },
@@ -68,10 +68,10 @@ class AStarBenchmark extends BenchmarkBase {
           columns: size,
           gridBuilder: (int x, int y) {
             if (x == 6 && y >= 0 && y < 10 && y > 12) {
-              return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+              return ANode(x: x, y: y, neighbors: [], isBarrier: true);
             }
             if (x == 18 && y < 30) {
-              return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+              return ANode(x: x, y: y, neighbors: [], isBarrier: true);
             }
 
             return ANode(x: x, y: y, neighbors: []);

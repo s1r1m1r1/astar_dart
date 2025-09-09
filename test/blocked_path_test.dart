@@ -14,9 +14,9 @@ void main() {
               (x == 3 && y == 3) ||
               (x == 4 && y == 3) ||
               (x == 5 && y == 3)) {
-            return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+            return ANode(x: x, y: y, neighbors: [], isBarrier: true);
           }
-          return ANode(x: x, y: y, neighbors: [], barrier: Barrier.pass);
+          return ANode(x: x, y: y, neighbors: [], isBarrier: false);
         });
     astar.addNeighbors();
     // 0,0   1,0   2,0   3,0   4,0   5,0

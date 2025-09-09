@@ -15,7 +15,7 @@ class AStarEuclidean extends AstarGrid {
     required ({int x, int y}) start,
     required ({int x, int y}) end,
   }) {
-    if (grid[end.x][end.y].barrier == Barrier.block) {
+    if (grid[end.x][end.y].isBarrier) {
       return [];
     }
 
@@ -98,14 +98,14 @@ class AStarEuclidean extends AstarGrid {
     if (y > 0) {
       // Top
       final neighbor = grid[x][y - 1];
-      if (neighbor.barrier != Barrier.block) {
+      if (!neighbor.isBarrier) {
         node.neighbors.add(neighbor);
       }
     }
     if (y < maxY) {
       // Bottom
       final neighbor = grid[x][y + 1];
-      if (neighbor.barrier != Barrier.block) {
+      if (!neighbor.isBarrier) {
         node.neighbors.add(neighbor);
       }
     }
@@ -113,14 +113,14 @@ class AStarEuclidean extends AstarGrid {
     if (x > 0) {
       // Left
       final neighbor = grid[x - 1][y];
-      if (neighbor.barrier != Barrier.block) {
+      if (!neighbor.isBarrier) {
         node.neighbors.add(neighbor);
       }
     }
     if (x < maxX) {
       // Right
       final neighbor = grid[x + 1][y];
-      if (neighbor.barrier != Barrier.block) {
+      if (!neighbor.isBarrier) {
         node.neighbors.add(neighbor);
       }
     }
@@ -129,21 +129,21 @@ class AStarEuclidean extends AstarGrid {
     if (x > 0 && y > 0) {
       // Top-Left
       final neighbor = grid[x - 1][y - 1];
-      if (neighbor.barrier != Barrier.block) {
+      if (!neighbor.isBarrier) {
         node.neighbors.add(neighbor);
       }
     }
     if (x > 0 && y < maxY) {
       // Bottom-Left
       final neighbor = grid[x - 1][y + 1];
-      if (neighbor.barrier != Barrier.block) {
+      if (!neighbor.isBarrier) {
         node.neighbors.add(neighbor);
       }
     }
     if (x < maxX && y > 0) {
       // Top-Right
       final neighbor = grid[x + 1][y - 1];
-      if (neighbor.barrier != Barrier.block) {
+      if (!neighbor.isBarrier) {
         node.neighbors.add(neighbor);
       }
     }
@@ -151,7 +151,7 @@ class AStarEuclidean extends AstarGrid {
     if (x < maxX && y < maxY) {
       // Bottom-Right
       final neighbor = grid[x + 1][y + 1];
-      if (neighbor.barrier != Barrier.block) {
+      if (!neighbor.isBarrier) {
         node.neighbors.add(neighbor);
       }
     }

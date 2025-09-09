@@ -11,7 +11,7 @@ void main() {
       columns: 7,
       gridBuilder: (x, y) {
         if ((x == 1 && y == 1) || (x == 1 && y == 0)) {
-          return ANode(x: x, y: y, neighbors: [], barrier: Barrier.block);
+          return ANode(x: x, y: y, neighbors: [], isBarrier: true);
         }
         return ANode(x: x, y: y, neighbors: []);
       },

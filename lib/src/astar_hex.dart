@@ -20,7 +20,7 @@ class AStarHex extends AstarGrid {
     required ({int x, int y}) end,
   }) {
     /// If the end node is blocked, return an empty path.
-    if (grid[end.x][end.y].barrier == Barrier.block) {
+    if (grid[end.x][end.y].isBarrier) {
       return [];
     }
 
@@ -148,7 +148,7 @@ class AStarHex extends AstarGrid {
     /// adds in left
     if (x > 0) {
       final t = grid[x - 1][y];
-      if (t.barrier != Barrier.block) {
+      if (!t.isBarrier) {
         node.neighbors.add(t);
       }
     }
@@ -156,7 +156,7 @@ class AStarHex extends AstarGrid {
     /// adds in right
     if (x < (grid.length - 1)) {
       final t = grid[x + 1][y];
-      if (t.barrier != Barrier.block) {
+      if (!t.isBarrier) {
         node.neighbors.add(t);
       }
     }
@@ -164,12 +164,12 @@ class AStarHex extends AstarGrid {
     /// adds in top
     if (y > 0) {
       final t = grid[x][y - 1];
-      if (t.barrier != Barrier.block) {
+      if (!t.isBarrier) {
         node.neighbors.add(t);
       }
       if (x < (grid.length - 1)) {
         final t2 = grid[x + 1][y - 1];
-        if (t2.barrier != Barrier.block) {
+        if (!t2.isBarrier) {
           node.neighbors.add(t2);
         }
       }
@@ -178,13 +178,13 @@ class AStarHex extends AstarGrid {
     /// adds in bottom
     if (y < (grid.first.length - 1)) {
       final t = grid[x][y + 1];
-      if (t.barrier != Barrier.block) {
+      if (!t.isBarrier) {
         node.neighbors.add(t);
       }
 
       if (x > 0) {
         final t2 = grid[x - 1][y + 1];
-        if (t2.barrier != Barrier.block) {
+        if (!t2.isBarrier) {
           node.neighbors.add(t2);
         }
       }

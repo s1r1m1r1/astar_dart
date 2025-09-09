@@ -10,7 +10,12 @@ class ANode implements Comparable<ANode> {
   final List<ANode> neighbors;
 
   /// The barrier status of the node (e.g., passable, blocked)
-  Barrier barrier;
+  bool isBarrier;
+
+  // alternative marker to mark the node as visited
+  bool visited = false;
+
+  bool isTarget = false;
 
   /// The weight or cost of moving to this node.
   double weight;
@@ -29,7 +34,7 @@ class ANode implements Comparable<ANode> {
     required this.x,
     required this.y,
     required this.neighbors,
-    this.barrier = Barrier.pass,
+    this.isBarrier = false,
     this.parent,
     this.weight = 1,
   });
