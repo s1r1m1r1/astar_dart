@@ -4,14 +4,10 @@ import 'package:astar_dart/astar_dart.dart';
 
 class AStarHex extends AstarGrid {
   AStarHex({
-    required int rows,
-    required int columns,
-    required GridBuilder gridBuilder,
-  }) : super(
-          rows: rows,
-          columns: columns,
-          gridBuilder: gridBuilder,
-        );
+    required super.rows,
+    required super.columns,
+    required GridBuilder super.gridBuilder,
+  });
 
   @override
   List<ANode> findPath({

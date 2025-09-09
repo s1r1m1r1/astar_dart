@@ -1,5 +1,3 @@
-import 'package:astar_dart/astar_dart.dart';
-
 /// Represents a node in the A* search grid.
 class ANode implements Comparable<ANode> {
   /// The x,y coordinate of the node.
