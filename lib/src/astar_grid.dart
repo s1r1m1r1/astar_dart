@@ -93,9 +93,8 @@ abstract class AstarGrid {
       final c = waitList.removeLast();
       if (end == c) return c;
       for (var n in c.neighbors) {
-        if (n.parent == null) {
-          analyzeDistance(n, end, parent: c);
-        }
+        if (n.parent != null) continue;
+        analyzeDistance(n, end, parent: c);
         if (!doneList.contains(n)) {
           waitList.add(n);
           doneList.add(c);

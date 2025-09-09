@@ -48,11 +48,13 @@ void main() {
   });
   group('test blocked path', () {
     test('test if blocked ', () {
+      astar.resetNodes();
       final path = astar.findPath(start: (x: 0, y: 0), end: (x: 5, y: 5));
       expect(path.isEmpty, true); // Check number of cols
     });
 
     test('test if not blocked ', () {
+      astar.resetNodes();
       final path = astar.findPath(start: (x: 0, y: 0), end: (x: 5, y: 2));
       expect(path.isNotEmpty, true); // Check number of cols
     });
