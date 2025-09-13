@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 void main() {
   late final AStarHex astar;

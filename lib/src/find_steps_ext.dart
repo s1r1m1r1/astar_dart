@@ -17,21 +17,27 @@ extension AstarGridExt on AstarGrid {
   List<DistancePoint> findSteps({
     required int steps,
     required Point<int> start,
+    List<Point<int>> obstacles = const [],
   }) {
     ANode a = grid[start.x][start.y];
     a.visited = true;
     final List<ANode> total = [];
     final List<ANode> next = [];
+    final List<ANode> current = [];
 
-    final List<ANode> current = [...a.neighbors];
+    for (var o in obstacles) {
+      grid[o.x][o.y].isTarget = true;
+    }
+    for (var n in a.neighbors) {
+      n.parent = a;
+      n.g = n.weight;
+      if (!n.isTarget) {
+        current.add(n);
+      }
+    }
     if (current.isEmpty) {
       return [];
     }
-    for (var element in a.neighbors) {
-      element.parent = a;
-      element.g = element.weight;
-    }
-    current.sort((a, b) => a.g.compareTo(b.g));
     for (var i = 0; i < steps; i++) {
       for (var c in current) {
         if (c.g <= steps) {
@@ -39,11 +45,14 @@ extension AstarGridExt on AstarGrid {
           total.add(c);
           for (var n in c.neighbors) {
             if (n.visited) continue;
+            if (n.isTarget) continue;
             n.visited = true;
             n.parent = c;
             n.g = n.weight + c.g;
             next.add(n);
           }
+        } else {
+          next.add(c);
         }
       }
 
@@ -52,10 +61,7 @@ extension AstarGridExt on AstarGrid {
       next.clear();
       current.sort((a, b) => a.g.compareTo(b.g));
     }
-
-    return total
-        .map((i) => DistancePoint(i.x, i.y, i.weight.toDouble()))
-        .toList();
+    return total.map((i) => DistancePoint(i.x, i.y, i.g.toDouble())).toList();
   }
 
   List<DistancePoint> findTargets({

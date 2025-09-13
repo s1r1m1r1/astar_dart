@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import '../astar_dart.dart';
@@ -36,10 +38,10 @@ abstract class AstarGrid {
   }
 
   /// List of nodes that have been evaluated.
-  final List<ANode> doneList = [];
+  // final List<ANode> doneList = [];
 
   /// List of nodes that are waiting to be evaluated.
-  final List<ANode> waitList = [];
+  final waitList = <ANode>[];
 
   /// Finds a path between the start and end points.
   ///
@@ -82,24 +84,27 @@ abstract class AstarGrid {
       if (n.parent == null) {
         analyzeDistance(n, end, parent: current);
       }
-      if (!doneList.contains(n)) {
+      if (!n.visited) {
+        n.visited = true;
         waitList.add(n);
-        doneList.add(n);
       }
     }
-    waitList.sort((a, b) => b.compareTo(a));
 
+    waitList.sort((a, b) => b.compareTo(a));
+    // var tail = <ANode>[];
     while (waitList.isNotEmpty) {
       final c = waitList.removeLast();
       if (end == c) return c;
       for (var n in c.neighbors) {
         if (n.parent != null) continue;
         analyzeDistance(n, end, parent: c);
-        if (!doneList.contains(n)) {
+        if (!n.visited) {
+          n.visited = true;
+          // waitList.insert(0, n);
           waitList.add(n);
-          doneList.add(c);
         }
       }
+
       waitList.sort((a, b) => b.compareTo(a));
     }
     return null;

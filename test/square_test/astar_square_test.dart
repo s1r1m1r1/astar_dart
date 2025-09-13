@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 void main() {
   late AStarManhattan astar;
@@ -20,6 +20,7 @@ void main() {
     });
     test('Finds path with obstacles', () {
       // astar.calculateGrid();
+      astar.resetNodes();
       astar
         ..setBarrier(x: 4, y: 4, isBarrier: true)
         ..setBarrier(x: 4, y: 5, isBarrier: true)
@@ -33,6 +34,7 @@ void main() {
 
     test('No path if blocked', () {
       // astar.calculateGrid();
+      astar.resetNodes();
       astar.setBarrier(x: 5, y: 5, isBarrier: true);
 
       astar.addNeighbors();
@@ -60,8 +62,6 @@ void main() {
     // });
 
     test('Finds steps within range', () {
-      // astar.calculateGrid();
-
       astar.resetNodes();
       final steps = astar.findSteps(steps: 3, start: const Point(5, 5));
       expect(steps.isNotEmpty, true);
@@ -76,7 +76,7 @@ void main() {
     // });
 
     test('Path contains correct nodes (deep equality)', () {
-      // astar.calculateGrid();
+      astar.resetNodes();
       final expectedPath = [
         ANode(x: 0, y: 3, neighbors: [], weight: 1.0),
         ANode(x: 0, y: 2, neighbors: [], weight: 1.0),

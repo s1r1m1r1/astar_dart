@@ -41,9 +41,9 @@ class AStarEuclidean extends AstarGrid {
         nodeAux = nodeAux.parent!;
       }
     }
-    visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
+    // visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
 
-    doneList.clear();
+    // doneList.clear();
     waitList.clear();
 
     if (winner == null && !_isNeighbors(start, end)) {

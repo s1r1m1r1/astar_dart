@@ -54,10 +54,9 @@ class AStarHex extends AstarGrid {
       path.clear();
     }
     waitList.clear();
-    doneList.clear();
 
     /// Call the doneList callback with the explored nodes.
-    visited?.call(doneList.map((e) => Point(e.x, e.y)).toList(growable: false));
+    // visited?.call(doneList.map((e) => Point(e.x, e.y)).toList(growable: false));
 
     return path.toList();
   }

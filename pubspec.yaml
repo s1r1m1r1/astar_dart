@@ -1,5 +1,5 @@
 name: astar_dart
-version: 3.0.0
+version: 3.1.0
 homepage: https://github.com/s1r1m1r1/astar_dart
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -9,9 +9,8 @@ dependencies:
   collection: ^1.18.0
   meta: ^1.12.0
 dev_dependencies:
+  test:
   flutter_lints: ^5.0.0
-  flutter_test:
-    sdk: flutter
 resolution: workspace
 topics:
   - astar

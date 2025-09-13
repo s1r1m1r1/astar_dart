@@ -3,11 +3,11 @@ import 'dart:math';
 import 'package:astar_dart/astar_dart.dart';
 
 class AStarManhattan extends AstarGrid {
-  AStarManhattan(
-      {required super.rows,
-      required super.columns,
-      super.gridBuilder,
-      required});
+  AStarManhattan({
+    required super.rows,
+    required super.columns,
+    super.gridBuilder,
+  });
 
   /// return full path without Start position
   /// for Point(0,0) to Point(0,3) result will be [Point(0,3),Point(0,2),Point(0,1)]
@@ -48,8 +48,8 @@ class AStarManhattan extends AstarGrid {
         nodeAux = nodeAux.parent!;
       }
     }
-    visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
-    doneList.clear();
+    // visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
+    // doneList.clear();
     waitList.clear();
 
     if (winner == null && !_isNeighbors(start, end)) {
