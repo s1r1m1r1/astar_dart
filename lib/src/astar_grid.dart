@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:math';
 
-import 'package:collection/collection.dart';
 import 'package:meta/meta.dart';
 
 import '../astar_dart.dart';
