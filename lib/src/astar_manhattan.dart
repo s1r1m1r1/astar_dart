@@ -96,6 +96,7 @@ class AStarManhattan extends AstarGrid {
         final node = row[y];
         node.reset();
         node.neighbors.clear();
+        if (node.isBarrier) continue;
         _chainNeighborsManhattan(node, maxX: maxX, maxY: maxY);
       }
     }
@@ -105,6 +106,7 @@ class AStarManhattan extends AstarGrid {
       {required int maxX, required int maxY}) {
     final x = node.x;
     final y = node.y;
+
     // Optimized neighbor adding for Manhattan distance (only cardinal directions)
     if (y > 0) {
       // Top

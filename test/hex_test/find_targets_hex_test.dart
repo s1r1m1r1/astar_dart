@@ -17,16 +17,14 @@ void main() {
       },
     );
     astar.addNeighbors();
-    // astar.setBarriers(<Point<int>>[].toListBarrier(Barrier.block));
   });
 
-  // top-left to bottom-right
   group('test AStarHex find targets', () {
     test(
       'test 1',
       () {
         final path = astar.findTargets(
-          maxSteps: 14,
+          steps: 14,
           start: const Point(0, 0),
           targets: const [
             Point(6, 6),

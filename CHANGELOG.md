@@ -1,3 +1,8 @@
+## 3.2.0
+  - added findStepsTargets()
+  - fix some bug in findTargets()
+  - improve example/main.dart
+
 ## 3.1.0
   - fixed some bugs findSteps
 

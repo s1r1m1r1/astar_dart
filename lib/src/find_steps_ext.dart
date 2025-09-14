@@ -26,12 +26,12 @@ extension AstarGridExt on AstarGrid {
     final List<ANode> current = [];
 
     for (var o in obstacles) {
-      grid[o.x][o.y].isTarget = true;
+      grid[o.x][o.y].isObstacle = true;
     }
     for (var n in a.neighbors) {
       n.parent = a;
       n.g = n.weight;
-      if (!n.isTarget) {
+      if (!n.isObstacle) {
         current.add(n);
       }
     }
@@ -45,7 +45,7 @@ extension AstarGridExt on AstarGrid {
           total.add(c);
           for (var n in c.neighbors) {
             if (n.visited) continue;
-            if (n.isTarget) continue;
+            if (n.isObstacle) continue;
             n.visited = true;
             n.parent = c;
             n.g = n.weight + c.g;
@@ -67,49 +67,139 @@ extension AstarGridExt on AstarGrid {
   List<DistancePoint> findTargets({
     required Point<int> start,
     required List<Point<int>> targets,
-    required int maxSteps,
+    List<Point<int>> obstacles = const [],
+    required int steps,
   }) {
     final targetCount = targets.length;
     ANode a = grid[start.x][start.y];
+    a.visited = true;
 
     for (var t in targets) {
       grid[t.x][t.y].isTarget = true;
     }
-    // final tNodes = targets.map((i) => grid[i.x][i.y]).toList();
-    final List<ANode> founded = [];
-    final List<ANode> next = [];
 
-    final List<ANode> current = [...a.neighbors];
+    for (var o in obstacles) {
+      grid[o.x][o.y].isObstacle = true;
+    }
+    // final tNodes = targets.map((i) => grid[i.x][i.y]).toList();
+    final founded = <ANode>[];
+    final next = <ANode>[];
+
+    final current = List<ANode>.empty(growable: true);
+
+    for (var n in a.neighbors) {
+      n.parent = a;
+      n.g = n.weight;
+      if (!n.isObstacle) {
+        current.add(n);
+      }
+    }
     if (current.isEmpty) {
       return [];
     }
-    for (var element in a.neighbors) {
-      element.parent = a;
-      element.g = element.weight + 0;
-    }
-    current.sort((a, b) => a.g.compareTo(b.g));
-    for (var i = 0; i < maxSteps; i++) {
-      if (founded.length == targetCount) break;
+    for (var i = 0; i < steps; i++) {
       for (var c in current) {
-        for (var n in c.neighbors) {
-          if (n.visited) continue;
-          n.visited = true;
-          n.parent = c;
-          n.g = n.weight + c.g;
-          if (n.isTarget) {
-            if (!founded.contains(n)) {
+        if (c.isTarget) {
+          c.visited = true;
+          founded.add(c);
+        } else {
+          for (var n in c.neighbors) {
+            if (n.visited) continue;
+            if (n.isObstacle) continue;
+            n.visited = true;
+            n.parent = c;
+            n.g = n.weight + c.g;
+            if (n.isTarget) {
               founded.add(n);
+              continue;
             }
-          } else {
             next.add(n);
           }
         }
       }
+
       current.clear();
       current.addAll(next);
       current.sort((a, b) => a.g.compareTo(b.g));
       next.clear();
     }
+
     return founded.map((i) => DistancePoint(i.x, i.y, i.g)).toList();
+  }
+
+  /// find steps area , useful for Turn Based Game
+  /// example 3 steps
+  /// ```
+  ///          3
+  ///       3  2  3 [x]
+  ///    3  2  1  2  3
+  /// 3  2  1  🧍‍♂️ 1  2  3
+  ///    3  2  1  2  3
+  ///       3  2  3 [x]
+  ///          3
+  /// ```
+  (List<DistancePoint> steps, List<DistancePoint> targets) findStepsTargets({
+    required int steps,
+    required Point<int> start,
+    required List<Point<int>> targets,
+    List<Point<int>> obstacles = const [],
+  }) {
+    ANode a = grid[start.x][start.y];
+    a.visited = true;
+    final List<ANode> total = [];
+    final List<ANode> next = [];
+    final List<ANode> current = [];
+    final List<ANode> founded = [];
+
+    for (var o in obstacles) {
+      grid[o.x][o.y].isObstacle = true;
+    }
+    for (var t in targets) {
+      grid[t.x][t.y].isTarget = true;
+    }
+    for (var n in a.neighbors) {
+      n.parent = a;
+      n.g = n.weight;
+      if (!n.isObstacle) {
+        current.add(n);
+      }
+    }
+    if (current.isEmpty) {
+      return ([], []);
+    }
+    for (var i = 0; i < steps; i++) {
+      for (var c in current) {
+        if (c.isTarget) {
+          c.visited = true;
+          founded.add(c);
+        } else if (c.g <= steps) {
+          c.visited = true;
+          total.add(c);
+          for (var n in c.neighbors) {
+            if (n.visited) continue;
+            n.visited = true;
+            if (n.isObstacle) continue;
+            n.parent = c;
+            n.g = n.weight + c.g;
+            if (n.isTarget) {
+              founded.add(n);
+            } else {
+              next.add(n);
+            }
+          }
+        } else {
+          next.add(c);
+        }
+      }
+
+      current.clear();
+      current.addAll(next);
+      next.clear();
+      current.sort((a, b) => a.g.compareTo(b.g));
+    }
+    return (
+      total.map((i) => DistancePoint(i.x, i.y, i.g.toDouble())).toList(),
+      founded.map((i) => DistancePoint(i.x, i.y, i.g.toDouble())).toList(),
+    );
   }
 }

@@ -139,6 +139,7 @@ abstract class AstarGrid {
         node.reset();
         node.visited = false;
         node.isTarget = false;
+        node.isObstacle = false;
         if (resetBarrier) {
           node.isBarrier = false;
           node.neighbors.clear();

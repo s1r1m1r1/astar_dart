@@ -65,7 +65,7 @@ class AStarBenchmark extends BenchmarkBase {
     astar.addNeighbors();
 
     // final path =
-    astar.findTargets(
+    final result = astar.findStepsTargets(
         start: Point(start.x, start.y),
         targets: [
           ...List.generate(10, (n) => Point(5, n)),

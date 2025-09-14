@@ -14,6 +14,7 @@ class ANode implements Comparable<ANode> {
   bool visited = false;
 
   bool isTarget = false;
+  bool isObstacle = false;
 
   /// The weight or cost of moving to this node.
   double weight;

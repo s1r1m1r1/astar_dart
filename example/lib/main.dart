@@ -126,60 +126,29 @@ class _GridExampleState extends State<GridExample> {
     return DefaultTextStyle(
       style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
       child: Center(
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 100.0),
-            child: ConstrainedBox(
-              constraints:
-                  BoxConstraints.tightFor(height: 10 * 100, width: 10 * 100),
-              child: Flow(
-                delegate: MyFlowDelegate(updater: updater),
-                children: [
-                  for (var x = 0; x < 10; x++)
-                    for (var y = 0; y < 10; y++)
-                      FloorItemWidget(
-                        floor: array2d[x][y],
-                        onTap: (floor) async {
-                          await _updateFloor(floor);
-                        },
-                      )
-                ],
-              ),
-            ),
+        child: InteractiveViewer(
+          panAxis: PanAxis.free,
+          boundaryMargin: const EdgeInsets.all(200),
+          minScale: 0.1,
+          maxScale: 1.6,
+          child: Wrap(
+            direction: Axis.horizontal,
+            runSpacing: 2,
+            spacing: 2,
+            children: [
+              for (var x = 0; x < 10; x++)
+                for (var y = 0; y < 10; y++)
+                  FloorItemWidget(
+                    floor: array2d[x][y],
+                    onTap: (floor) async {
+                      await _updateFloor(floor);
+                    },
+                  )
+            ],
           ),
         ),
       ),
     );
-  }
-}
-
-class MyFlowDelegate extends FlowDelegate {
-  MyFlowDelegate({required this.updater})
-      : super(
-          repaint: updater,
-        );
-
-  final ValueNotifier<bool> updater;
-
-  @override
-  bool shouldRepaint(MyFlowDelegate oldDelegate) {
-    return updater != oldDelegate.updater;
-  }
-
-  @override
-  void paintChildren(FlowPaintingContext context) {
-    final startPoint = Size(0, 0);
-    for (int i = 0; i < context.childCount; ++i) {
-      final y = i % 10;
-      final x = i ~/ 10;
-
-      context.paintChild(
-        i,
-        transform: Matrix4.translationValues(-startPoint.width + (x * 100.0),
-            -startPoint.height + (y * 100.0), 0),
-      );
-    }
   }
 }
 
@@ -220,33 +189,28 @@ class FloorItemWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('x: ${floor.x}, y: ${floor.y}'),
-                        SizedBox(width: 32),
-                        Icon(
-                          switch (floor.ground) {
-                            GroundType.field => Icons.grass,
-                            GroundType.water => Icons.water,
-                            GroundType.forest => Icons.forest,
-                            GroundType.barrier => Icons.block,
-                          },
-                          color: Colors.black,
-                          size: 20.0,
-                        ),
-                        SizedBox(width: 32),
-                        Text(
-                          "weight: ${switch (floor.ground) {
-                            GroundType.field => '1',
-                            GroundType.water => '7',
-                            GroundType.forest => '10',
-                            GroundType.barrier => 'x',
-                          }}",
-                        )
-                      ],
+                    Text('x: ${floor.x}, y: ${floor.y}'),
+                    SizedBox(height: 2),
+                    Text(
+                      "weight: ${switch (floor.ground) {
+                        GroundType.field => '1',
+                        GroundType.water => '7',
+                        GroundType.forest => '10',
+                        GroundType.barrier => 'x',
+                      }}",
                     ),
-                    SizedBox(height: 32),
+                    SizedBox(height: 4),
+                    Icon(
+                      switch (floor.ground) {
+                        GroundType.field => Icons.grass,
+                        GroundType.water => Icons.water,
+                        GroundType.forest => Icons.forest,
+                        GroundType.barrier => Icons.block,
+                      },
+                      color: Colors.black,
+                      size: 20.0,
+                    ),
+                    SizedBox(height: 2),
                     Text(
                       switch (floor.target) {
                         Target.player => 'PLAYER',
