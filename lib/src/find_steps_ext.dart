@@ -70,7 +70,6 @@ extension AstarGridExt on AstarGrid {
     List<Point<int>> obstacles = const [],
     required int steps,
   }) {
-    final targetCount = targets.length;
     ANode a = grid[start.x][start.y];
     a.visited = true;
 
