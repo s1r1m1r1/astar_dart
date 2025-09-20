@@ -1,7 +1,6 @@
 name: benchmark
 publish_to: none
 version: 1.4.0
-resolution: workspace
 environment:
   sdk: ">=3.5.0 <4.0.0"
 
