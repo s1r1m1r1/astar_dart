@@ -39,7 +39,6 @@ abstract class AstarGrid {
   // final List<ANode> doneList = [];
 
   /// List of nodes that are waiting to be evaluated.
-  final waitList = <ANode>[];
 
   /// Finds a path between the start and end points.
   ///
@@ -49,8 +48,8 @@ abstract class AstarGrid {
   /// Returns a [FutureOr] containing a list of [ANode] representing the path.
   List<ANode> findPath({
     void Function(List<Point<int>>)? visited,
-    required ({int x, int y}) start,
-    required ({int x, int y}) end,
+    required Point<int> start,
+    required Point<int> end,
   });
 
   /// Number of rows in the grid.
@@ -77,35 +76,67 @@ abstract class AstarGrid {
   /// return null if path not found, no way on labyrinth
   @internal
   ANode? getWinner(ANode current, ANode end) {
+    final waitList = <ANode>[];
     if (end == current) return current;
-    for (var n in current.neighbors) {
-      if (n.parent == null) {
-        analyzeDistance(n, end, parent: current);
-      }
-      if (!n.visited) {
-        n.visited = true;
-        waitList.add(n);
-      }
+    final neighbors = current.neighbors;
+    for (var n in neighbors) {
+      n.visited = true;
+      n.g = n.weight;
+      waitList.add(n);
     }
 
-    waitList.sort((a, b) => b.compareTo(a));
+    waitList.sort((a, b) => b.f.compareTo(a.f));
     // var tail = <ANode>[];
     while (waitList.isNotEmpty) {
       final c = waitList.removeLast();
       if (end == c) return c;
       for (var n in c.neighbors) {
-        if (n.parent != null) continue;
+        if (n.visited) continue;
         analyzeDistance(n, end, parent: c);
-        if (!n.visited) {
-          n.visited = true;
-          // waitList.insert(0, n);
-          waitList.add(n);
-        }
+        n.visited = true;
+        waitList.add(n);
       }
-
-      waitList.sort((a, b) => b.compareTo(a));
+      waitList.sort((a, b) => b.f.compareTo(a.f));
     }
     return null;
+  }
+
+  List<ANode> reconstruct(Point<int> end) {
+    ANode astar = grid[end.x][end.y];
+    final parent = astar.parent;
+    final path = [astar];
+    if (parent == null) return path;
+    ANode nextNode = parent;
+    path.add(nextNode);
+    while (nextNode.parent != null) {
+      nextNode = nextNode.parent!;
+      path.add(nextNode);
+    }
+
+    return path;
+  }
+
+  List<ANode> reconstructNormalized(Point<int> end) {
+    ANode astar = grid[end.x][end.y];
+    final path = [astar];
+    final nextList = <ANode>[];
+    nextList.addAll(astar.neighbors);
+    if (nextList.isEmpty) return path;
+    nextList.sort((a, b) => b.g.compareTo(a.g));
+    int g = astar.g;
+
+    while (nextList.isNotEmpty) {
+      final n = nextList.removeLast();
+      if (!n.visited) continue;
+      if (n.g < g) {
+        g = n.g;
+        path.add(n);
+        nextList.clear();
+        nextList.addAll(n.neighbors);
+        nextList.sort((a, b) => b.g.compareTo(a.g));
+      }
+    }
+    return path;
   }
 
   /// calculate distance follow Grid rules
@@ -125,18 +156,19 @@ abstract class AstarGrid {
   void setPoint(WeightedPoint point) {
     assert(point.x <= rows, "Point can't be bigger than Array2d rows");
     assert(point.y <= columns, "Point can't be bigger than Array2d columns");
-    grid[point.x][point.y].weight = point.weight.toDouble();
+    grid[point.x][point.y].weight = point.weight;
   }
 
   /// resetBarrier = ```true```, should connect grid with [addNeighbors] before [findPath]
   ///
   ///
   ///  resetBarrier = ```false```, can reused directly to [findPath]
-  void resetNodes([resetBarrier = false]) {
-    for (var x = 0; x < grid.length; x++) {
-      final row = grid[x];
+  void resetNodes({resetBarrier = false}) {
+    for (var row in grid.array) {
       for (var node in row) {
-        node.reset();
+        node.parent = null;
+        node.h = 0;
+        node.g = 0;
         node.visited = false;
         node.isTarget = false;
         node.isObstacle = false;

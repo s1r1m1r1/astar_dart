@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:astar_dart/astar_dart.dart';
-import 'package:collection/collection.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -12,10 +11,22 @@ void main() {
     // astar.calculateGrid();
   });
 
+  setUp(() {
+    astar = AStarManhattan(rows: 10, columns: 10);
+  });
+
+  tearDownAll(() {
+    astar.resetNodes(resetBarrier: true);
+  });
+
+  tearDown(() {
+    astar.resetNodes(resetBarrier: true);
+  });
+
   group('AStarSquare test 1', () {
     test('Finds path in simple grid', () {
       astar.addNeighbors();
-      final path = astar.findPath(start: (x: 0, y: 0), end: (x: 9, y: 9));
+      final path = astar.findPath(start: Point(0, 0), end: Point(9, 9));
       expect(path.isNotEmpty, true);
     });
     test('Finds path with obstacles', () {
@@ -28,72 +39,32 @@ void main() {
         ..setBarrier(x: 5, y: 5, isBarrier: true);
 
       astar.addNeighbors();
-      final path = astar.findPath(start: (x: 0, y: 0), end: (x: 9, y: 9));
+      final path = astar.findPath(start: Point(0, 0), end: Point(9, 9));
       expect(path.isNotEmpty, true);
     });
-
+  });
+  group('AStarSquare test 2', () {
     test('No path if blocked', () {
-      // astar.calculateGrid();
-      astar.resetNodes();
+      astar.resetNodes(resetBarrier: true);
       astar.setBarrier(x: 5, y: 5, isBarrier: true);
 
       astar.addNeighbors();
-      final path = (astar.findPath(start: (x: 5, y: 4), end: (x: 5, y: 6)))
-          .toPointList();
-      expect(path.length, 4);
+      final path = astar.findPath(start: Point(5, 4), end: Point(5, 6));
+      expect(path.length, 5);
+      expect(path.last, Point(5, 4));
+      expect(path.first, Point(5, 6));
     });
+  });
 
-    // test('Finds path with weighted points', () async {
-    //   astar.calculateGrid();
-    //   astar.setPoint(const WeightedPoint(5, 5, weight: 5)); // Make (5,5) costly
-    //   final path = await astar.findPath(
-    //       start: const Point(0, 0), end: const Point(9, 9));
-    //   expect(path.isNotEmpty,
-    //       true); // Path should still exist, but might be different
-    // });
-
-    // test('Finds path with Manhattan distance', () async {
-    //   astar.setDiagonalMovement(DiagonalMovement.manhattan);
-    //   astar.calculateGrid();
-    //   final path = await astar.findPath(
-    //       start: const Point(0, 0), end: const Point(2, 2));
-    //   expect(
-    //       path.length, 4); // Manhattan path should be 4 steps (2 right, 2 up)
-    // });
-
-    test('Finds steps within range', () {
-      astar.resetNodes();
-      final steps = astar.findSteps(steps: 3, start: const Point(5, 5));
-      expect(steps.isNotEmpty, true);
-      // You might want to add more specific assertions about the reachable points
-    });
-
-    // test('Handles start and end being neighbors', () async {
-    //   astar.calculateGrid();
-    //   final path = await astar.findPath(
-    //       start: const Point(0, 0), end: const Point(0, 1));
-    //   expect(path.isEmpty, true);
-    // });
-
+  group('AStarSquare test 3', () {
     test('Path contains correct nodes (deep equality)', () {
-      astar.resetNodes();
-      final expectedPath = [
-        ANode(x: 0, y: 3, neighbors: [], weight: 1.0),
-        ANode(x: 0, y: 2, neighbors: [], weight: 1.0),
-        ANode(x: 0, y: 1, neighbors: [], weight: 1.0),
-      ];
+      astar.resetNodes(resetBarrier: true);
 
       astar.addNeighbors();
-      final path = astar.findPath(start: (x: 0, y: 0), end: (x: 0, y: 3));
-
-      // Use a deep equality check to compare the lists of ANodes
-      expect(
-        const ListEquality()
-            .equals(path, expectedPath), // Using collection package
-        true,
-      );
+      final path = astar.findPath(start: Point(0, 0), end: Point(0, 3));
+      expect(path.length, 4);
+      expect(path.last, Point(0, 0));
+      expect(path.first, Point(0, 3));
     });
-
-    // Add more tests as needed...
   });
 }

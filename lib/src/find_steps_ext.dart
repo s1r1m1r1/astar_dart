@@ -38,6 +38,7 @@ extension AstarGridExt on AstarGrid {
     if (current.isEmpty) {
       return [];
     }
+    current.sort();
     for (var i = 0; i < steps; i++) {
       for (var c in current) {
         if (c.g <= steps) {
@@ -59,9 +60,9 @@ extension AstarGridExt on AstarGrid {
       current.clear();
       current.addAll(next);
       next.clear();
-      current.sort((a, b) => a.g.compareTo(b.g));
+      current.sort();
     }
-    return total.map((i) => DistancePoint(i.x, i.y, i.g.toDouble())).toList();
+    return total.map((i) => DistancePoint(i.x, i.y, i.g)).toList();
   }
 
   List<DistancePoint> findTargets({
@@ -96,6 +97,7 @@ extension AstarGridExt on AstarGrid {
     if (current.isEmpty) {
       return [];
     }
+    current.sort();
     for (var i = 0; i < steps; i++) {
       for (var c in current) {
         if (c.isTarget) {
@@ -119,7 +121,7 @@ extension AstarGridExt on AstarGrid {
 
       current.clear();
       current.addAll(next);
-      current.sort((a, b) => a.g.compareTo(b.g));
+      current.sort();
       next.clear();
     }
 
@@ -132,7 +134,7 @@ extension AstarGridExt on AstarGrid {
   ///          3
   ///       3  2  3 [x]
   ///    3  2  1  2  3
-  /// 3  2  1  🧍‍♂️ 1  2  3
+  ///   [x]  1 🧍‍♂️ 1  2  3
   ///    3  2  1  2  3
   ///       3  2  3 [x]
   ///          3
@@ -166,6 +168,7 @@ extension AstarGridExt on AstarGrid {
     if (current.isEmpty) {
       return ([], []);
     }
+    current.sort();
     for (var i = 0; i < steps; i++) {
       for (var c in current) {
         if (c.isTarget) {
@@ -194,11 +197,22 @@ extension AstarGridExt on AstarGrid {
       current.clear();
       current.addAll(next);
       next.clear();
-      current.sort((a, b) => a.g.compareTo(b.g));
+      current.sort();
+      // current.sort((a, b) => a.g.compareTo(b.g));
     }
     return (
-      total.map((i) => DistancePoint(i.x, i.y, i.g.toDouble())).toList(),
-      founded.map((i) => DistancePoint(i.x, i.y, i.g.toDouble())).toList(),
+      total.map((i) => DistancePoint(i.x, i.y, i.g)).toList(),
+      founded.map((i) => DistancePoint(i.x, i.y, i.g)).toList(),
     );
   }
+
+  // List<DistancePoint> reconstructPath(Point<int> point) {
+  //   final path = <DistancePoint>[];
+  //   var current = grid[point.x][point.y];
+  //   while (current.parent != null) {
+  //     path.add(DistancePoint(current.x, current.y, current.g));
+  //     current = current.parent!;
+  //   }
+  //   return path.reversed.toList();
+  // }
 }

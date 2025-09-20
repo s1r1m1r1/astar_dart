@@ -19,8 +19,8 @@ class AStarManhattan extends AstarGrid {
   @override
   List<ANode> findPath({
     void Function(List<Point<int>>)? visited,
-    required ({int x, int y}) start,
-    required ({int x, int y}) end,
+    required Point<int> start,
+    required Point<int> end,
   }) {
     if (grid[end.x][end.y].isBarrier) {
       return [];
@@ -33,30 +33,41 @@ class AStarManhattan extends AstarGrid {
       return [];
     }
 
+    startNode.g = 0;
+    startNode.visited = true;
+
     ANode? winner = getWinner(
       startNode,
       endNode,
     );
-    List<ANode> path = [grid[end.x][end.y]];
-    if (winner?.parent != null) {
-      ANode nodeAux = winner!.parent!;
-      for (int i = 0; i < winner.g - 1; i++) {
-        if (nodeAux == startNode) {
-          break;
-        }
-        path.add(nodeAux);
-        nodeAux = nodeAux.parent!;
-      }
-    }
-    // visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
-    // doneList.clear();
-    waitList.clear();
-
-    if (winner == null && !_isNeighbors(start, end)) {
-      path.clear();
+    if (winner != null) {
+      final path = reconstructNormalized(winner);
+      return path;
     }
 
-    return path.toList();
+    visited?.call(grid.whereabout((i) => i.visited).toList());
+
+    return [];
+    // List<ANode> path = [grid[end.x][end.y]];
+    // if (winner?.parent != null) {
+    //   ANode nodeAux = winner!.parent!;
+    //   for (int i = 0; i < winner.g - 1; i++) {
+    //     if (nodeAux == startNode) {
+    //       break;
+    //     }
+    //     path.add(nodeAux);
+    //     nodeAux = nodeAux.parent!;
+    //   }
+    // }
+    // // visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
+    // // doneList.clear();
+    // waitList.clear();
+
+    // if (winner == null && !_isNeighbors(start, end)) {
+    //   path.clear();
+    // }
+
+    // return path.toList();
   }
 
 //----------------------------------------------------------------------
@@ -67,7 +78,7 @@ class AStarManhattan extends AstarGrid {
     current.g = parent.g + current.weight;
 
     /// performance , make direction more stronger
-    current.h = _distance(current, end) * 2.0;
+    current.h = _distance(current, end) * 2;
   }
 
   int _distance(ANode a, ANode b) {
@@ -75,8 +86,8 @@ class AStarManhattan extends AstarGrid {
   }
 
   bool _isNeighbors(
-    ({int x, int y}) start,
-    ({int x, int y}) end,
+    Point<int> start,
+    Point<int> end,
   ) {
     int dx = (start.x - end.x).abs();
     int dy = (start.y - end.y).abs();

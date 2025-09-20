@@ -12,45 +12,34 @@ class AStarEuclidean extends AstarGrid {
   @override
   List<ANode> findPath({
     void Function(List<Point<int>>)? visited,
-    required ({int x, int y}) start,
-    required ({int x, int y}) end,
+    required Point<int> start,
+    required Point<int> end,
   }) {
     if (grid[end.x][end.y].isBarrier) {
       return [];
     }
 
     ANode startNode = grid[start.x][start.y];
-
     ANode endNode = grid[end.x][end.y];
+
     if (_isNeighbors(start, end)) {
       return [];
     }
+    startNode.visited = true;
+    startNode.g = 0;
     ANode? winner = getWinner(
       startNode,
       endNode,
     );
 
-    List<ANode> path = [grid[end.x][end.y]];
-    if (winner?.parent != null) {
-      ANode nodeAux = winner!.parent!;
-      for (int i = 0; i < winner.g - 1; i++) {
-        if (nodeAux == startNode) {
-          break;
-        }
-        path.add(nodeAux);
-        nodeAux = nodeAux.parent!;
-      }
-    }
-    // visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
-
-    // doneList.clear();
-    waitList.clear();
-
-    if (winner == null && !_isNeighbors(start, end)) {
-      path.clear();
+    if (winner != null) {
+      final path = reconstructNormalized(winner);
+      return path;
     }
 
-    return path.toList();
+    visited?.call(grid.whereabout((i) => i.visited).toList());
+
+    return [];
   }
 
 //----------------------------------------------------------------------
@@ -59,7 +48,7 @@ class AStarEuclidean extends AstarGrid {
   void analyzeDistance(ANode current, ANode end, {required ANode parent}) {
     current.parent = parent;
     current.g = parent.g + current.weight;
-    current.h = _distance(current, end) * 1.5;
+    current.h = _distance(current, end) * 2;
   }
 
   int _distance(ANode a, ANode b) {
@@ -68,7 +57,7 @@ class AStarEuclidean extends AstarGrid {
     return toX.abs() + toY.abs();
   }
 
-  bool _isNeighbors(({int x, int y}) start, ({int x, int y}) end) {
+  bool _isNeighbors(Point<int> start, Point<int> end) {
     int dx = (start.x - end.x).abs();
     int dy = (start.y - end.y).abs();
 
@@ -84,8 +73,8 @@ class AStarEuclidean extends AstarGrid {
       for (ANode node in row) {
         // node.reset();
         node.parent = null;
-        node.h = 0.0;
-        node.g = 0.0;
+        node.h = 0;
+        node.g = 0;
         node.neighbors.clear();
         _chainNeighbors(node, maxX: maxX, maxY: maxY);
       }

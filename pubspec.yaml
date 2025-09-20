@@ -1,5 +1,5 @@
 name: astar_dart
-version: 3.2.0
+version: 4.0.0
 homepage: https://github.com/s1r1m1r1/astar_dart
 environment:
   sdk: ">=3.5.0 <4.0.0"

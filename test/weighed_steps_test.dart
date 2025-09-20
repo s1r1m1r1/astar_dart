@@ -61,7 +61,7 @@ void main() {
     ///  6{6}      -      -      -      -      -      -
     ///
 
-    test('test center 3 steps', () {
+    test('test 1', () {
       astar.resetNodes();
       final path = (astar.findSteps(start: const Point(0, 0), steps: 6));
       path.sort((a, b) => a.y.compareTo(b.y));
@@ -99,7 +99,7 @@ void main() {
     ///   -      -      -      -      -      -      -
     ///
 
-    test('test center 3 steps', () {
+    test('test 2', () {
       astar.resetNodes();
       final path = (astar.findSteps(start: const Point(2, 0), steps: 6));
       path.sort((a, b) => a.y.compareTo(b.y));

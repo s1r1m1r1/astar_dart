@@ -1,5 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'dart:math';
+
 import 'package:astar_dart/astar_dart.dart';
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +35,7 @@ class GridExample extends StatefulWidget {
 class _GridExampleState extends State<GridExample> {
   late ValueNotifier<bool> updater;
   late final Array2d<Floor> array2d;
-  ({int x, int y}) start = (x: 0, y: 0);
+  final start = Point<int>(0, 0);
 
   @override
   void initState() {
@@ -89,8 +91,7 @@ class _GridExampleState extends State<GridExample> {
     astar.addNeighbors();
 
     debugPrint("calculate start 2");
-    final path = await Future.value(
-        astar.findPath(start: start, end: (x: floor.x, y: floor.y)));
+    final path = await Future.value(astar.findPath(start: start, end: floor));
 
     debugPrint("calculate start 3");
     array2d.forEach((floor, x, y) => floor.isPath = false);

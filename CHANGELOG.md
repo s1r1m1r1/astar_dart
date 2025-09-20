@@ -1,3 +1,12 @@
+
+## 4.0.0
+  - added findStepsTargets()
+  - added reconstructNormalized() to find path for findPath() 
+  - added reconstruct() to find path for targets and steps 
+  - fix some bug in findTargets()
+  - improve example/main.dart
+  - for complex search recommend use findStepsTargets() with reconstruct() 
+
 ## 3.2.0
   - added findStepsTargets()
   - fix some bug in findTargets()

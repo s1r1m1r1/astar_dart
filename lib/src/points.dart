@@ -7,7 +7,7 @@ class WeightedPoint extends Point<int> {
 
 class DistancePoint extends Point<int> {
   DistancePoint(super.x, super.y, this.distance);
-  final double distance;
+  final int distance;
 }
 
 /// --------------------------------------------

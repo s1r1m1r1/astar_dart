@@ -12,8 +12,8 @@ class AStarHex extends AstarGrid {
   @override
   List<ANode> findPath({
     void Function(List<Point<int>>)? visited,
-    required ({int x, int y}) start,
-    required ({int x, int y}) end,
+    required Point<int> start,
+    required Point<int> end,
   }) {
     /// If the end node is blocked, return an empty path.
     if (grid[end.x][end.y].isBarrier) {
@@ -29,36 +29,20 @@ class AStarHex extends AstarGrid {
       return [endNode];
     }
 
-    /// Find the best path using the A* algorithm.
-
+    startNode.g = 0;
+    startNode.visited = true;
     ANode? winner = getWinner(
       startNode,
       endNode,
     );
-
-    /// Reconstruct the path from the winner node.
-    List<ANode> path = [grid[end.x][end.y]];
-    if (winner?.parent != null) {
-      ANode nodeAux = winner!.parent!;
-      for (int i = 0; i < winner.g - 1; i++) {
-        if (nodeAux == startNode) {
-          break;
-        }
-        path.add(nodeAux);
-        nodeAux = nodeAux.parent!;
-      }
+    if (winner != null) {
+      final path = reconstructNormalized(winner);
+      return path;
     }
 
-    /// If no path was found, clear the path list.
-    if (winner == null) {
-      path.clear();
-    }
-    waitList.clear();
+    visited?.call(grid.whereabout((i) => i.visited).toList());
 
-    /// Call the doneList callback with the explored nodes.
-    // visited?.call(doneList.map((e) => Point(e.x, e.y)).toList(growable: false));
-
-    return path.toList();
+    return [];
   }
 
   //----------------------------------------------------------------------
@@ -69,7 +53,7 @@ class AStarHex extends AstarGrid {
     current.parent = parent;
     current.g = parent.g + current.weight;
     // make short distance stronger by multiply by 2.0
-    current.h = _distance(current, end) * 2.0;
+    current.h = _distance(current, end) * 2;
   }
 
   /// Calculates the distance between two nodes.
@@ -97,8 +81,8 @@ class AStarHex extends AstarGrid {
 
   /// Checks if two points are neighbors on a hexagonal grid.
   bool _isNeighbors(
-    ({int x, int y}) a,
-    ({int x, int y}) b,
+    Point<int> a,
+    Point<int> b,
   ) {
     ///      0,-1;  +1 -1
     /// -1,0 ; center ;  +1,0

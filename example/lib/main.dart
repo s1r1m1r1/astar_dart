@@ -1,5 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'dart:math';
+
 import 'package:astar_dart/astar_dart.dart';
 import 'package:flutter/material.dart';
 
@@ -109,8 +111,8 @@ class _GridExampleState extends State<GridExample> {
     );
     astar.addNeighbors();
 
-    final path = await Future.value(
-        astar.findPath(start: (x: 0, y: 0), end: (x: floor.x, y: floor.y)));
+    final path =
+        await Future.value(astar.findPath(start: Point(0, 0), end: floor));
     array2d.forEach((floor, x, y) => floor
       ..isPath = false
       ..update());
@@ -243,18 +245,14 @@ enum Target {
   none,
 }
 
-class Floor with ChangeNotifier {
+class Floor extends Point<int> with ChangeNotifier {
   Floor({
-    required this.x,
-    required this.y,
+    required int x,
+    required int y,
     required this.target,
     required this.ground,
     this.isPath = false,
-  });
-
-  int x;
-
-  int y;
+  }) : super(x, y);
 
   bool isPath;
 

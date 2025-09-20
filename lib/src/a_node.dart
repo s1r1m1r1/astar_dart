@@ -1,8 +1,7 @@
-/// Represents a node in the A* search grid.
-class ANode implements Comparable<ANode> {
-  /// The x,y coordinate of the node.
-  final int x, y;
+import 'dart:math';
 
+/// Represents a node in the A* search grid.
+class ANode extends Point<int> implements Comparable<ANode> {
   /// The parent node in the path.
   ANode? parent;
   final List<ANode> neighbors;
@@ -17,26 +16,26 @@ class ANode implements Comparable<ANode> {
   bool isObstacle = false;
 
   /// The weight or cost of moving to this node.
-  double weight;
+  int weight;
 
   /// The actual cost of the path from the start node to this node (g-score).
-  double g = 0;
+  int g = 0;
 
   /// The estimated cost of the path from this node to the end node (h-score).
-  double h = 0;
+  int h = 0;
 
   /// The total estimated cost of the path from the start node to the end node through this node (f-score = g + h).
-  double get f => g + h;
+  int get f => g + h;
 
   /// Creates a new ANode.
   ANode({
-    required this.x,
-    required this.y,
+    required int x,
+    required int y,
     required this.neighbors,
     this.isBarrier = false,
     this.parent,
     this.weight = 1,
-  });
+  }) : super(x, y);
 
   /// Compares this node to another node based on their x and y coordinates.
   @override
@@ -67,7 +66,7 @@ class ANode implements Comparable<ANode> {
   /// reset [ANode] , but save [neighbors] and [barrier]
   void reset() {
     parent = null;
-    h = 0.0;
-    g = 0.0;
+    h = 0;
+    g = 0;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:astar_dart/astar_dart.dart';
 import 'package:test/test.dart';
 
@@ -49,13 +51,13 @@ void main() {
   group('test blocked path', () {
     test('test if blocked ', () {
       astar.resetNodes();
-      final path = astar.findPath(start: (x: 0, y: 0), end: (x: 5, y: 5));
+      final path = astar.findPath(start: Point(0, 0), end: Point(5, 5));
       expect(path.isEmpty, true); // Check number of cols
     });
 
     test('test if not blocked ', () {
       astar.resetNodes();
-      final path = astar.findPath(start: (x: 0, y: 0), end: (x: 5, y: 2));
+      final path = astar.findPath(start: Point(0, 0), end: Point(5, 2));
       expect(path.isNotEmpty, true); // Check number of cols
     });
   });
