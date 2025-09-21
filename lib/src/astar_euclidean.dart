@@ -27,10 +27,7 @@ class AStarEuclidean extends AstarGrid {
     }
     startNode.visited = true;
     startNode.g = 0;
-    ANode? winner = getWinner(
-      startNode,
-      endNode,
-    );
+    ANode? winner = getWinner(startNode, endNode, ceilSize: 8);
 
     if (winner != null) {
       final path = reconstructNormalized(winner);

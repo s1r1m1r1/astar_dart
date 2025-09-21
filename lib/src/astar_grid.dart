@@ -75,27 +75,32 @@ abstract class AstarGrid {
   ///
   /// return null if path not found, no way on labyrinth
   @internal
-  ANode? getWinner(ANode current, ANode end) {
+  ANode? getWinner(ANode current, ANode end, {int ceilSize = 4}) {
     final waitList = <ANode>[];
     if (end == current) return current;
     final neighbors = current.neighbors;
     for (var n in neighbors) {
       n.visited = true;
+      n.parent = current;
       n.g = n.weight;
       waitList.add(n);
     }
 
     waitList.sort((a, b) => b.f.compareTo(a.f));
-    // var tail = <ANode>[];
+    int maxLength = min(waitList.length, ceilSize);
     while (waitList.isNotEmpty) {
-      final c = waitList.removeLast();
-      if (end == c) return c;
-      for (var n in c.neighbors) {
-        if (n.visited) continue;
-        analyzeDistance(n, end, parent: c);
-        n.visited = true;
-        waitList.add(n);
+      /// iteration n nodes per time
+      for (var i = 0; i < maxLength; i++) {
+        final c = waitList.removeLast();
+        if (end == c) return c;
+        for (var n in c.neighbors) {
+          if (n.visited) continue;
+          analyzeDistance(n, end, parent: c);
+          n.visited = true;
+          waitList.add(n);
+        }
       }
+      maxLength = min(waitList.length, ceilSize);
       waitList.sort((a, b) => b.f.compareTo(a.f));
     }
     return null;
@@ -119,22 +124,25 @@ abstract class AstarGrid {
   List<ANode> reconstructNormalized(Point<int> end) {
     ANode astar = grid[end.x][end.y];
     final path = [astar];
-    final nextList = <ANode>[];
+    var nextList = <ANode>[];
     nextList.addAll(astar.neighbors);
     if (nextList.isEmpty) return path;
     nextList.sort((a, b) => b.g.compareTo(a.g));
     int g = astar.g;
-
-    while (nextList.isNotEmpty) {
-      final n = nextList.removeLast();
+    int index = 0;
+    int length = nextList.length;
+    while (index < length) {
+      final n = nextList[index];
       if (!n.visited) continue;
       if (n.g < g) {
         g = n.g;
         path.add(n);
-        nextList.clear();
-        nextList.addAll(n.neighbors);
+        index = 0;
+        length = n.neighbors.length;
+        nextList = n.neighbors;
         nextList.sort((a, b) => b.g.compareTo(a.g));
       }
+      index++;
     }
     return path;
   }

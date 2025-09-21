@@ -26,48 +26,25 @@ class AStarManhattan extends AstarGrid {
       return [];
     }
 
-    ANode startNode = grid[start.x][start.y];
+    ANode aStart = grid[start.x][start.y];
 
-    ANode endNode = grid[end.x][end.y];
+    ANode aEnd = grid[end.x][end.y];
     if (_isNeighbors(start, end)) {
       return [];
     }
 
-    startNode.g = 0;
-    startNode.visited = true;
+    aStart.g = 0;
+    aStart.visited = true;
 
     ANode? winner = getWinner(
-      startNode,
-      endNode,
+      aStart,
+      aEnd,
+      ceilSize: 4,
     );
-    if (winner != null) {
-      final path = reconstructNormalized(winner);
-      return path;
-    }
-
+    if (winner == null) return [aStart];
+    final path = reconstruct(winner);
     visited?.call(grid.whereabout((i) => i.visited).toList());
-
-    return [];
-    // List<ANode> path = [grid[end.x][end.y]];
-    // if (winner?.parent != null) {
-    //   ANode nodeAux = winner!.parent!;
-    //   for (int i = 0; i < winner.g - 1; i++) {
-    //     if (nodeAux == startNode) {
-    //       break;
-    //     }
-    //     path.add(nodeAux);
-    //     nodeAux = nodeAux.parent!;
-    //   }
-    // }
-    // // visited?.call(doneList.map((e) => Point(e.x, e.y)).toList());
-    // // doneList.clear();
-    // waitList.clear();
-
-    // if (winner == null && !_isNeighbors(start, end)) {
-    //   path.clear();
-    // }
-
-    // return path.toList();
+    return path;
   }
 
 //----------------------------------------------------------------------

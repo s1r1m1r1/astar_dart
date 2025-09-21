@@ -34,6 +34,7 @@ class AStarHex extends AstarGrid {
     ANode? winner = getWinner(
       startNode,
       endNode,
+      ceilSize: 6,
     );
     if (winner != null) {
       final path = reconstructNormalized(winner);
