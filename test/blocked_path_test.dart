@@ -52,7 +52,7 @@ void main() {
     test('test if blocked ', () {
       astar.resetNodes();
       final path = astar.findPath(start: Point(0, 0), end: Point(5, 5));
-      expect(path.isEmpty, true); // Check number of cols
+      expect(path.length, 1); // Check number of cols
     });
 
     test('test if not blocked ', () {

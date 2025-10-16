@@ -61,10 +61,10 @@ void main() {
         steps: 5,
       );
 
-      final steps = result.$1;
-      final targets = result.$2;
+      final steps = result.steps;
+      final targets = result.targets;
 
-      expect(steps.length, 6); // Total reachable nodes in 5 steps
+      expect(steps.length, 7); // Total reachable nodes in 5 steps
       expect(targets.length, 2);
     });
 
@@ -109,10 +109,10 @@ void main() {
         steps: 5,
       );
 
-      final steps = result.$1;
-      final targets = result.$2;
+      final steps = result.steps;
+      final targets = result.targets;
 
-      expect(steps.length, 11); // Total reachable nodes in 5 steps
+      expect(steps.length, 12); // Total reachable nodes in 5 steps
       expect(targets.length, 2);
     });
   });

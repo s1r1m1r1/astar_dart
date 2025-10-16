@@ -35,10 +35,10 @@ void main() {
         steps: 5,
       );
 
-      final steps = result.$1;
-      final targets = result.$2;
+      final steps = result.steps;
+      final targets = result.targets;
 
-      expect(steps.length, 12); // Total reachable nodes in 5 steps
+      expect(steps.length, 13); // Total reachable nodes in 5 steps
       expect(targets.length, 1);
       expect(targets.first, Point(1, 2));
       expect(targets.first.distance, 3);
@@ -63,7 +63,7 @@ void main() {
         steps: 8,
       );
 
-      final targets = result.$2;
+      final targets = result.targets;
 
       expect(targets.length, 3);
       expect(targets.where((p) => p.x == 1 && p.y == 0).first.distance, 1);
@@ -79,11 +79,11 @@ void main() {
         steps: 0,
       );
 
-      final steps = result.$1;
-      final targets = result.$2;
+      final steps = result.steps;
+      final targets = result.targets;
 
       // The start point itself is a "step" at distance 0
-      expect(steps.length, 0);
+      expect(steps.length, 1);
       expect(targets, isEmpty);
     });
 
@@ -113,10 +113,10 @@ void main() {
         steps: 5,
       );
 
-      final steps = result.$1;
-      final targets = result.$2;
+      final steps = result.steps;
+      final targets = result.targets;
 
-      expect(steps.length, 10);
+      expect(steps.length, 11);
       expect(targets.length, 1);
       expect(targets.first, const Point(1, 2));
       expect(targets.first.distance, 3);

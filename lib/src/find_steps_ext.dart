@@ -139,7 +139,7 @@ extension AstarGridExt on AstarGrid {
   ///       3  2  3 [x]
   ///          3
   /// ```
-  (List<DistancePoint> steps, List<DistancePoint> targets) findStepsTargets({
+  ({List<DistancePoint> steps, List<DistancePoint> targets}) findStepsTargets({
     required int steps,
     required Point<int> start,
     required List<Point<int>> targets,
@@ -161,26 +161,29 @@ extension AstarGridExt on AstarGrid {
     for (var n in a.neighbors) {
       n.parent = a;
       n.g = n.weight;
+      n.visited = true;
       if (!n.isObstacle) {
         current.add(n);
       }
     }
     if (current.isEmpty) {
-      return ([], []);
+      return (steps: [], targets: []);
     }
-    current.sort();
+    current.sort((a, b) => a.f.compareTo(b.f));
     for (var i = 0; i < steps; i++) {
       for (var c in current) {
         if (c.isTarget) {
           c.visited = true;
           founded.add(c);
         } else if (c.g <= steps) {
-          c.visited = true;
           total.add(c);
           for (var n in c.neighbors) {
             if (n.visited) continue;
+            if (n.isObstacle) {
+              n.visited = true;
+              continue;
+            }
             n.visited = true;
-            if (n.isObstacle) continue;
             n.parent = c;
             n.g = n.weight + c.g;
             if (n.isTarget) {
@@ -197,12 +200,12 @@ extension AstarGridExt on AstarGrid {
       current.clear();
       current.addAll(next);
       next.clear();
-      current.sort();
-      // current.sort((a, b) => a.g.compareTo(b.g));
+      current.sort((a, b) => a.f.compareTo(b.f));
     }
+    total.insert(0, a);
     return (
-      total.map((i) => DistancePoint(i.x, i.y, i.g)).toList(),
-      founded.map((i) => DistancePoint(i.x, i.y, i.g)).toList(),
+      steps: total.map((i) => DistancePoint(i.x, i.y, i.g)).toList(),
+      targets: founded.map((i) => DistancePoint(i.x, i.y, i.g)).toList(),
     );
   }
 

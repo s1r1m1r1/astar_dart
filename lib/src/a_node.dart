@@ -55,10 +55,10 @@ class ANode extends Point<int> implements Comparable<ANode> {
   /// they are compared by their h-scores as a tie-breaker.
   @override
   int compareTo(ANode other) {
-    int result = f.compareTo(other.f); // Compare f values first
+    int result = g.compareTo(other.g); // Compare f values first
     if (result == 0) {
       // Tie-breaker using h if f values are equal
-      result = h.compareTo(other.h);
+      result = other.h.compareTo(h);
     }
     return result;
   }

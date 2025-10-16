@@ -15,28 +15,19 @@ class AStarEuclidean extends AstarGrid {
     required Point<int> start,
     required Point<int> end,
   }) {
-    if (grid[end.x][end.y].isBarrier) {
-      return [];
-    }
-
     ANode startNode = grid[start.x][start.y];
     ANode endNode = grid[end.x][end.y];
 
-    if (_isNeighbors(start, end)) {
-      return [];
-    }
+    if (endNode.isBarrier) return [startNode];
+    if (_isNeighbors(start, end)) return [startNode, endNode];
+
     startNode.visited = true;
     startNode.g = 0;
-    ANode? winner = getWinner(startNode, endNode, ceilSize: 8);
-
-    if (winner != null) {
-      final path = reconstructNormalized(winner);
-      return path;
-    }
-
+    ANode? winner = getWinner(startNode, endNode);
+    if (winner == null) return [startNode];
+    final path = reconstruct(winner);
     visited?.call(grid.whereabout((i) => i.visited).toList());
-
-    return [];
+    return path;
   }
 
 //----------------------------------------------------------------------

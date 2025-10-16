@@ -45,8 +45,8 @@ void main() {
       steps: 6,
     );
 
-    final steps = result.$1;
-    final targets = result.$2;
+    final steps = result.steps;
+    final targets = result.targets;
   });
 
 // (0,0) (1,0) (2,0) (3,0) (4,0)

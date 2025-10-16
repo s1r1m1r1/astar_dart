@@ -16,34 +16,22 @@ class AStarHex extends AstarGrid {
     required Point<int> end,
   }) {
     /// If the end node is blocked, return an empty path.
-    if (grid[end.x][end.y].isBarrier) {
-      return [];
-    }
 
     /// Get the start and end nodes from the grid.
     ANode startNode = grid[start.x][start.y];
     ANode endNode = grid[end.x][end.y];
 
     /// If start and end are neighbors, return a direct path.
-    if (_isNeighbors(start, end)) {
-      return [endNode];
-    }
+    if (_isNeighbors(start, end)) return [startNode, endNode];
+    if (endNode.isBarrier) return [startNode];
 
     startNode.g = 0;
     startNode.visited = true;
-    ANode? winner = getWinner(
-      startNode,
-      endNode,
-      ceilSize: 6,
-    );
-    if (winner != null) {
-      final path = reconstructNormalized(winner);
-      return path;
-    }
-
+    ANode? winner = getWinner(startNode, endNode);
+    if (winner == null) return [startNode];
+    final path = reconstruct(winner);
     visited?.call(grid.whereabout((i) => i.visited).toList());
-
-    return [];
+    return path;
   }
 
   //----------------------------------------------------------------------
@@ -54,7 +42,7 @@ class AStarHex extends AstarGrid {
     current.parent = parent;
     current.g = parent.g + current.weight;
     // make short distance stronger by multiply by 2.0
-    current.h = _distance(current, end) * 2;
+    current.h = _distance(current, end);
   }
 
   /// Calculates the distance between two nodes.

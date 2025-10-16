@@ -29,9 +29,8 @@ class AStarManhattan extends AstarGrid {
     ANode aStart = grid[start.x][start.y];
 
     ANode aEnd = grid[end.x][end.y];
-    if (_isNeighbors(start, end)) {
-      return [];
-    }
+    if (aEnd.isBarrier) return [aStart];
+    if (_isNeighbors(start, end)) return [aStart, aEnd];
 
     aStart.g = 0;
     aStart.visited = true;
@@ -39,7 +38,6 @@ class AStarManhattan extends AstarGrid {
     ANode? winner = getWinner(
       aStart,
       aEnd,
-      ceilSize: 4,
     );
     if (winner == null) return [aStart];
     final path = reconstruct(winner);

@@ -1,3 +1,8 @@
+## 5.0.0
+  - improve heuristic function
+  - fix reconstruct() in findPath
+  - using SplayTreeMap instead sort 
+  - start point is always return as first element in path
 
 ## 4.0.0
   - added findStepsTargets()

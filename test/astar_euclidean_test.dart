@@ -4,30 +4,6 @@ import 'package:astar_dart/astar_dart.dart';
 import 'package:test/test.dart';
 
 void main() {
-  // No need for a global 'astar' instance.
-  // This avoids the race condition and makes tests independent.
-  // late final AStarEuclidean astar;
-
-  // The setUpAll and tearDownAll are no longer needed
-  // because the astar instance is created inside each group's setUp.
-  // setUpAll(() {
-  //   astar = AStarEuclidean(
-  //       rows: 4,
-  //       columns: 4,
-  //       gridBuilder: (int x, int y) {
-  //         return ANode(
-  //           x: x,
-  //           y: y,
-  //           neighbors: [],
-  //         );
-  //       });
-  //   astar.addNeighbors();
-  // });
-
-  // tearDownAll(() {
-  //   astar.resetNodes(resetBarrier: true);
-  // });
-
   group('test AStarSquareGrid euclidean', () {
     late AStarEuclidean astar;
 
