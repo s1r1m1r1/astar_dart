@@ -30,7 +30,7 @@ class AStarManhattan extends AstarGrid {
 
     ANode aEnd = grid[end.x][end.y];
     if (aEnd.isBarrier) return [aStart];
-    if (_isNeighbors(start, end)) return [aStart, aEnd];
+    if (_isNeighbors(start, end)) return [aEnd, aStart];
 
     aStart.g = 0;
     aStart.visited = true;
@@ -74,18 +74,14 @@ class AStarManhattan extends AstarGrid {
   /// expensive not call every time,try reusing
   @override
   void addNeighbors() {
-    final maxX = grid.length - 1;
-    final maxY = grid.first.length - 1;
-    for (var x = 0; x < grid.length; x++) {
-      final row = grid[x];
-      for (var y = 0; y < row.length; y++) {
-        final node = row[y];
-        node.reset();
-        node.neighbors.clear();
-        if (node.isBarrier) continue;
-        _chainNeighborsManhattan(node, maxX: maxX, maxY: maxY);
-      }
-    }
+    final maxX = grid.width - 1;
+    final maxY = grid.height - 1;
+    grid.forEach((node, x, y) {
+      node.reset();
+      node.neighbors.clear();
+      if (node.isBarrier) return;
+      _chainNeighborsManhattan(node, maxX: maxX, maxY: maxY);
+    });
   }
 
   void _chainNeighborsManhattan(ANode node,

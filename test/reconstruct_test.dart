@@ -72,31 +72,31 @@ void main() {
 //
   group('test reconstruct', () {
     test('finds targets and steps within the limit', () {
-      final result = astar.reconstruct(Point(1, 3));
+      final result = astar.reconstructByPoint(Point(1, 3));
       expect(result.length, 3);
     });
     test('finds targets and steps within the limit', () {
-      final result = astar.reconstruct(Point(0, 0));
+      final result = astar.reconstructByPoint(Point(0, 0));
       expect(result.length, 5);
     });
     test('finds targets and steps within the limit', () {
-      final result = astar.reconstruct(Point(1, 3));
+      final result = astar.reconstructByPoint(Point(1, 3));
       expect(result.length, 3);
     });
     test('finds targets and steps within the limit', () {
-      final result = astar.reconstruct(Point(0, 3));
+      final result = astar.reconstructByPoint(Point(0, 3));
       expect(result.length, 4);
     });
     test('finds targets and steps within the limit', () {
-      final result = astar.reconstruct(Point(4, 3));
+      final result = astar.reconstructByPoint(Point(4, 3));
       expect(result.length, 4);
     });
     test('obstacle have one item itself', () {
-      final result = astar.reconstruct(Point(3, 1));
+      final result = astar.reconstructByPoint(Point(3, 1));
       expect(result.length, 1);
     });
     test('obstacle have one item itself', () {
-      final result = astar.reconstruct(Point(0, 2));
+      final result = astar.reconstructByPoint(Point(0, 2));
       expect(result.length, 1);
     });
   });

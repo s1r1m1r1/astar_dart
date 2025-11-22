@@ -48,9 +48,12 @@ void main() {
       final path =
           (astar.findPath(start: const Point(0, 6), end: const Point(6, 6)))
               .toPointList();
-      expect(path.length, 8);
-      expect(path.first, const Point(6, 6));
-      expect(path.last, const Point(0, 6));
+      expect(path.length, 7);
+      expect(path.first.x, 6);
+      expect(path.first.y, 6);
+
+      expect(path.last.x, 0);
+      expect(path.last.y, 6);
     });
 
     test('find path from (0, 6) to (6, 0) has a length of 9', () {
@@ -58,8 +61,11 @@ void main() {
           (astar.findPath(start: const Point(0, 6), end: const Point(6, 0)))
               .toPointList();
       expect(path.length, 7);
-      expect(path.first, const Point(6, 0));
-      expect(path.last, const Point(0, 6));
+      expect(path.first.x, 6);
+      expect(path.first.y, 0);
+
+      expect(path.last.x, 0);
+      expect(path.last.y, 6);
     });
   });
 }

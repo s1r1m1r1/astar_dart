@@ -187,7 +187,7 @@ class _GridExampleState extends State<GridExample>
     for (var p in path) {
       array2d[p.x][p.y].isPath = true;
     }
-    _path = path.reversed.toList();
+    _path = path.reversed.map((i) => Point(i.x, i.y)).toList();
     _pathIndex = 0;
     _nextAnim();
     updater.value = !updater.value;

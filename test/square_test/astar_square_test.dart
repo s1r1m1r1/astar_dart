@@ -51,8 +51,10 @@ void main() {
       astar.addNeighbors();
       final path = astar.findPath(start: Point(5, 4), end: Point(5, 6));
       expect(path.length, 5);
-      expect(path.last, Point(5, 4));
-      expect(path.first, Point(5, 6));
+      expect(path.last.x, 5);
+      expect(path.last.y, 4);
+      expect(path.first.x, 5);
+      expect(path.first.y, 6);
     });
   });
 
@@ -63,8 +65,10 @@ void main() {
       astar.addNeighbors();
       final path = astar.findPath(start: Point(0, 0), end: Point(0, 3));
       expect(path.length, 4);
-      expect(path.last, Point(0, 0));
-      expect(path.first, Point(0, 3));
+      expect(path.last.x, 0);
+      expect(path.last.y, 0);
+      expect(path.first.x, 0);
+      expect(path.first.y, 3);
     });
   });
 }

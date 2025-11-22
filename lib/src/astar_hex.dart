@@ -22,7 +22,7 @@ class AStarHex extends AstarGrid {
     ANode endNode = grid[end.x][end.y];
 
     /// If start and end are neighbors, return a direct path.
-    if (_isNeighbors(start, end)) return [startNode, endNode];
+    if (_isNeighbors(start, end)) return [endNode, startNode];
     if (endNode.isBarrier) return [startNode];
 
     startNode.g = 0;
@@ -97,8 +97,9 @@ class AStarHex extends AstarGrid {
   /// Adds neighbors to each node in the grid.
   @override
   void addNeighbors() {
-    for (var row in grid.array) {
-      for (ANode node in row) {
+    for (int y = 0; y < grid.height; y++) {
+      for (int x = 0; x < grid.width; x++) {
+        final node = grid[x][y];
         node.reset();
         node.neighbors.clear();
         _chainNeighbors(node);
@@ -122,7 +123,7 @@ class AStarHex extends AstarGrid {
     }
 
     /// adds in right
-    if (x < (grid.length - 1)) {
+    if (x < (grid.width - 1)) {
       final t = grid[x + 1][y];
       if (!t.isBarrier) {
         node.neighbors.add(t);
@@ -135,7 +136,7 @@ class AStarHex extends AstarGrid {
       if (!t.isBarrier) {
         node.neighbors.add(t);
       }
-      if (x < (grid.length - 1)) {
+      if (x < (grid.width - 1)) {
         final t2 = grid[x + 1][y - 1];
         if (!t2.isBarrier) {
           node.neighbors.add(t2);
@@ -144,7 +145,7 @@ class AStarHex extends AstarGrid {
     }
 
     /// adds in bottom
-    if (y < (grid.first.length - 1)) {
+    if (y < (grid.height - 1)) {
       final t = grid[x][y + 1];
       if (!t.isBarrier) {
         node.neighbors.add(t);

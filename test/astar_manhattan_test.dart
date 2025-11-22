@@ -50,13 +50,15 @@ void main() {
     test('the last point is the start point', () {
       final path =
           (astar.findPath(start: const Point(0, 0), end: const Point(3, 3)));
-      expect(path.last, const Point(0, 0));
+      expect(path.last.x, 0);
+      expect(path.last.y, 0);
     });
 
     test('the first point is the end point', () {
       final path =
           (astar.findPath(start: const Point(0, 0), end: const Point(3, 3)));
-      expect(path.first, const Point(3, 3));
+      expect(path.first.x, 3);
+      expect(path.first.y, 3);
     });
 
     test('a path from (0,0) to (3,3) has a length of 7', () {
@@ -70,8 +72,10 @@ void main() {
       final path =
           (astar.findPath(start: const Point(0, 0), end: const Point(1, 1)));
       expect(path.length, 3);
-      expect(path.last, Point(0, 0));
-      expect(path.first, Point(1, 1));
+      expect(path.last.x, 0);
+      expect(path.last.y, 0);
+      expect(path.first.x, 1);
+      expect(path.first.y, 1);
     });
 
     //   test('A path with a barrier is shorter or empty', () {

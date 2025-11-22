@@ -8,9 +8,9 @@ import 'package:benchmark_harness/benchmark_harness.dart';
 ///
 ///```bash
 /// cd benchmarks;
-/// dart run main.dart;
+/// dart run lib/main.dart;
 ///```
-/// dart run main.dart
+/// dart run lib/main.dart
 void main() {
   // too slow
   AstarTest2Benchmark(withDiagonal: false, size: 32).report();

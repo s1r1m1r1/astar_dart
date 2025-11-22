@@ -19,7 +19,7 @@ class AStarEuclidean extends AstarGrid {
     ANode endNode = grid[end.x][end.y];
 
     if (endNode.isBarrier) return [startNode];
-    if (_isNeighbors(start, end)) return [startNode, endNode];
+    if (_isNeighbors(start, end)) return [endNode, startNode];
 
     startNode.visited = true;
     startNode.g = 0;
@@ -55,18 +55,20 @@ class AStarEuclidean extends AstarGrid {
   /// Adds neighbors to cells
   @override
   void addNeighbors() {
-    final maxX = grid.length - 1;
-    final maxY = grid.first.length - 1;
-    for (var row in grid.array) {
-      for (ANode node in row) {
-        // node.reset();
-        node.parent = null;
-        node.h = 0;
-        node.g = 0;
-        node.neighbors.clear();
-        _chainNeighbors(node, maxX: maxX, maxY: maxY);
-      }
-    }
+    final maxX = grid.width - 1;
+    final maxY = grid.height - 1;
+    grid.forEach((node, x, y) {
+      node.parent = null;
+      node.h = 0;
+      node.g = 0;
+      node.neighbors.clear();
+      _chainNeighbors(node, maxX: maxX, maxY: maxY);
+    });
+    // for (var row in grid.fo) {
+    //   for (ANode node in row) {
+    //     // node.reset();
+    //   }
+    // }
   }
 
   void _chainNeighbors(ANode node, {required int maxX, required int maxY}) {

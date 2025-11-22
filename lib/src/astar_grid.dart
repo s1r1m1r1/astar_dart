@@ -119,10 +119,14 @@ abstract class AstarGrid {
     return null;
   }
 
-  List<ANode> reconstruct(Point<int> end) {
-    ANode astar = grid[end.x][end.y];
-    final parent = astar.parent;
-    final path = [astar];
+  List<ANode> reconstructByPoint(Point<int> point) {
+    final node = grid[point.x][point.y];
+    return reconstruct(node);
+  }
+
+  List<ANode> reconstruct(ANode end) {
+    final parent = end.parent;
+    final path = [end];
     if (parent == null) return path;
     ANode nextNode = parent;
     path.add(nextNode);
@@ -159,19 +163,17 @@ abstract class AstarGrid {
   ///
   ///  resetBarrier = ```false```, can reused directly to [findPath]
   void resetNodes({resetBarrier = false}) {
-    for (var row in grid.array) {
-      for (var node in row) {
-        node.parent = null;
-        node.h = 0;
-        node.g = 0;
-        node.visited = false;
-        node.isTarget = false;
-        node.isObstacle = false;
-        if (resetBarrier) {
-          node.isBarrier = false;
-          node.neighbors.clear();
-        }
+    grid.forEach((node, x, y) {
+      node.parent = null;
+      node.h = 0;
+      node.g = 0;
+      node.visited = false;
+      node.isTarget = false;
+      node.isObstacle = false;
+      if (resetBarrier) {
+        node.isBarrier = false;
+        node.neighbors.clear();
       }
-    }
+    });
   }
 }
