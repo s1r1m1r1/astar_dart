@@ -1,6 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:astar_dart/astar_dart.dart';
@@ -38,14 +37,14 @@ class _GridExampleState extends State<GridExample>
   late ValueNotifier<bool> updater;
   IconData lastTapped = Icons.notifications;
   late final Array2d<Floor> array2d;
-  var _player = Point<int>(0, 0);
+  var _player = (x: 0, y: 0);
   final int _rows = 10;
   final int _cols = 10;
-  var _path = <Point<int>>[];
+  var _path = <Point>[];
   int _pathIndex = 0;
-  Point<int> _playerTo = Point<int>(0, 0);
-  Point<int> _playerFrom = Point<int>(0, 0);
-  final _visited = ValueNotifier(<Point<int>>[]);
+  Point _playerTo = (x: 0, y: 0);
+  Point _playerFrom = (x: 0, y: 0);
+  final _visited = ValueNotifier(<Point>[]);
   late final AnimationController _animController;
 
   void _onAnimationCompleted(AnimationStatus status) {
@@ -95,7 +94,7 @@ class _GridExampleState extends State<GridExample>
     _animController.addStatusListener(_onAnimationCompleted);
     _visited.addListener(() {
       _visited.value.map((i) {
-        array2d[i.x][i.y].isVisited = true;
+        array2d.elementAt(i.x, i.y).isVisited = true;
       });
       updater.value = !updater.value;
     });
@@ -143,12 +142,12 @@ class _GridExampleState extends State<GridExample>
     });
   }
 
-  Future<void> _updateFloor(Floor floor, {required Point<int> startPos}) async {
+  Future<void> _updateFloor(Floor floor, {required Point startPos}) async {
     final astar = AStarManhattan(
       rows: _rows,
       columns: _cols,
       gridBuilder: (x, y) {
-        final floor = array2d[x][y];
+        final floor = array2d.elementAt(x, y);
         return ANode(
             x: x,
             y: y,
@@ -172,22 +171,23 @@ class _GridExampleState extends State<GridExample>
 
     final path = await Future.value(astar.findPath(
       start: startPos,
-      end: floor,
+      end: (x: floor.x, y: floor.y),
       visited: (visited) {
         print("VISITED ${visited.length}");
         visited.map((i) {
-          array2d[i.x][i.y].isVisited = true;
+          array2d.elementAt(i.x, i.y).isVisited = true;
         });
       },
     ));
-    array2d.forEach((floor, x, y) {
+    for (var floor in array2d.array) {
       floor.isPath = false;
       floor.isVisited = false;
-    });
-    for (var p in path) {
-      array2d[p.x][p.y].isPath = true;
     }
-    _path = path.reversed.toList();
+
+    for (var p in path) {
+      array2d.elementAt(p.x, p.y).isPath = true;
+    }
+    _path = path.reversed.map((i) => (x: i.x, y: i.y)).toList();
     _pathIndex = 0;
     _nextAnim();
     updater.value = !updater.value;
@@ -233,7 +233,7 @@ class _GridExampleState extends State<GridExample>
                               for (var x = 0; x < _rows; x++)
                                 for (var y = 0; y < _cols; y++)
                                   FloorItemWidget(
-                                    floor: array2d[x][y],
+                                    floor: array2d.elementAt(x, y),
                                     onTap: (floor) async {
                                       await _updateFloor(floor,
                                           startPos: _player);
@@ -441,16 +441,17 @@ enum Target {
   none,
 }
 
-class Floor extends Point<int> with ChangeNotifier {
+class Floor with ChangeNotifier {
   Floor({
-    required int x,
-    required int y,
+    required this.x,
+    required this.y,
     required this.target,
     required this.ground,
     this.isPath = false,
     this.isVisited = false,
-  }) : super(x, y);
+  });
 
+  final int x, y;
   bool isPath;
   bool isVisited;
 

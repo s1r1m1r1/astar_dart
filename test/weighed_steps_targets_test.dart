@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:test/test.dart';
 
@@ -56,8 +54,8 @@ void main() {
     test('finds targets and steps within the limit', () {
       astar.resetNodes();
       final result = astar.findStepsTargets(
-        start: const Point(0, 0),
-        targets: [const Point(1, 4), const Point(3, 0), Point(4, 4)],
+        start: const (x: 0, y: 0),
+        targets: [const (x: 1, y: 4), const (x: 3, y: 0), const (x: 4, y: 4)],
         steps: 5,
       );
 
@@ -93,18 +91,18 @@ void main() {
     test('finds targets and steps within the limit', () {
       astar.resetNodes();
       final result = astar.findStepsTargets(
-        start: const Point(2, 2),
+        start: const (x: 2, y: 2),
         obstacles: [
-          Point(3, 3),
-          Point(4, 4),
-          Point(3, 1),
-          Point(4, 1),
+          const (x: 3, y: 3),
+          const (x: 4, y: 4),
+          const (x: 3, y: 1),
+          const (x: 4, y: 1),
         ],
         targets: const [
-          Point(1, 4),
-          Point(3, 4),
-          Point(0, 3),
-          Point(3, 0),
+          const (x: 1, y: 4),
+          const (x: 3, y: 4),
+          const (x: 0, y: 3),
+          const (x: 3, y: 0),
         ],
         steps: 5,
       );

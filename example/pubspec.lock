@@ -29,17 +29,17 @@ packages:
     dependency: transitive
     description:
       name: array2d
-      sha256: "77da83073b6c645e59c660f4d0b2c42e51c74960f63814e381ce6534cfec06df"
+      sha256: ba49b3f021ae96581c76c2d4e38b92696202cbd1d032c7a8bd172f4f0fe67652
       url: "https://pub.dev"
     source: hosted
-    version: "1.4.0"
+    version: "2.3.1"
   astar_dart:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "4.0.0"
+    version: "5.0.0"
   async:
     dependency: transitive
     description:

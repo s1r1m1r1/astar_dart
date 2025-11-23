@@ -1,10 +1,11 @@
-import 'dart:math';
-
 /// Represents a node in the A* search grid.
-class ANode extends Point<int> implements Comparable<ANode> {
+class ANode implements Comparable<ANode> {
+  /// The x and y coordinates of the node.
+  final int x, y;
+
   /// The parent node in the path.
   ANode? parent;
-  final List<ANode> neighbors;
+  List<ANode>? neighbors;
 
   /// The barrier status of the node (e.g., passable, blocked)
   bool isBarrier;
@@ -29,13 +30,13 @@ class ANode extends Point<int> implements Comparable<ANode> {
 
   /// Creates a new ANode.
   ANode({
-    required int x,
-    required int y,
-    required this.neighbors,
+    required this.x,
+    required this.y,
+    this.neighbors,
     this.isBarrier = false,
     this.parent,
     this.weight = 1,
-  }) : super(x, y);
+  });
 
   /// Compares this node to another node based on their x and y coordinates.
   @override
@@ -63,10 +64,15 @@ class ANode extends Point<int> implements Comparable<ANode> {
     return result;
   }
 
-  /// reset [ANode] , but save [neighbors] and [barrier]
-  void reset() {
-    parent = null;
-    h = 0;
-    g = 0;
+  void addNeighbor(ANode node) {
+    neighbors ??= [];
+    neighbors!.add(node);
   }
+
+  /// reset [ANode] , but save [neighbors] and [barrier]
+  // void reset() {
+  //   parent = null;
+  //   h = 0;
+  //   g = 0;
+  // }
 }

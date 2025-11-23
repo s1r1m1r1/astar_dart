@@ -1,7 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:example/main.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +33,7 @@ class GridExample extends StatefulWidget {
 class _GridExampleState extends State<GridExample> {
   late ValueNotifier<bool> updater;
   late final Array2d<Floor> array2d;
-  final start = Point<int>(0, 0);
+  final start = (x: 0, y: 0);
 
   @override
   void initState() {
@@ -54,18 +52,18 @@ class _GridExampleState extends State<GridExample> {
       );
     });
 
-    array2d[start.x][start.y].target = Target.player;
+    array2d.elementAt(start.x, start.y).target = Target.player;
 
     _setObstacles();
   }
 
   void _setObstacles() {
     // Example Hex Obstacles (Customize as needed)
-    array2d[3][3].ground = GroundType.barrier;
-    array2d[4][4].ground = GroundType.barrier;
-    array2d[5][3].ground = GroundType.barrier;
-    array2d[2][4].ground = GroundType.water;
-    array2d[7][2].ground = GroundType.forest;
+    array2d.elementAt(3, 3).ground = GroundType.barrier;
+    array2d.elementAt(4, 4).ground = GroundType.barrier;
+    array2d.elementAt(5, 3).ground = GroundType.barrier;
+    array2d.elementAt(2, 4).ground = GroundType.water;
+    array2d.elementAt(7, 2).ground = GroundType.forest;
   }
 
   Future<void> _calculatePath(Floor floor) async {
@@ -75,7 +73,7 @@ class _GridExampleState extends State<GridExample> {
       rows: array2d.width,
       columns: array2d.height,
       gridBuilder: (int x, int y) {
-        final floor = array2d[x][y];
+        final floor = array2d.elementAt(x, y);
         return ANode(
             x: x,
             y: y,
@@ -91,13 +89,16 @@ class _GridExampleState extends State<GridExample> {
     astar.addNeighbors();
 
     debugPrint("calculate start 2");
-    final path = await Future.value(astar.findPath(start: start, end: floor));
+    final path = await Future.value(
+        astar.findPath(start: start, end: (x: floor.x, y: floor.y)));
 
     debugPrint("calculate start 3");
-    array2d.forEach((floor, x, y) => floor.isPath = false);
+    for (var a in array2d.array) {
+      a.isPath = false;
+    }
     if (path.isNotEmpty) {
       for (var p in path) {
-        array2d[p.x][p.y]
+        array2d.elementAt(p.x, p.y)
           ..isPath = true
           ..update();
       }
@@ -142,9 +143,9 @@ class _GridExampleState extends State<GridExample> {
                               height: 100,
                               width: 100,
                               child: FloorItemWidget(
-                                floor: array2d[x][y],
+                                floor: array2d.elementAt(x, y),
                                 onTap: (floor) => _calculatePath(floor),
-                                color: switch (array2d[x][y]) {
+                                color: switch (array2d.elementAt(x, y)) {
                                   Floor(:final x, :final y)
                                       when x == start.x && y == start.y =>
                                     Colors.purple,

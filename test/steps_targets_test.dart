@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:test/test.dart';
 
@@ -30,8 +28,8 @@ void main() {
     test('finds targets and steps within the limit', () {
       astar.resetNodes();
       final result = astar.findStepsTargets(
-        start: const Point(0, 0),
-        targets: [const Point(1, 2), const Point(4, 4)],
+        start: const (x: 0, y: 0),
+        targets: [const (x: 1, y: 2), const (x: 4, y: 4)],
         steps: 5,
       );
 
@@ -40,8 +38,7 @@ void main() {
 
       expect(steps.length, 13); // Total reachable nodes in 5 steps
       expect(targets.length, 1);
-      expect(targets.first, Point(1, 2));
-      expect(targets.first.distance, 3);
+      expect(targets.first, (x: 1, y: 2, distance: 3));
     });
 
 // (0,0) (1,0) (2,0) (3,0) (4,0)
@@ -58,8 +55,8 @@ void main() {
     test('finds multiple targets with different distances', () {
       astar.resetNodes();
       final result = astar.findStepsTargets(
-        start: const Point(0, 0),
-        targets: [const Point(1, 0), const Point(3, 1), const Point(4, 3)],
+        start: const (x: 0, y: 0),
+        targets: [const (x: 1, y: 0), const (x: 3, y: 1), const (x: 4, y: 3)],
         steps: 8,
       );
 
@@ -74,8 +71,8 @@ void main() {
     test('no steps found when steps limit is zero', () {
       astar.resetNodes();
       final result = astar.findStepsTargets(
-        start: const Point(0, 0),
-        targets: [const Point(1, 0)],
+        start: const (x: 0, y: 0),
+        targets: [const (x: 1, y: 0)],
         steps: 0,
       );
 
@@ -107,9 +104,9 @@ void main() {
     test('finds targets and steps with temporary obstacles', () {
       astar.resetNodes();
       final result = astar.findStepsTargets(
-        start: const Point(0, 0),
-        targets: [const Point(1, 2), const Point(4, 4)],
-        obstacles: [const Point(2, 2)],
+        start: const (x: 0, y: 0),
+        targets: [const (x: 1, y: 2), const (x: 4, y: 4)],
+        obstacles: [const (x: 2, y: 2)],
         steps: 5,
       );
 
@@ -118,8 +115,7 @@ void main() {
 
       expect(steps.length, 11);
       expect(targets.length, 1);
-      expect(targets.first, const Point(1, 2));
-      expect(targets.first.distance, 3);
+      expect(targets.first, const (x: 1, y: 2, distance: 3));
     });
   });
 }

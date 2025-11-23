@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:benchmark_harness/benchmark_harness.dart';
 
@@ -65,6 +63,6 @@ class AStarBenchmark extends BenchmarkBase {
     astar.addNeighbors();
 
     // final path =
-    astar.findSteps(start: Point(start.x, start.y), steps: 15);
+    astar.findSteps(start: (x: start.x, y: start.y), steps: 15);
   }
 }

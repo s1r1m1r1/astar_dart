@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 
 class AStarHex extends AstarGrid {
@@ -11,18 +9,18 @@ class AStarHex extends AstarGrid {
 
   @override
   List<ANode> findPath({
-    void Function(List<Point<int>>)? visited,
-    required Point<int> start,
-    required Point<int> end,
+    void Function(List<Point>)? visited,
+    required ({int x, int y}) start,
+    required ({int x, int y}) end,
   }) {
     /// If the end node is blocked, return an empty path.
 
     /// Get the start and end nodes from the grid.
-    ANode startNode = grid[start.x][start.y];
-    ANode endNode = grid[end.x][end.y];
+    ANode startNode = grid.elementAt(start.x, start.y);
+    ANode endNode = grid.elementAt(end.x, end.y);
 
     /// If start and end are neighbors, return a direct path.
-    if (_isNeighbors(start, end)) return [startNode, endNode];
+    if (_isNeighbors(start, end)) return [endNode, startNode];
     if (endNode.isBarrier) return [startNode];
 
     startNode.g = 0;
@@ -30,7 +28,11 @@ class AStarHex extends AstarGrid {
     ANode? winner = getWinner(startNode, endNode);
     if (winner == null) return [startNode];
     final path = reconstruct(winner);
-    visited?.call(grid.whereabout((i) => i.visited).toList());
+    visited?.call(grid
+        .whereabout((i) => i.visited)
+        .map((i) => (x: i.x, y: i.y))
+        .toList());
+
     return path;
   }
 
@@ -70,8 +72,8 @@ class AStarHex extends AstarGrid {
 
   /// Checks if two points are neighbors on a hexagonal grid.
   bool _isNeighbors(
-    Point<int> a,
-    Point<int> b,
+    ({int x, int y}) a,
+    ({int x, int y}) b,
   ) {
     ///      0,-1;  +1 -1
     /// -1,0 ; center ;  +1,0
@@ -97,63 +99,69 @@ class AStarHex extends AstarGrid {
   /// Adds neighbors to each node in the grid.
   @override
   void addNeighbors() {
-    for (var row in grid.array) {
-      for (ANode node in row) {
-        node.reset();
-        node.neighbors.clear();
-        _chainNeighbors(node);
-      }
+    final maxY = grid.height - 1;
+    final maxX = grid.width - 1;
+    for (int i = 0; i < grid.length; i++) {
+      final node = grid.array[i];
+      if (node.isBarrier) continue;
+      node.parent = null;
+      node.h = 0;
+      node.g = 0;
+      node.neighbors = null;
+      _chainNeighbors(node, maxX, maxY);
     }
   }
 
   /// Connects a node to its neighbors on a hexagonal grid.
   void _chainNeighbors(
     ANode node,
+    int maxX,
+    int maxY,
   ) {
     final x = node.x;
     final y = node.y;
 
     /// adds in left
     if (x > 0) {
-      final t = grid[x - 1][y];
+      final t = grid.elementAt(x - 1, y);
       if (!t.isBarrier) {
-        node.neighbors.add(t);
+        node.addNeighbor(t);
       }
     }
 
     /// adds in right
-    if (x < (grid.length - 1)) {
-      final t = grid[x + 1][y];
+    if (x < maxY) {
+      final t = grid.elementAt(x + 1, y);
       if (!t.isBarrier) {
-        node.neighbors.add(t);
+        node.addNeighbor(t);
       }
     }
 
     /// adds in top
     if (y > 0) {
-      final t = grid[x][y - 1];
+      final t = grid.elementAt(x, y - 1);
       if (!t.isBarrier) {
-        node.neighbors.add(t);
+        node.addNeighbor(t);
       }
-      if (x < (grid.length - 1)) {
-        final t2 = grid[x + 1][y - 1];
+      if (x < maxX) {
+        final t2 = grid.elementAt(x + 1, y - 1);
         if (!t2.isBarrier) {
-          node.neighbors.add(t2);
+          node.addNeighbor(t2);
         }
       }
     }
 
     /// adds in bottom
-    if (y < (grid.first.length - 1)) {
-      final t = grid[x][y + 1];
+    if (y < maxY) {
+      final t = grid.elementAt(x, y + 1);
       if (!t.isBarrier) {
-        node.neighbors.add(t);
+        node.addNeighbor(t);
       }
 
       if (x > 0) {
-        final t2 = grid[x - 1][y + 1];
+        final t2 = grid.elementAt(x - 1, y + 1);
         if (!t2.isBarrier) {
-          node.neighbors.add(t2);
+          node.addNeighbor(t2);
         }
       }
     }

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:test/test.dart';
 
@@ -25,11 +23,11 @@ void main() {
       () {
         final path = astar.findTargets(
           steps: 14,
-          start: const Point(0, 0),
+          start: (x: 0, y: 0),
           targets: const [
-            Point(6, 6),
-            Point(5, 5),
-            Point(2, 0),
+            (x: 6, y: 6),
+            (x: 5, y: 5),
+            (x: 2, y: 0),
           ],
         );
         expect(path[0].distance, 5.0); // Check number of cols

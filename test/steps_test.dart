@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:test/test.dart';
 
@@ -18,7 +16,7 @@ void main() {
   group('test steps', () {
     test('test top-left 2 steps with one barrier', () {
       astar.resetNodes();
-      final path = astar.findSteps(start: const Point(0, 0), steps: 2);
+      final path = astar.findSteps(start: const (x: 0, y: 0), steps: 2);
       // with barrier 2,0
       expect(path.length, 4); // Check number of cols
     });
@@ -47,25 +45,25 @@ void main() {
 
     test('test top-left 3 steps with one barrier', () {
       astar.resetNodes();
-      final path = astar.findSteps(start: const Point(0, 0), steps: 3);
+      final path = astar.findSteps(start: const (x: 0, y: 0), steps: 3);
       // with barrier 2,0
       expect(path.length, 7); // Check number of cols
     });
 
     test('test bottom-right 3 steps', () {
       astar.resetNodes();
-      final path = astar.findSteps(start: const Point(6, 6), steps: 3);
+      final path = astar.findSteps(start: const (x: 6, y: 6), steps: 3);
       expect(path.length, 9); // Check number of cols
     });
 
     test('test center 2 steps', () {
       astar.resetNodes();
-      final path = (astar.findSteps(start: const Point(3, 3), steps: 2));
+      final path = (astar.findSteps(start: const (x: 3, y: 3), steps: 2));
       expect(path.length, 12); // Check number of cols
     });
     test('test center 3 steps', () {
       astar.resetNodes();
-      final path = (astar.findSteps(start: const Point(3, 3), steps: 3));
+      final path = (astar.findSteps(start: const (x: 3, y: 3), steps: 3));
       expect(path.length, 24); // Check number of cols
     });
 
@@ -94,14 +92,14 @@ void main() {
     test('bloc path 2', () {
       astar.resetNodes();
       final path = astar.findSteps(
-          start: const Point(3, 3),
+          start: const (x: 3, y: 3),
           steps: 4,
           obstacles: [
-            Point(2, 2),
-            Point(2, 4),
-            Point(5, 2),
-            Point(3, 5),
-            Point(4, 5)
+            const (x: 2, y: 2),
+            const (x: 2, y: 4),
+            const (x: 5, y: 2),
+            const (x: 3, y: 5),
+            const (x: 4, y: 5)
           ]);
       expect(path.length, 26); // Check count
     });
@@ -129,13 +127,15 @@ void main() {
     ///
     test('bloc path 3', () {
       astar.resetNodes();
-      final path =
-          astar.findSteps(start: const Point(1, 1), steps: 4, obstacles: [
-        Point(2, 2),
-        Point(1, 4),
-        Point(2, 4),
-        Point(3, 5),
-      ]);
+      final path = astar.findSteps(
+          start: const (x: 1, y: 1),
+          steps: 4,
+          obstacles: [
+            const (x: 2, y: 2),
+            const (x: 1, y: 4),
+            const (x: 2, y: 4),
+            const (x: 3, y: 5),
+          ]);
       expect(path.length, 18); // Check count
     });
     //----------------

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:test/test.dart';
 
@@ -41,7 +39,7 @@ void main() {
 
     test('find path from (3, 2) to (4, 3) has length 2', () {
       final path =
-          (astar.findPath(start: const Point(3, 2), end: const Point(4, 3)));
+          (astar.findPath(start: const (x: 3, y: 2), end: const (x: 4, y: 3)));
       expect(path.length, 3);
       // expect(path.first, Point(4, 3));
       // expect(path.last, Point(3, 2));
@@ -49,56 +47,58 @@ void main() {
 
     test('find path from (6, 6) to (0, 0) has length 12', () {
       final path =
-          (astar.findPath(start: const Point(6, 6), end: const Point(0, 0)))
+          (astar.findPath(start: const (x: 6, y: 6), end: const (x: 0, y: 0)))
               .toPointList();
       expect(path.length, 13);
-      expect(path.first, Point(0, 0));
-      expect(path.last, Point(6, 6));
+      expect(path.first, (x: 0, y: 0));
+      expect(path.last, (x: 6, y: 6));
     });
 
     test('find path from (0, 6) to (6, 0) has length 6', () {
       final path =
-          (astar.findPath(start: const Point(0, 6), end: const Point(6, 0)))
+          (astar.findPath(start: const (x: 0, y: 6), end: const (x: 6, y: 0)))
               .toPointList();
       expect(path.length, 7);
-      expect(path.first, Point(6, 0));
-      expect(path.last, Point(0, 6));
+      expect(path.first, (x: 6, y: 0));
+      expect(path.last, (x: 0, y: 6));
     });
 
     test('find path from (3, 3) to (0, 0) has length 6', () {
       final path =
-          (astar.findPath(start: const Point(3, 3), end: const Point(0, 0)))
+          (astar.findPath(start: const (x: 3, y: 3), end: const (x: 0, y: 0)))
               .toPointList();
-      expect(path.length, 8);
-      expect(path.first, Point(0, 0));
-      expect(path.last, Point(3, 3));
+      expect(path.length, 7);
+      expect(path.first.x, 0);
+      expect(path.first.y, 0);
+      expect(path.last.x, 3);
+      expect(path.last.y, 3);
     });
 
     test('find path from (3, 3) to (0, 6) has length 3', () {
       final path =
-          (astar.findPath(start: const Point(3, 3), end: const Point(0, 6)))
+          (astar.findPath(start: const (x: 3, y: 3), end: const (x: 0, y: 6)))
               .toPointList();
       expect(path.length, 4);
-      expect(path.first, Point(0, 6));
-      expect(path.last, Point(3, 3));
+      expect(path.first, (x: 0, y: 6));
+      expect(path.last, (x: 3, y: 3));
     });
 
     test('find path from (3, 3) to (6, 0) has length 3', () {
       final path =
-          (astar.findPath(start: const Point(3, 3), end: const Point(6, 0)))
+          (astar.findPath(start: const (x: 3, y: 3), end: const (x: 6, y: 0)))
               .toPointList();
       expect(path.length, 4);
-      expect(path.first, Point(6, 0));
-      expect(path.last, Point(3, 3));
+      expect(path.first, (x: 6, y: 0));
+      expect(path.last, (x: 3, y: 3));
     });
 
     test('find path from (3, 3) to (6, 6) has length 6', () {
       final path =
-          (astar.findPath(start: const Point(3, 3), end: const Point(6, 6)))
+          (astar.findPath(start: const (x: 3, y: 3), end: const (x: 6, y: 6)))
               .toPointList();
       expect(path.length, 7);
-      expect(path.first, Point(6, 6));
-      expect(path.last, Point(3, 3));
+      expect(path.first, (x: 6, y: 6));
+      expect(path.last, (x: 3, y: 3));
     });
   });
 }
