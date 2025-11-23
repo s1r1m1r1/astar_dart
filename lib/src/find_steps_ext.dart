@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 
 extension AstarGridExt on AstarGrid {
@@ -16,19 +14,20 @@ extension AstarGridExt on AstarGrid {
   /// ```
   List<DistancePoint> findSteps({
     required int steps,
-    required Point<int> start,
-    List<Point<int>> obstacles = const [],
+    required Point start,
+    List<Point> obstacles = const [],
   }) {
-    ANode a = grid[start.x][start.y];
+    ANode a = grid.elementAt(start.x, start.y);
     a.visited = true;
     final List<ANode> total = [];
     final List<ANode> next = [];
     final List<ANode> current = [];
 
     for (var o in obstacles) {
-      grid[o.x][o.y].isObstacle = true;
+      grid.elementAt(o.x, o.y).isObstacle = true;
     }
-    for (var n in a.neighbors) {
+    if (a.neighbors == null) return [(x: a.x, y: a.y, distance: 0)];
+    for (var n in a.neighbors!) {
       n.parent = a;
       n.g = n.weight;
       if (!n.isObstacle) {
@@ -44,7 +43,8 @@ extension AstarGridExt on AstarGrid {
         if (c.g <= steps) {
           c.visited = true;
           total.add(c);
-          for (var n in c.neighbors) {
+          if (c.neighbors == null) continue;
+          for (var n in c.neighbors!) {
             if (n.visited) continue;
             if (n.isObstacle) continue;
             n.visited = true;
@@ -62,32 +62,32 @@ extension AstarGridExt on AstarGrid {
       next.clear();
       current.sort();
     }
-    return total.map((i) => DistancePoint(i.x, i.y, i.g)).toList();
+    return total.map((i) => (x: i.x, y: i.y, distance: i.g)).toList();
   }
 
   List<DistancePoint> findTargets({
-    required Point<int> start,
-    required List<Point<int>> targets,
-    List<Point<int>> obstacles = const [],
+    required Point start,
+    required List<Point> targets,
+    List<Point> obstacles = const [],
     required int steps,
   }) {
-    ANode a = grid[start.x][start.y];
+    ANode a = grid.elementAt(start.x, start.y);
     a.visited = true;
 
     for (var t in targets) {
-      grid[t.x][t.y].isTarget = true;
+      grid.elementAt(t.x, t.y).isTarget = true;
     }
 
     for (var o in obstacles) {
-      grid[o.x][o.y].isObstacle = true;
+      grid.elementAt(o.x, o.y).isObstacle = true;
     }
     // final tNodes = targets.map((i) => grid[i.x][i.y]).toList();
     final founded = <ANode>[];
     final next = <ANode>[];
 
     final current = List<ANode>.empty(growable: true);
-
-    for (var n in a.neighbors) {
+    if (a.neighbors == null) return [(x: a.x, y: a.y, distance: 0)];
+    for (var n in a.neighbors!) {
       n.parent = a;
       n.g = n.weight;
       if (!n.isObstacle) {
@@ -104,7 +104,8 @@ extension AstarGridExt on AstarGrid {
           c.visited = true;
           founded.add(c);
         } else {
-          for (var n in c.neighbors) {
+          if (c.neighbors == null) continue;
+          for (var n in c.neighbors!) {
             if (n.visited) continue;
             if (n.isObstacle) continue;
             n.visited = true;
@@ -125,7 +126,7 @@ extension AstarGridExt on AstarGrid {
       next.clear();
     }
 
-    return founded.map((i) => DistancePoint(i.x, i.y, i.g)).toList();
+    return founded.map((i) => (x: i.x, y: i.y, distance: i.g)).toList();
   }
 
   /// find steps area , useful for Turn Based Game
@@ -141,11 +142,11 @@ extension AstarGridExt on AstarGrid {
   /// ```
   ({List<DistancePoint> steps, List<DistancePoint> targets}) findStepsTargets({
     required int steps,
-    required Point<int> start,
-    required List<Point<int>> targets,
-    List<Point<int>> obstacles = const [],
+    required Point start,
+    required List<Point> targets,
+    List<Point> obstacles = const [],
   }) {
-    ANode a = grid[start.x][start.y];
+    ANode a = grid.elementAt(start.x, start.y);
     a.visited = true;
     final List<ANode> total = [];
     final List<ANode> next = [];
@@ -153,19 +154,22 @@ extension AstarGridExt on AstarGrid {
     final List<ANode> founded = [];
 
     for (var o in obstacles) {
-      grid[o.x][o.y].isObstacle = true;
+      grid.elementAt(o.x, o.y).isObstacle = true;
     }
     for (var t in targets) {
-      grid[t.x][t.y].isTarget = true;
+      grid.elementAt(t.x, t.y).isTarget = true;
     }
-    for (var n in a.neighbors) {
-      n.parent = a;
-      n.g = n.weight;
-      n.visited = true;
-      if (!n.isObstacle) {
-        current.add(n);
+    if (a.neighbors != null) {
+      for (var n in a.neighbors!) {
+        n.parent = a;
+        n.g = n.weight;
+        n.visited = true;
+        if (!n.isObstacle) {
+          current.add(n);
+        }
       }
     }
+
     if (current.isEmpty) {
       return (steps: [], targets: []);
     }
@@ -177,7 +181,8 @@ extension AstarGridExt on AstarGrid {
           founded.add(c);
         } else if (c.g <= steps) {
           total.add(c);
-          for (var n in c.neighbors) {
+          if (c.neighbors == null) continue;
+          for (var n in c.neighbors!) {
             if (n.visited) continue;
             if (n.isObstacle) {
               n.visited = true;
@@ -204,8 +209,8 @@ extension AstarGridExt on AstarGrid {
     }
     total.insert(0, a);
     return (
-      steps: total.map((i) => DistancePoint(i.x, i.y, i.g)).toList(),
-      targets: founded.map((i) => DistancePoint(i.x, i.y, i.g)).toList(),
+      steps: total.map((i) => (x: i.x, y: i.y, distance: i.g)).toList(),
+      targets: founded.map((i) => (x: i.x, y: i.y, distance: i.g)).toList(),
     );
   }
 

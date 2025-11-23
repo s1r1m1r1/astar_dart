@@ -29,18 +29,18 @@ void main() {
     );
     astar.addNeighbors();
     final result = astar.findStepsTargets(
-      start: const Point(2, 2),
+      start: const (x: 2, y: 2),
       obstacles: [
-        Point(3, 3),
-        Point(4, 4),
-        Point(3, 1),
-        Point(4, 1),
+        const (x: 3, y: 3),
+        const (x: 4, y: 4),
+        const (x: 3, y: 1),
+        const (x: 4, y: 1),
       ],
       targets: const [
-        Point(1, 4),
-        Point(3, 4),
-        Point(0, 3),
-        Point(3, 0),
+        const (x: 1, y: 4),
+        const (x: 3, y: 4),
+        const (x: 0, y: 3),
+        const (x: 3, y: 0),
       ],
       steps: 6,
     );
@@ -72,31 +72,31 @@ void main() {
 //
   group('test reconstruct', () {
     test('finds targets and steps within the limit', () {
-      final result = astar.reconstructByPoint(Point(1, 3));
+      final result = astar.reconstructByPoint(const (x: 1, y: 3));
       expect(result.length, 3);
     });
     test('finds targets and steps within the limit', () {
-      final result = astar.reconstructByPoint(Point(0, 0));
+      final result = astar.reconstructByPoint(const (x: 0, y: 0));
       expect(result.length, 5);
     });
     test('finds targets and steps within the limit', () {
-      final result = astar.reconstructByPoint(Point(1, 3));
+      final result = astar.reconstructByPoint(const (x: 1, y: 3));
       expect(result.length, 3);
     });
     test('finds targets and steps within the limit', () {
-      final result = astar.reconstructByPoint(Point(0, 3));
+      final result = astar.reconstructByPoint(const (x: 0, y: 3));
       expect(result.length, 4);
     });
     test('finds targets and steps within the limit', () {
-      final result = astar.reconstructByPoint(Point(4, 3));
+      final result = astar.reconstructByPoint(const (x: 4, y: 3));
       expect(result.length, 4);
     });
     test('obstacle have one item itself', () {
-      final result = astar.reconstructByPoint(Point(3, 1));
+      final result = astar.reconstructByPoint(const (x: 3, y: 1));
       expect(result.length, 1);
     });
     test('obstacle have one item itself', () {
-      final result = astar.reconstructByPoint(Point(0, 2));
+      final result = astar.reconstructByPoint(const (x: 0, y: 2));
       expect(result.length, 1);
     });
   });

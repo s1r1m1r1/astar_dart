@@ -1,3 +1,6 @@
+## 6.0.0
+  - replace Point from dart.math to records
+
 ## 5.0.0
   - improve heuristic function
   - fix reconstruct() in findPath

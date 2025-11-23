@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:test/test.dart';
 
@@ -43,34 +41,34 @@ void main() {
 
     test('findPath returns a path', () {
       final path =
-          (astar.findPath(start: const Point(0, 0), end: const Point(3, 3)));
+          (astar.findPath(start: const (x: 0, y: 0), end: const (x: 3, y: 3)));
       expect(path, isNotEmpty);
     });
 
     test('the last point is the start point', () {
       final path =
-          (astar.findPath(start: const Point(0, 0), end: const Point(3, 3)));
+          (astar.findPath(start: const (x: 0, y: 0), end: const (x: 3, y: 3)));
       expect(path.last.x, 0);
       expect(path.last.y, 0);
     });
 
     test('the first point is the end point', () {
       final path =
-          (astar.findPath(start: const Point(0, 0), end: const Point(3, 3)));
+          (astar.findPath(start: const (x: 0, y: 0), end: const (x: 3, y: 3)));
       expect(path.first.x, 3);
       expect(path.first.y, 3);
     });
 
     test('a path from (0,0) to (3,3) has a length of 7', () {
       final path =
-          (astar.findPath(start: const Point(0, 0), end: const Point(3, 3)));
+          (astar.findPath(start: const (x: 0, y: 0), end: const (x: 3, y: 3)));
       expect(path.length, 7);
     });
 
     test('a path from (0,0) to (1,1) is not found with Manhattan distance', () {
       // Manhattan distance does not allow diagonal movement by default.
       final path =
-          (astar.findPath(start: const Point(0, 0), end: const Point(1, 1)));
+          (astar.findPath(start: const (x: 0, y: 0), end: const (x: 1, y: 1)));
       expect(path.length, 3);
       expect(path.last.x, 0);
       expect(path.last.y, 0);

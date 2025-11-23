@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:a_star_algorithm/a_star_algorithm.dart' as astar2;
 import 'package:astar_dart/astar_dart.dart';
 import 'package:a_star/a_star.dart' as astar3;
@@ -80,8 +78,8 @@ class AStarBenchmark extends BenchmarkBase {
           },
         );
     }
-    const start = Point(0, 0);
-    final end = Point<int>(size - 1, size - 1);
+    const start = (x: 0, y: 0);
+    final end = (x: size - 1, y: size - 1);
     astar.addNeighbors();
 
     // final path =

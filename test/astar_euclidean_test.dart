@@ -29,7 +29,8 @@ void main() {
     });
 
     test('test first point is end point', () {
-      final path = astar.findPath(start: Point(0, 0), end: Point(0, 3));
+      final path =
+          astar.findPath(start: const (x: 0, y: 0), end: const (x: 0, y: 3));
       expect(path.length, 4);
       expect(path.last.x, 0);
       expect(path.last.y, 0);
@@ -61,7 +62,8 @@ void main() {
     });
 
     test('test last point is start ', () {
-      final path = astar.findPath(start: Point(0, 0), end: Point(3, 3));
+      final path =
+          astar.findPath(start: const (x: 0, y: 0), end: const (x: 3, y: 3));
       expect(path.length, 4);
       expect(path.last.x, 0);
       expect(path.last.y, 0);

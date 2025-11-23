@@ -5,7 +5,7 @@ class ANode implements Comparable<ANode> {
 
   /// The parent node in the path.
   ANode? parent;
-  final List<ANode> neighbors;
+  List<ANode>? neighbors;
 
   /// The barrier status of the node (e.g., passable, blocked)
   bool isBarrier;
@@ -32,7 +32,7 @@ class ANode implements Comparable<ANode> {
   ANode({
     required this.x,
     required this.y,
-    required this.neighbors,
+    this.neighbors,
     this.isBarrier = false,
     this.parent,
     this.weight = 1,
@@ -64,10 +64,15 @@ class ANode implements Comparable<ANode> {
     return result;
   }
 
-  /// reset [ANode] , but save [neighbors] and [barrier]
-  void reset() {
-    parent = null;
-    h = 0;
-    g = 0;
+  void addNeighbor(ANode node) {
+    neighbors ??= [];
+    neighbors!.add(node);
   }
+
+  /// reset [ANode] , but save [neighbors] and [barrier]
+  // void reset() {
+  //   parent = null;
+  //   h = 0;
+  //   g = 0;
+  // }
 }

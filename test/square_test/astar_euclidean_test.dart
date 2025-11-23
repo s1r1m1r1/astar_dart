@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:test/test.dart';
 
@@ -25,7 +23,8 @@ void main() {
     });
 
     test('Finds path in simple grid (Euclidean)', () {
-      final path = astar.findPath(start: Point(0, 0), end: Point(9, 9));
+      final path =
+          astar.findPath(start: const (x: 0, y: 0), end: const (x: 9, y: 9));
       expect(path.length, 10);
     });
   });

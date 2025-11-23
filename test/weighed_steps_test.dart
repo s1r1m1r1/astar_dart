@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:math';
-
 import 'package:astar_dart/astar_dart.dart';
 import 'package:test/test.dart';
 
@@ -63,7 +61,7 @@ void main() {
 
     test('test 1', () {
       astar.resetNodes();
-      final path = (astar.findSteps(start: const Point(0, 0), steps: 6));
+      final path = (astar.findSteps(start: const (x: 0, y: 0), steps: 6));
       path.sort((a, b) => a.y.compareTo(b.y));
       path.sort((a, b) => a.x.compareTo(b.x));
       path.sort((a, b) => a.distance.compareTo(b.distance));
@@ -101,7 +99,7 @@ void main() {
 
     test('test 2', () {
       astar.resetNodes();
-      final path = (astar.findSteps(start: const Point(2, 0), steps: 6));
+      final path = (astar.findSteps(start: const (x: 2, y: 0), steps: 6));
       path.sort((a, b) => a.y.compareTo(b.y));
       path.sort((a, b) => a.x.compareTo(b.x));
       path.sort((a, b) => a.distance.compareTo(b.distance));
